@@ -1,0 +1,22 @@
+//
+// Created by sunvy on 19/12/2025.
+//
+
+#ifndef SUNSETCRAFT_SUNSETPCH_H
+#define SUNSETCRAFT_SUNSETPCH_H
+
+#include <array>
+#include <chrono>
+#include <cmath>
+#include <cstdint>
+#include <functional>
+#include <limits>
+#include <map>
+#include <memory>
+#include <ranges>
+#include <string>
+#include <vector>
+
+#include <glm/glm.hpp>
+
+#endif //SUNSETCRAFT_SUNSETPCH_H

@@ -1,0 +1,21 @@
+{
+  "name" : "sunsetcraft",
+  "version-string" : "1.0.0",
+  "builtin-baseline" : "544a4c5c297e60e4ac4a5a1810df66748d908869",
+  "dependencies" : [ {
+    "name" : "glad",
+    "version>=" : "0.1.36"
+  }, {
+    "name" : "glfw3",
+    "version>=" : "3.4#1"
+  }, {
+    "name" : "glm",
+    "version>=" : "1.0.2"
+  }, {
+    "name" : "opengl",
+    "version>=" : "2022-12-04#3"
+  }, {
+    "name" : "stb",
+    "version>=" : "2024-07-29#1"
+  } ]
+}

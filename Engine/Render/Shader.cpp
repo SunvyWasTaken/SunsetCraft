@@ -1,0 +1,86 @@
+//
+// Created by sunvy on 15/12/2025.
+//
+
+#include "Shader.h"
+
+#include <glad/glad.h>
+#include <glm/gtc/type_ptr.hpp>
+
+#include <fstream>
+
+namespace
+{
+    std::string OpenFile(const std::string_view& filename)
+    {
+        std::ifstream tmpFile;
+        tmpFile.open(filename.data());
+        std::stringstream tmpFileStream;
+        // read file's buffer contents into streams
+        tmpFileStream << tmpFile.rdbuf();
+        // close file handlers
+        tmpFile.close();
+        // convert stream into string
+        return tmpFileStream.str();
+    }
+
+    void CreateShader(const char * vertexShaderSource, const char * fragmentShaderSource, unsigned int& shaderProgram)
+    {
+        unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
+        glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+        glCompileShader(vertexShader);
+
+        unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+        glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+        glCompileShader(fragmentShader);
+
+        shaderProgram = glCreateProgram();
+        glAttachShader(shaderProgram, vertexShader);
+        glAttachShader(shaderProgram, fragmentShader);
+        glLinkProgram(shaderProgram);
+
+        glDeleteShader(vertexShader);
+        glDeleteShader(fragmentShader);
+    }
+}
+
+namespace SunsetEngine
+{
+    Shader::Shader(const std::string_view& vertPath, const std::string_view& fragPath)
+        : id(0)
+    {
+        const std::string vertShader = OpenFile(vertPath);
+        const std::string fragShader = OpenFile(fragPath);
+        CreateShader(vertShader.c_str(), fragShader.c_str(), id);
+    }
+
+    Shader::Shader(const char* vertSource, const char* fragSource)
+    {
+        CreateShader(vertSource, fragSource, id);
+    }
+
+    Shader::~Shader()
+    {
+        glDeleteProgram(id);
+    }
+
+    std::uint32_t Shader::GetId() const
+    {
+        return id;
+    }
+
+    void Shader::Use() const
+    {
+        glUseProgram(id);
+    }
+
+    void Shader::SetVec3(const std::string_view& name, const glm::vec3& value) const
+    {
+        glUniform3f(glGetUniformLocation(id, name.data()), value.x, value.y, value.z);
+    }
+
+    void Shader::SetMat4(const std::string_view& name, const glm::mat4& value) const
+    {
+        glUniformMatrix4fv(glGetUniformLocation(id, name.data()), 1, GL_FALSE, &value[0][0]);
+    }
+}
