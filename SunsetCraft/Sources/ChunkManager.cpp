@@ -30,7 +30,7 @@ namespace
         return static_cast<int>(std::floor(value / 32));
     }
 
-    void LoadChunk(const glm::ivec3& position)
+    void LoadChunk(const glm::ivec3& position, CraftScene* scene)
     {
         for (int x = position.x - m_RenderDistance; x <= position.x + m_RenderDistance; ++x) {
             for (int z = position.z - m_RenderDistance; z <= position.z + m_RenderDistance; ++z) {
@@ -38,7 +38,7 @@ namespace
                     std::tuple<int,int,int> key = std::make_tuple(x, y, z);
                     if (m_Chunks.find(key) == m_Chunks.end()) {
                         // Créer et générer le chunk
-                        m_Chunks[key] = std::make_unique<Chunk>(glm::vec3{x, y, z});
+                        m_Chunks[key] = std::make_unique<Chunk>(glm::vec3{x, y, z}, scene);
                     }
                 }
             }
@@ -84,15 +84,15 @@ void ChunkManager::Update(const glm::vec3& position)
         WorldToChunk(position.z)};
 
     UnloadChunk(positionInChunk);
-    LoadChunk(positionInChunk);
+    LoadChunk(positionInChunk, m_Scene);
 }
 
-void ChunkManager::Draw(CraftScene* scene) const
+void ChunkManager::Draw() const
 {
     for (const auto& chunk : m_Chunks | std::views::values)
     {
-        chunk->UseShader(scene->m_Camera);
-        scene->m_TexturesManager.Use(chunk->GetShader());
+        chunk->UseShader(m_Scene->m_Camera);
+        m_Scene->m_TexturesManager.Use(chunk->GetShader());
         chunk->Draw();
     }
 }

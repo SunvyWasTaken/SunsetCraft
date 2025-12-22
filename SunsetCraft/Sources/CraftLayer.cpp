@@ -41,7 +41,7 @@ void CraftLayer::OnDraw()
 {
     if (CraftScene* scene = static_cast<CraftScene*>(GetScene()))
     {
-        scene->m_Chunks.Draw(scene);
+        scene->m_Chunks.Draw();
     }
 }
 

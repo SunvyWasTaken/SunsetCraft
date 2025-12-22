@@ -11,18 +11,22 @@
 
 #include <glm/gtc/noise.hpp>
 
+#include "CraftScene.h"
+
 namespace
 {
     constexpr std::uint32_t EncodeVoxel(
         const std::uint32_t x,
         const std::uint32_t y,
         const std::uint32_t z,
-        const std::uint32_t type)
+        const std::uint32_t type,
+        const std::uint32_t uvID)
     {
         return  (x & 0x1F) |
-               ((y & 0x1F) << 5) |
-               ((z & 0x1F) << 10) |
-               ((type & 0xFF) << 15);
+                ((y & 0x1F) << 5) |
+                ((z & 0x1F) << 10) |
+                ((type & 0xFF) << 15) |
+                ((uvID & 0x1FF) << 23);
     }
 
     std::size_t Index(const int x, const int y, const int z)
@@ -37,7 +41,7 @@ namespace
         return data[Index(x, y, z)] != 0;
     }
 
-    void CreateMesh(const std::array<std::uint8_t, 32*32*32>& data, std::vector<std::uint32_t>& indices)
+    void CreateMesh(const std::array<std::uint8_t, 32*32*32>& data, std::vector<std::uint32_t>& indices, CraftScene* scene)
     {
         indices.reserve(data.size());
 
@@ -62,7 +66,7 @@ namespace
                         continue;
                     }
 
-                    std::uint32_t index = EncodeVoxel(x, y, z, voxel);
+                    std::uint32_t index = EncodeVoxel(x, y, z, voxel, scene->m_TexturesManager.Get("grass_block_side.png"));
                     indices.push_back(index);
                 }
             }
@@ -77,7 +81,7 @@ namespace
     }
 }
 
-Chunk::Chunk(const glm::vec3& pos)
+Chunk::Chunk(const glm::vec3& pos, CraftScene* scene)
     : position(pos)
     , data()
     , m_Drawable(nullptr)
@@ -86,7 +90,7 @@ Chunk::Chunk(const glm::vec3& pos)
     Generate();
 
     std::vector<std::uint32_t> vertices;
-    CreateMesh(data, vertices);
+    CreateMesh(data, vertices, scene);
 
     m_Drawable = std::make_unique<SunsetEngine::Drawable>(vertices);
     m_Shader = std::make_unique<SunsetEngine::Shader>("SunsetCraft/Shaders/ChunkVertShader.vert", "SunsetCraft/Shaders/ChunkFragShader.frag");

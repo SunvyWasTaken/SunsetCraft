@@ -5,11 +5,14 @@
 #include "TexturesManager.h"
 
 #include <filesystem>
+#include <iostream>
 
 #include "Render/Shader.h"
 
 namespace
 {
+    std::unordered_map<std::string, std::uint32_t> _textures;
+
     void GetTextureFiles(const std::string_view& path, std::vector<std::string>& files)
     {
         files.clear();
@@ -55,15 +58,22 @@ namespace
         int atlasHeight = 0;
         std::vector<SunsetEngine::Image> m_Textures;
 
-        std::string CurrentPath = std::filesystem::current_path().string();
-        CurrentPath += "/Textures";
         std::vector<std::string> files;
-        GetTextureFiles(CurrentPath, files);
+        GetTextureFiles(path, files);
+        m_Textures.reserve(files.size());
+        _textures.reserve(files.size());
+
         for (const auto& file : files)
         {
             m_Textures.emplace_back(file);
             atlasWidth = std::max(atlasWidth, m_Textures.back().width);
             atlasHeight += m_Textures.back().height;
+            std::string tmp = file;
+            if (tmp.starts_with(path))
+            {
+                tmp.erase(0, path.length());
+            }
+            _textures.emplace(tmp, m_Textures.size() - 1);
         }
 
         unsigned char* atlasData = CreateAtlas(atlasWidth, atlasHeight, m_Textures);
@@ -93,4 +103,9 @@ TexturesManager::~TexturesManager()
 void TexturesManager::Use(const SunsetEngine::Shader* shader) const
 {
     m_Texture.Use(shader);
+}
+
+std::uint32_t TexturesManager::Get(const std::string_view& name)
+{
+    return _textures.at(name.data());
 }

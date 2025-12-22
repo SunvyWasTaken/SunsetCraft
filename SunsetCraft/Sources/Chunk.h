@@ -13,11 +13,13 @@ namespace SunsetEngine
     struct AABB;
 }
 
+class CraftScene;
+
 class Chunk
 {
     constexpr static int m_chunkSize = 32;
 public:
-    explicit Chunk(const glm::vec3& pos);
+    Chunk(const glm::vec3& pos, CraftScene* scene);
     ~Chunk();
 
     void UseShader(const SunsetEngine::Camera& camera) const;

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 4.1)
+cmake_minimum_required(VERSION 3.31)
 
 add_library(MiniMotor_compiler_flags INTERFACE)
 target_compile_features(MiniMotor_compiler_flags INTERFACE cxx_std_20)

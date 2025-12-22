@@ -16,9 +16,13 @@ public:
 
     void Update(const glm::vec3& position);
 
-    void Draw(CraftScene* scene) const;
+    void Draw() const;
 
     std::vector<Chunk*> GetNearbyChunks(const glm::vec3& position);
+
+private:
+    friend class CraftScene;
+    CraftScene* m_Scene = nullptr;
 };
 
 #endif //SUNSETCRAFT_CHUNKMANAGER_H

@@ -9,6 +9,7 @@ uniform mat4 view;
 out vec3 FragPos;
 out vec3 Normal;
 out vec2 TexCoord;
+flat out uint UvId;
 
 // Decoder la position du bloc
 vec3 DecodePos(uint v)
@@ -18,6 +19,11 @@ vec3 DecodePos(uint v)
         float((v >> 5) & 31u),
         float((v >> 10) & 31u)
     );
+}
+
+uint DecodeUV(uint v)
+{
+    return uint((v >> 23)& 511u);
 }
 
 // 36 sommets d'un cube 1x1x1
@@ -100,4 +106,5 @@ void main()
     FragPos = worldPos;
     Normal = normalize(cubeNormals[gl_VertexID % 36]);
     TexCoord = cubeUV[gl_VertexID % 36];
+    UvId = DecodeUV(vData);
 }

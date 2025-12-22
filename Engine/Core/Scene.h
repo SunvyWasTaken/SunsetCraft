@@ -9,6 +9,7 @@ namespace SunsetEngine
 {
     struct Scene
     {
+        virtual ~Scene() = default;
     };
 }
 
