@@ -15,7 +15,7 @@ struct CraftScene : public SunsetEngine::Scene
 {
     SunsetEngine::Camera m_Camera;
     ChunkManager m_Chunks;
-    // TexturesManager m_TexturesManager;
+    TexturesManager m_TexturesManager;
 };
 
 

@@ -92,7 +92,7 @@ void ChunkManager::Draw(CraftScene* scene) const
     for (const auto& chunk : m_Chunks | std::views::values)
     {
         chunk->UseShader(scene->m_Camera);
-        //scene->m_TexturesManager.Use(chunk->GetShader());
+        scene->m_TexturesManager.Use(chunk->GetShader());
         chunk->Draw();
     }
 }

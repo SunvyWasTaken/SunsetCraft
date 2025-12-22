@@ -10,7 +10,7 @@ out vec3 FragPos;
 out vec3 Normal;
 out vec2 TexCoord;
 
-// Décoder la position du bloc
+// Decoder la position du bloc
 vec3 DecodePos(uint v)
 {
     return vec3(
@@ -64,6 +64,32 @@ const vec3 cubeNormals[36] = vec3[](
     vec3(0,-1,0), vec3(0,-1,0), vec3(0,-1,0)
 );
 
+const vec2 cubeUV[36] = vec2[](
+// front
+vec2(0,0), vec2(1,0), vec2(1,1),
+vec2(0,0), vec2(1,1), vec2(0,1),
+
+// back
+vec2(0,0), vec2(1,0), vec2(1,1),
+vec2(0,0), vec2(1,1), vec2(0,1),
+
+// left
+vec2(0,0), vec2(1,0), vec2(1,1),
+vec2(0,0), vec2(1,1), vec2(0,1),
+
+// right
+vec2(0,0), vec2(1,0), vec2(1,1),
+vec2(0,0), vec2(1,1), vec2(0,1),
+
+// top
+vec2(0,0), vec2(1,0), vec2(1,1),
+vec2(0,0), vec2(1,1), vec2(0,1),
+
+// bottom
+vec2(0,0), vec2(1,0), vec2(1,1),
+vec2(0,0), vec2(1,1), vec2(0,1)
+);
+
 void main()
 {
     vec3 localPos = cubeVerts[gl_VertexID % 36];
@@ -73,4 +99,5 @@ void main()
 
     FragPos = worldPos;
     Normal = normalize(cubeNormals[gl_VertexID % 36]);
+    TexCoord = cubeUV[gl_VertexID % 36];
 }

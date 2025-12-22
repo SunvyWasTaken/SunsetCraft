@@ -11,7 +11,6 @@ namespace SunsetEngine
     {
     public:
         Shader(const std::string_view& vertPath, const std::string_view& fragPath);
-        Shader(const char* vertSource, const char* fragSource);
         ~Shader();
 
         std::uint32_t GetId() const;
