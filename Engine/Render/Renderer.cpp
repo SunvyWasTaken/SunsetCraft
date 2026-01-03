@@ -7,6 +7,10 @@
 #include "Core/Application.h"
 #include "Core/ApplicationSetting.h"
 
+#include "Imgui/imgui.h"
+#include "Imgui/imgui_impl_glfw.h"
+#include "Imgui/imgui_impl_opengl3.h"
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -56,10 +60,23 @@ namespace SunsetEngine
 
         glEnable(GL_DEPTH_TEST);
         // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+        IMGUI_CHECKVERSION();
+        ImGui::CreateContext();
+        ImGuiIO& io = ImGui::GetIO();
+        io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+        ImGui::StyleColorsDark();
+
+        ImGui_ImplGlfw_InitForOpenGL(m_Window, true);
+        ImGui_ImplOpenGL3_Init("#version 330");
     }
 
     Renderer::~Renderer()
     {
+        ImGui_ImplOpenGL3_Shutdown();
+        ImGui_ImplGlfw_Shutdown();
+        ImGui::DestroyContext();
+
         glfwDestroyWindow(m_Window);
         glfwTerminate();
     }
@@ -71,11 +88,23 @@ namespace SunsetEngine
 
     void Renderer::BeginFrame()
     {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
+        bool show_demo_window = true;
+        if (show_demo_window)
+            ImGui::ShowDemoWindow(&show_demo_window);
     }
 
     void Renderer::EndFrame()
     {
+        ImGui::Render();
+
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
         glfwSwapBuffers(m_Window);
         glfwPollEvents();
     }

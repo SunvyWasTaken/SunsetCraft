@@ -5,19 +5,24 @@
 #ifndef SUNSETCRAFT_CHUNK_H
 #define SUNSETCRAFT_CHUNK_H
 
+#include "../World/Block.h"
+
 namespace SunsetEngine
 {
     class Camera;
     class Shader;
     class Drawable;
-    struct AABB;
 }
 
 class CraftScene;
 
+constexpr static int m_chunkSize = 16;
+constexpr static int m_CubeChunkSize = m_chunkSize * m_chunkSize * m_chunkSize;
+
+using BlockList = std::array<BlockId, m_CubeChunkSize>;
+
 class Chunk
 {
-    constexpr static int m_chunkSize = 32;
 public:
     Chunk(const glm::vec3& pos, CraftScene* scene);
     ~Chunk();
@@ -28,8 +33,6 @@ public:
 
     void Generate();
 
-    std::vector<SunsetEngine::AABB> GetAABBs(const glm::ivec3& regionMin, const glm::ivec3& regionMax) const;
-
     static int ChunkSize()
     {
         return m_chunkSize;
@@ -37,9 +40,11 @@ public:
 
     SunsetEngine::Shader* GetShader();
 
+    BlockId GetBlockId(const glm::ivec3& pos) const;
+
 private:
     glm::vec3 position;
-    std::array<std::uint8_t, m_chunkSize*m_chunkSize*m_chunkSize> data;
+    BlockList data;
 
     std::unique_ptr<SunsetEngine::Drawable> m_Drawable;
     std::unique_ptr<SunsetEngine::Shader> m_Shader;

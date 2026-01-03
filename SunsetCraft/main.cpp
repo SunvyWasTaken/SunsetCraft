@@ -2,7 +2,7 @@
 
 #include "CameraLayer.h"
 #include "CraftLayer.h"
-#include "CraftScene.h"
+#include "Sources/World/CraftScene.h"
 #include "Core/Application.h"
 #include "Core/ApplicationSetting.h"
 

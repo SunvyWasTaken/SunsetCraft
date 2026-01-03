@@ -5,11 +5,13 @@
 #ifndef SUNSETCRAFT_CRAFTSCENE_H
 #define SUNSETCRAFT_CRAFTSCENE_H
 
-#include "ChunkManager.h"
-#include "TexturesManager.h"
+#include "../Chunk/ChunkManager.h"
+#include "../TexturesManager.h"
 #include "Core/Scene.h"
 #include "Render/Camera.h"
 
+
+struct RaycastHit;
 
 struct CraftScene : public SunsetEngine::Scene
 {
@@ -17,6 +19,8 @@ struct CraftScene : public SunsetEngine::Scene
     {
         m_Chunks.m_Scene = this;
     }
+
+    void LineTrace(RaycastHit& hit, const glm::vec3& start, const glm::vec3& end);
 
     SunsetEngine::Camera m_Camera;
     ChunkManager m_Chunks;

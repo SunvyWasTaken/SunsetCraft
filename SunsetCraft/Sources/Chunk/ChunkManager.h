@@ -18,7 +18,7 @@ public:
 
     void Draw() const;
 
-    std::vector<Chunk*> GetNearbyChunks(const glm::vec3& position);
+    Chunk* GetChunks(const glm::vec3& position);
 
 private:
     friend class CraftScene;

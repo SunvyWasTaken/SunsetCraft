@@ -11,7 +11,8 @@
 
 #include <glm/gtc/noise.hpp>
 
-#include "CraftScene.h"
+#include "../World/CraftScene.h"
+#include "World/Block.h"
 
 namespace
 {
@@ -19,13 +20,11 @@ namespace
         const std::uint32_t x,
         const std::uint32_t y,
         const std::uint32_t z,
-        const std::uint32_t type,
         const std::uint32_t uvID)
     {
         return  (x & 0x1F) |
                 ((y & 0x1F) << 5) |
                 ((z & 0x1F) << 10) |
-                ((type & 0xFF) << 15) |
                 ((uvID & 0x1FF) << 23);
     }
 
@@ -34,14 +33,14 @@ namespace
         return x + z * Chunk::ChunkSize() + y * Chunk::ChunkSize() * Chunk::ChunkSize();
     }
 
-    bool IsSolid(const std::array<std::uint8_t, 32*32*32>& data, int x, int y, int z)
+    bool IsSolid(const BlockList& data, int x, int y, int z)
     {
         if (x < 0 || x >= Chunk::ChunkSize() || y < 0 || y >= Chunk::ChunkSize() || z < 0 || z >= Chunk::ChunkSize())
             return true;
-        return data[Index(x, y, z)] != 0;
+        return data[Index(x, y, z)] != BlockId::Air;
     }
 
-    void CreateMesh(const std::array<std::uint8_t, 32*32*32>& data, std::vector<std::uint32_t>& indices, CraftScene* scene)
+    void CreateMesh(const BlockList& data, std::vector<std::uint32_t>& indices, CraftScene* scene)
     {
         indices.reserve(data.size());
 
@@ -51,8 +50,8 @@ namespace
             {
                 for (int x = 0; x < Chunk::ChunkSize(); ++x)
                 {
-                    const std::uint8_t voxel = data[Index(x, y, z)];
-                    if (voxel == 0)
+                    const BlockId voxel = data[Index(x, y, z)];
+                    if (voxel == BlockId::Air)
                         continue;
 
                     // Vérifie si au moins un voisin est vide
@@ -66,7 +65,15 @@ namespace
                         continue;
                     }
 
-                    std::uint32_t index = EncodeVoxel(x, y, z, voxel, scene->m_TexturesManager.Get("grass_block_side.png"));
+                    uint32_t uvId;
+                    uvId = scene->m_TexturesManager.Get("grass_block_side.png");
+
+                    if (voxel == BlockId::Stone)
+                    {
+                        uvId = scene->m_TexturesManager.Get("stone.png");
+                    }
+
+                    std::uint32_t index = EncodeVoxel(x, y, z, uvId);
                     indices.push_back(index);
                 }
             }
@@ -78,6 +85,45 @@ namespace
         float nx = (std::sin(x * 0.1f) + 1.0f) * 0.5f;
         float nz = (std::sin(z * 0.1f) + 1.0f) * 0.5f;
         return nx + nz * 0.5f;
+    }
+
+    // Fonction pseudo-aléatoire basée sur x, z et seed
+    float hash(int x, int z, int seed) {
+        int n = x + z * 57 + seed * 131;
+        n = (n << 13) ^ n;
+        return (1.0f - ((n * (n * n * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824.0f);
+    }
+
+    // Fonction de lissage (smoothstep)
+    float smoothStep(float t) {
+        return t * t * (3 - 2 * t);
+    }
+
+    // Interpolation bilinéaire lissée
+    float lerp(float a, float b, float t) {
+        return a + (b - a) * smoothStep(t);
+    }
+
+    // Noise chaotique mais lisse
+    float smoothChaosNoise(float x, float z, int seed)
+    {
+        int x0 = (int)std::floor(x);
+        int x1 = x0 + 1;
+        int z0 = (int)std::floor(z);
+        int z1 = z0 + 1;
+
+        float sx = x - (float)x0;
+        float sz = z - (float)z0;
+
+        float n0 = hash(x0, z0, seed);
+        float n1 = hash(x1, z0, seed);
+        float ix0 = lerp(n0, n1, sx);
+
+        n0 = hash(x0, z1, seed);
+        n1 = hash(x1, z1, seed);
+        float ix1 = lerp(n0, n1, sx);
+
+        return lerp(ix0, ix1, sz);
     }
 }
 
@@ -125,38 +171,30 @@ void Chunk::Generate()
         for (int x = 0; x < m_chunkSize; ++x)
         {
             int WorldX = x + static_cast<int>(position.x) * m_chunkSize;
-            const float noise = smoothNoise(WorldX, WorldZ, seed) * 20;
-            // const float noise = glm::perlin(glm::vec2{WorldX, WorldZ}) * 20;
+            const float noise = smoothChaosNoise(WorldX * 0.05, WorldZ * 0.05, seed) * 20;
+            //const float noise = smoothNoise(WorldX, WorldZ, seed) * 20;
+            //const float noise = glm::perlin(glm::vec2{WorldX, WorldZ}) * 20;
 
             for (int y = 0; y < Chunk::ChunkSize(); ++y)
             {
                 int WorldY = y + static_cast<int>(position.y) * m_chunkSize;
-                if (WorldY < noise)
-                    data[Index(x, y, z)] = 1;
+                if (WorldY < noise - 2)
+                    data[Index(x, y, z)] = BlockId::Stone;
+                else if (WorldY < noise)
+                    data[Index(x, y, z)] = BlockId::Dirt;
                 else
-                    data[Index(x, y, z)] = 0;
+                    data[Index(x, y, z)] = BlockId::Air;
             }
         }
     }
 }
 
-std::vector<SunsetEngine::AABB> Chunk::GetAABBs(const glm::ivec3& regionMin, const glm::ivec3& regionMax) const
-{
-    std::vector<SunsetEngine::AABB> solids;
-    for (int x = regionMin.x; x <= regionMax.x; ++x)
-        for (int y = regionMin.y; y <= regionMax.y; ++y)
-            for (int z = regionMin.z; z <= regionMax.z; ++z)
-                if (IsSolid(data, x, y, z)) {
-                    solids.push_back(SunsetEngine::AABB
-                    {
-                        glm::vec3(x, y, z),
-                        glm::vec3(x + 1.0f, y + 1.0f, z + 1.0f)
-                    });
-                }
-    return solids;
-}
-
 SunsetEngine::Shader* Chunk::GetShader()
 {
     return m_Shader.get();
+}
+
+BlockId Chunk::GetBlockId(const glm::ivec3& pos) const
+{
+    return data[Index(pos.x, pos.y, pos.z)];
 }

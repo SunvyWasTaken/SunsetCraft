@@ -4,10 +4,13 @@
 
 #include "CraftLayer.h"
 
-#include "Chunk.h"
-#include "ChunkManager.h"
-#include "CraftScene.h"
+#include <iostream>
+
+#include "Chunk/Chunk.h"
+#include "Chunk/ChunkManager.h"
+#include "World/CraftScene.h"
 #include "Render/Camera.h"
+#include "World/RaycastHit.h"
 
 namespace
 {
@@ -34,6 +37,12 @@ void CraftLayer::OnUpdate(float dt)
     if (CraftScene* scene = static_cast<CraftScene*>(GetScene()))
     {
         scene->m_Chunks.Update(scene->m_Camera.GetPosition());
+        RaycastHit hit;
+        scene->LineTrace(hit , scene->m_Camera.GetPosition(), scene->m_Camera.GetPosition() + scene->m_Camera.GetForward());
+        if (hit.Hit)
+        {
+            std::cerr << "CraftLayer::OnAttach: hit" << std::endl;
+        }
     }
 }
 

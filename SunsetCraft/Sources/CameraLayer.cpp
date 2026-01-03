@@ -4,7 +4,7 @@
 
 #include "CameraLayer.h"
 
-#include "CraftScene.h"
+#include "World/CraftScene.h"
 #include "Core/Input.h"
 #include "Render/Camera.h"
 

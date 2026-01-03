@@ -5,15 +5,18 @@
 #include "ChunkManager.h"
 
 #include "Chunk.h"
-#include "CraftScene.h"
+#include "../World/CraftScene.h"
 
 namespace
 {
-    int m_RenderDistance = 2;
-    int verticalRadius = 1;
+    int m_RenderDistance = 6;
+    int verticalRadius = 2;
 
-    struct triplet_hash {
-        std::size_t operator()(const std::tuple<int,int,int>& t) const
+    using ChunkKey = std::tuple<int,int,int>;
+
+    struct triplet_hash
+    {
+        std::size_t operator()(const ChunkKey& t) const
         {
             auto h1 = std::hash<int>{}(std::get<0>(t));
             auto h2 = std::hash<int>{}(std::get<1>(t));
@@ -22,12 +25,12 @@ namespace
         }
     };
 
-    std::unordered_map<std::tuple<int, int, int>, std::unique_ptr<Chunk>, triplet_hash> m_Chunks;
+    std::unordered_map<ChunkKey, std::unique_ptr<Chunk>, triplet_hash> m_Chunks;
 
     template <typename T>
     int WorldToChunk(T value)
     {
-        return static_cast<int>(std::floor(value / 32));
+        return static_cast<int>(std::floor(value / m_chunkSize));
     }
 
     void LoadChunk(const glm::ivec3& position, CraftScene* scene)
@@ -35,7 +38,7 @@ namespace
         for (int x = position.x - m_RenderDistance; x <= position.x + m_RenderDistance; ++x) {
             for (int z = position.z - m_RenderDistance; z <= position.z + m_RenderDistance; ++z) {
                 for (int y = position.y - verticalRadius; y <= position.y + verticalRadius; ++y) {
-                    std::tuple<int,int,int> key = std::make_tuple(x, y, z);
+                    ChunkKey key = std::make_tuple(x, y, z);
                     if (m_Chunks.find(key) == m_Chunks.end()) {
                         // Créer et générer le chunk
                         m_Chunks[key] = std::make_unique<Chunk>(glm::vec3{x, y, z}, scene);
@@ -97,33 +100,18 @@ void ChunkManager::Draw() const
     }
 }
 
-std::vector<Chunk*> ChunkManager::GetNearbyChunks(const glm::vec3& position)
+Chunk* ChunkManager::GetChunks(const glm::vec3& position)
 {
-    std::vector<Chunk*> result;
+    Chunk* result = nullptr;
 
     // Position du joueur en coordonnées chunk
     int chunkX = WorldToChunk(position.x);
     int chunkY = WorldToChunk(position.y);
     int chunkZ = WorldToChunk(position.z);
 
-    constexpr int radius = 1;
+    const ChunkKey key = std::make_tuple(chunkX, chunkY, chunkZ);
 
-    for (int x = chunkX - radius; x <= chunkX + radius; ++x)
-    {
-        for (int y = chunkY - radius; y <= chunkY + radius; ++y)
-        {
-            for (int z = chunkZ - radius; z <= chunkZ + radius; ++z)
-            {
-                auto key = std::make_tuple(x, y, z);
-                auto it = m_Chunks.find(key);
-
-                if (it != m_Chunks.end())
-                {
-                    result.push_back(it->second.get());
-                }
-            }
-        }
-    }
+    result = m_Chunks.at(key).get();
 
     return result;
 }
