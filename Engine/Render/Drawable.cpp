@@ -13,6 +13,7 @@ namespace SunsetEngine
         , vbo(0)
         , vertexCount(vertices.size())
     {
+        LOG("Drawable : {}", vertices.size());
         glGenVertexArrays(1, &vao);
         glGenBuffers(1, &vbo);
 
@@ -43,6 +44,7 @@ namespace SunsetEngine
 
     void Drawable::Draw() const
     {
+        HUD("Draw : {}", vao);
         glBindVertexArray(vao);
         glDrawArraysInstanced(GL_TRIANGLES, 0, 36, static_cast<GLsizei>(vertexCount));
         glBindVertexArray(0);

@@ -9,7 +9,6 @@
 #include <glad/glad.h>
 
 #define STB_IMAGE_IMPLEMENTATION
-#include <iostream>
 
 #include "stb_image.h"
 
@@ -38,7 +37,7 @@ namespace SunsetEngine
         m_Data = stbi_load(path.data(), &width, &height, &nbrChannels, 0);
         if (m_Data == nullptr)
         {
-            std::cerr << "Load Image failed : " << path << std::endl;
+            LOG("Load Image failed : ", path)
         }
     }
 
@@ -49,7 +48,7 @@ namespace SunsetEngine
 
         stbi_image_free(m_Data);
         m_Data = nullptr;
-        std::cerr << "Image Destroy" << std::endl;
+        LOG("Image Destroy")
     }
 
     void Image::SetData(unsigned char* data)
@@ -74,7 +73,7 @@ namespace SunsetEngine
     Texture::~Texture()
     {
         glDeleteTextures(1, &Id);
-        std::cerr << "Texture destroy" << std::endl;
+        LOG("Texture destroy");
     }
 
     void Texture::Use(const Shader* shader) const
@@ -97,7 +96,7 @@ namespace SunsetEngine
         {
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_image->width, m_image->height, 0, GL_RGB, GL_UNSIGNED_BYTE, m_image->m_Data);
             glGenerateMipmap(GL_TEXTURE_2D);
-            std::cerr << "Texture generated" << std::endl;
+            LOG("Texture generated")
         }
 
         m_image->Clear();

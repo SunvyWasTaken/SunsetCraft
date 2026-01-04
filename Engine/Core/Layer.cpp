@@ -9,7 +9,6 @@ namespace SunsetEngine
     Layer::Layer(Scene* scene)
         : m_Scene(scene)
     {
-
     }
 
     Scene* Layer::GetScene() const

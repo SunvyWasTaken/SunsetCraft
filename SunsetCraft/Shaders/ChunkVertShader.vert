@@ -100,7 +100,7 @@ void main()
 {
     vec3 localPos = cubeVerts[gl_VertexID % 36];
     vec3 blockPos = DecodePos(vData);
-    vec3 worldPos = blockPos + localPos + chunkLocation * 32;
+    vec3 worldPos = blockPos + localPos + chunkLocation * 16;
     gl_Position = projection * view * vec4(worldPos,1.0);
 
     FragPos = worldPos;

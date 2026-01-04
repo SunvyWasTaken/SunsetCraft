@@ -24,6 +24,7 @@ namespace SunsetEngine
         : m_LayerStack()
         , m_Scene(nullptr)
     {
+        LOG("App Create")
         AppSetting = setting;
         m_Render = new Renderer();
     }

@@ -39,6 +39,7 @@ namespace SunsetEngine
 {
     Renderer::Renderer()
     {
+        LOG("Render Create")
         const ApplicationSetting& setting = Application::GetSetting();
         m_Window = CreateWindow(setting);
         if (m_Window == NULL)
@@ -59,7 +60,7 @@ namespace SunsetEngine
         }
 
         glEnable(GL_DEPTH_TEST);
-        // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
@@ -91,17 +92,31 @@ namespace SunsetEngine
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
-
-        bool show_demo_window = true;
-        if (show_demo_window)
-            ImGui::ShowDemoWindow(&show_demo_window);
     }
 
     void Renderer::EndFrame()
     {
-        ImGui::Render();
+        if (!Hud::IsEmpty())
+        {
+            ImGui::Begin("Stats");
+            for (std::vector<std::string>::iterator it = Hud::begin(); it != Hud::end(); ++it)
+            {
+                ImGui::Text("%s", it->c_str());
+            }
+            ImGui::End();
+            Hud::Clear();
+        }
+
+        ImGui::Begin("Log");
+        for (std::vector<std::string>::iterator it = Logger::begin(); it != Logger::end(); ++it)
+        {
+             ImGui::Text("%s", it->c_str());
+        }
+        ImGui::End();
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        ImGui::Render();
 
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 

@@ -156,6 +156,7 @@ void Chunk::UseShader(const SunsetEngine::Camera& camera) const
 
 void Chunk::Draw() const
 {
+    HUD("Draw Chunk")
     m_Drawable->Draw();
 }
 

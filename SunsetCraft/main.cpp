@@ -2,6 +2,7 @@
 
 #include "CameraLayer.h"
 #include "CraftLayer.h"
+#include "DebugLayer.h"
 #include "Sources/World/CraftScene.h"
 #include "Core/Application.h"
 #include "Core/ApplicationSetting.h"
@@ -14,6 +15,7 @@ int main()
 
     app.PushLayer<CraftLayer>();
     app.PushLayer<CameraLayer>();
+    //app.PushLayer<DebugLayer>();
 
     app.Run();
     return 0;
