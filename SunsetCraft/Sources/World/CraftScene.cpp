@@ -19,11 +19,10 @@ void CraftScene::LineTrace(RaycastHit& hit, const glm::vec3& start, const glm::v
 
     for (int i = 1; i < step; ++i)
     {
-        glm::vec3 position = start + (static_cast<float>(i) * dir);
-
-        Chunk* chunk = m_Chunks.GetChunks(position);
-        BlockId block = chunk->GetBlockId(position);
-        if (block != BlockId::Air)
+        const glm::vec3 position = start + (static_cast<float>(i) * dir);
+        HUD("LineTrace position : {}, {}, {}", position.x, position.y, position.z);
+        const Chunk* chunk = m_Chunks.GetChunks(position);
+        if (const BlockId block = chunk->GetBlockId(position); block != BlockId::Air)
         {
             hit.Hit = true;
             hit.blockPose = position;
