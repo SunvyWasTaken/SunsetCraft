@@ -44,7 +44,6 @@ namespace SunsetEngine
 
     void Drawable::Draw() const
     {
-        HUD("Draw : {}", vao);
         glBindVertexArray(vao);
         glDrawArraysInstanced(GL_TRIANGLES, 0, 36, static_cast<GLsizei>(vertexCount));
         glBindVertexArray(0);

@@ -60,7 +60,7 @@ namespace SunsetEngine
         }
 
         glEnable(GL_DEPTH_TEST);
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
@@ -89,6 +89,8 @@ namespace SunsetEngine
 
     void Renderer::BeginFrame()
     {
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
@@ -113,8 +115,6 @@ namespace SunsetEngine
              ImGui::Text("%s", it->c_str());
         }
         ImGui::End();
-
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         ImGui::Render();
 

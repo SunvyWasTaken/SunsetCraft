@@ -93,7 +93,6 @@ void ChunkManager::Update(const glm::vec3& position)
 
 void ChunkManager::Draw() const
 {
-    HUD("ChunkManager Draw")
     for (const auto& chunk : m_Chunks | std::views::values)
     {
         chunk->UseShader(m_Scene->m_Camera);
