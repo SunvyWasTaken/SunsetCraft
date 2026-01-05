@@ -10,10 +10,12 @@ namespace SunsetEngine
     class Drawable final
     {
     public:
-        explicit Drawable(const std::vector<std::uint32_t>& indices);
+        explicit Drawable(const std::vector<std::uint32_t>& vertices);
         ~Drawable();
 
         void Clear() const;
+
+        void Create(const std::vector<std::uint32_t>& vertices);
 
         void Draw() const;
 

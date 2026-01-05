@@ -10,6 +10,7 @@ namespace SunsetEngine
     struct Input
     {
         static bool IsKeyPress(unsigned int key);
+        static bool IsMouseButtonClick(unsigned int button);
         static glm::vec2 GetMousePosition();
     };
 }

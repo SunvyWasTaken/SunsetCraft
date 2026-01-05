@@ -16,6 +16,7 @@ class CameraLayer : public SunsetEngine::Layer
 {
 public:
     explicit CameraLayer(SunsetEngine::Scene* scene);
+    ~CameraLayer();
     void OnAttach() override;
     void OnUpdate(float dt) override;
     void OnDraw() override;

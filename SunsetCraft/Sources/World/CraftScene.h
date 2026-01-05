@@ -20,7 +20,7 @@ struct CraftScene : public SunsetEngine::Scene
         m_Chunks.m_Scene = this;
     }
 
-    void LineTrace(RaycastHit& hit, const glm::vec3& start, const glm::vec3& end);
+    void LineTrace(RaycastHit& hit, const glm::vec3& start, const glm::vec3& forward, const float distance);
 
     SunsetEngine::Camera m_Camera;
     ChunkManager m_Chunks;

@@ -52,7 +52,7 @@ namespace SunsetEngine
 
         glfwSetFramebufferSizeCallback(m_Window, framebuffer_size_callback);
 
-        //glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
         if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
         {
@@ -100,7 +100,8 @@ namespace SunsetEngine
     {
         if (!Hud::IsEmpty())
         {
-            ImGui::Begin("Stats");
+            ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
+            ImGui::Begin("Stats", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
             for (std::vector<std::string>::iterator it = Hud::begin(); it != Hud::end(); ++it)
             {
                 ImGui::Text("%s", it->c_str());
@@ -114,6 +115,7 @@ namespace SunsetEngine
         {
              ImGui::Text("%s", it->c_str());
         }
+        ImGui::SetScrollHereY(1.0f);
         ImGui::End();
 
         ImGui::Render();

@@ -16,6 +16,8 @@
 
 namespace
 {
+    CraftScene* m_Scene = nullptr;
+
     constexpr std::uint32_t EncodeVoxel(
         const std::uint32_t x,
         const std::uint32_t y,
@@ -30,7 +32,27 @@ namespace
 
     std::size_t Index(const int x, const int y, const int z)
     {
-        return x + z * Chunk::ChunkSize() + y * Chunk::ChunkSize() * Chunk::ChunkSize();
+        int N = Chunk::ChunkSize();
+        int ix = (x % N + N) % N;
+        int iy = (y % N + N) % N;
+        int iz = (z % N + N) % N;
+
+        return ix + iz * N + iy * N * N;
+    }
+
+    glm::ivec3 WorldToChunk(const glm::ivec3& ChunkPos, const glm::ivec3& pos)
+    {
+        glm::ivec3 localPos;
+        localPos.x = pos.x - ChunkPos.x * Chunk::ChunkSize();
+        localPos.y = pos.y - ChunkPos.y * Chunk::ChunkSize();
+        localPos.z = pos.z - ChunkPos.z * Chunk::ChunkSize();
+
+        // s'assure que le résultat est toujours dans [0, ChunkSize-1]
+        localPos.x = (localPos.x % Chunk::ChunkSize() + Chunk::ChunkSize()) % Chunk::ChunkSize();
+        localPos.y = (localPos.y % Chunk::ChunkSize() + Chunk::ChunkSize()) % Chunk::ChunkSize();
+        localPos.z = (localPos.z % Chunk::ChunkSize() + Chunk::ChunkSize()) % Chunk::ChunkSize();
+
+        return localPos;
     }
 
     bool IsSolid(const BlockList& data, int x, int y, int z)
@@ -135,8 +157,10 @@ Chunk::Chunk(const glm::vec3& pos, CraftScene* scene)
 {
     Generate();
 
+    m_Scene = scene;
+
     std::vector<std::uint32_t> vertices;
-    CreateMesh(data, vertices, scene);
+    CreateMesh(data, vertices, m_Scene);
 
     m_Drawable = std::make_unique<SunsetEngine::Drawable>(vertices);
     m_Shader = std::make_unique<SunsetEngine::Shader>("SunsetCraft/Shaders/ChunkVertShader.vert", "SunsetCraft/Shaders/ChunkFragShader.frag");
@@ -196,5 +220,19 @@ SunsetEngine::Shader* Chunk::GetShader()
 
 BlockId Chunk::GetBlockId(const glm::ivec3& pos) const
 {
-    return data[Index(pos.x, pos.y, pos.z)];
+    const glm::ivec3 i = WorldToChunk(position, pos);
+    return data[Index(i.x, i.y, i.z)];
+}
+
+// pos is the world location
+void Chunk::SetBlockId(const glm::ivec3& pos, BlockId blockId)
+{
+    const glm::ivec3 i = WorldToChunk(position, pos);
+    data[Index(i.x, i.y, i.z)] = blockId;
+    LOG("I {}, coord in chunks : {}", Index(i.x, i.y, i.z), i);
+    std::vector<std::uint32_t> vertices;
+    CreateMesh(data, vertices, m_Scene);
+
+    m_Drawable->Clear();
+    m_Drawable->Create(vertices);
 }

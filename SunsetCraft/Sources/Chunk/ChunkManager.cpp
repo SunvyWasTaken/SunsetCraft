@@ -9,8 +9,8 @@
 
 namespace
 {
-    int m_RenderDistance = 6;
-    int verticalRadius = 2;
+    int m_RenderDistance = 1;
+    int verticalRadius = 1;
 
     using ChunkKey = std::tuple<int,int,int>;
 

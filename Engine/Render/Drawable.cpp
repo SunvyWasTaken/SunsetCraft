@@ -13,7 +13,22 @@ namespace SunsetEngine
         , vbo(0)
         , vertexCount(vertices.size())
     {
-        LOG("Drawable : {}", vertices.size());
+        Create(vertices);
+    }
+
+    Drawable::~Drawable()
+    {
+        Clear();
+    }
+
+    void Drawable::Clear() const
+    {
+        glDeleteVertexArrays(1, &vao);
+        glDeleteBuffers(1, &vbo);
+    }
+
+    void Drawable::Create(const std::vector<std::uint32_t>& vertices)
+    {
         glGenVertexArrays(1, &vao);
         glGenBuffers(1, &vbo);
 
@@ -29,17 +44,6 @@ namespace SunsetEngine
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
         glBindVertexArray(0);
-    }
-
-    Drawable::~Drawable()
-    {
-        Clear();
-    }
-
-    void Drawable::Clear() const
-    {
-        glDeleteVertexArrays(1, &vao);
-        glDeleteBuffers(1, &vbo);
     }
 
     void Drawable::Draw() const

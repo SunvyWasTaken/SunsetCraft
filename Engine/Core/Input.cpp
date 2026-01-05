@@ -11,6 +11,7 @@
 namespace
 {
     glm::vec2 lastMousePosition = glm::vec2(0.0f, 0.0f);
+    std::map<unsigned int, bool> bIsMouseButtonClick;
 }
 
 namespace SunsetEngine
@@ -18,6 +19,24 @@ namespace SunsetEngine
     bool Input::IsKeyPress(const unsigned int key)
     {
         return glfwGetKey(static_cast<GLFWwindow*>(Renderer::Get()), key) == GLFW_PRESS;
+    }
+
+    bool Input::IsMouseButtonClick(const unsigned int button)
+    {
+        if (glfwGetMouseButton(static_cast<GLFWwindow*>(Renderer::Get()), button) == GLFW_PRESS)
+        {
+            if (bIsMouseButtonClick.find(button) != bIsMouseButtonClick.end())
+            {
+                if (!bIsMouseButtonClick[button])
+                {
+                    bIsMouseButtonClick[button] = true;
+                    return true;
+                }
+                return false;
+            }
+        }
+        bIsMouseButtonClick[button] = false;
+        return false;
     }
 
     glm::vec2 Input::GetMousePosition()

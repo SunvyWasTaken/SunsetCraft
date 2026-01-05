@@ -42,6 +42,8 @@ public:
 
     BlockId GetBlockId(const glm::ivec3& pos) const;
 
+    void SetBlockId(const glm::ivec3& pos, BlockId blockId);
+
 private:
     glm::vec3 position;
     BlockList data;
