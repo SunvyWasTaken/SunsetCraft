@@ -16,6 +16,21 @@ struct RaycastHit
     BlockId BlockType = BlockId::Null;
     Chunk* chunk = nullptr;
     glm::ivec3 blockPose;
+    glm::ivec3 hitNormal;
+
+    operator bool() const
+    {
+        return Hit;
+    }
+
+    void Clear()
+    {
+        Hit = false;
+        BlockType = BlockId::Null;
+        chunk = nullptr;
+        blockPose = glm::ivec3(0);
+        hitNormal = glm::ivec3(0);
+    }
 };
 
 #endif //SUNSETCRAFT_RAYCASTHIT_H

@@ -29,6 +29,8 @@ namespace SunsetEngine
 
     void Drawable::Create(const std::vector<std::uint32_t>& vertices)
     {
+        vertexCount = vertices.size();
+
         glGenVertexArrays(1, &vao);
         glGenBuffers(1, &vbo);
 

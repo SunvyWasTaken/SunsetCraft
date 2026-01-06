@@ -60,6 +60,8 @@ namespace SunsetEngine
         }
 
         glEnable(GL_DEPTH_TEST);
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_FRONT);
         // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
         IMGUI_CHECKVERSION();
@@ -110,7 +112,9 @@ namespace SunsetEngine
             Hud::Clear();
         }
 
-        ImGui::Begin("Log");
+        ImGui::SetNextWindowPos(ImVec2(0, Application::GetSetting().WindowSize.y - 150), ImGuiCond_Always);
+        ImGui::SetNextWindowSize(ImVec2(Application::GetSetting().WindowSize.x, 150), ImGuiCond_Always);
+        ImGui::Begin("Log", nullptr);
         for (std::vector<std::string>::iterator it = Logger::begin(); it != Logger::end(); ++it)
         {
              ImGui::Text("%s", it->c_str());

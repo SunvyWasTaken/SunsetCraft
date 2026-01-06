@@ -83,24 +83,16 @@ void CameraLayer::OnUpdate(float dt)
         ProcessInput(scene->m_Camera, dt);
 
         RaycastHit hit;
-        glm::vec3 dir = scene->m_Camera.GetForward() * 2.f;
-        HUD("Dir : {}", dir);
-        glm::vec3 blockPos = scene->m_Camera.GetPosition() + dir;
-        HUD("Blockpos : {}", blockPos);
-        glm::ivec3 targetPos = glm::floor(blockPos);
-        HUD("Target : {}", targetPos);
-        //scene->LineTrace(hit , scene->m_Camera.GetPosition(), scene->m_Camera.GetForward(), 10.f);
-        Chunk* c = scene->m_Chunks.GetChunks(targetPos);
-
-        if (c != nullptr)
+        scene->LineTrace(hit , scene->m_Camera.GetPosition(), scene->m_Camera.GetForward(), 10.f);
+        if (hit)
         {
             if (SunsetEngine::Input::IsMouseButtonClick(GLFW_MOUSE_BUTTON_1))
-                c->SetBlockId(targetPos, BlockId::Dirt);
+                hit.chunk->SetBlockId(hit.blockPose + hit.hitNormal, BlockId::Dirt);
             else if (SunsetEngine::Input::IsMouseButtonClick(GLFW_MOUSE_BUTTON_2))
-                c->SetBlockId(targetPos, BlockId::Air);
+                hit.chunk->SetBlockId(hit.blockPose, BlockId::Air);
 
             m_Shader->Use();
-            m_Shader->SetVec3("BlockLocation", targetPos);
+            m_Shader->SetVec3("BlockLocation", hit.blockPose);
             m_Shader->SetMat4("view", scene->m_Camera.GetViewMatrix());
             m_Shader->SetMat4("projection", scene->m_Camera.GetProjection());
             SunsetEngine::Render::SetWireframe(true);

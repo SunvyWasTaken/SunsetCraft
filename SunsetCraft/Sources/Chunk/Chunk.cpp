@@ -54,10 +54,7 @@ namespace
 
     glm::ivec3 WorldToChunk(const glm::ivec3& ChunkPos, const glm::ivec3& pos)
     {
-        glm::ivec3 localPos;
-        localPos.x = pos.x - ChunkPos.x * Chunk::ChunkSize();
-        localPos.y = pos.y - ChunkPos.y * Chunk::ChunkSize();
-        localPos.z = pos.z - ChunkPos.z * Chunk::ChunkSize();
+        glm::ivec3 localPos = pos - ChunkPos * Chunk::ChunkSize();
 
         // s'assure que le résultat est toujours dans [0, ChunkSize-1]
         localPos.x = (localPos.x % Chunk::ChunkSize() + Chunk::ChunkSize()) % Chunk::ChunkSize();
