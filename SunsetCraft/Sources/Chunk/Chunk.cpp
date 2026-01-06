@@ -18,15 +18,27 @@ namespace
 {
     CraftScene* m_Scene = nullptr;
 
+    enum VoxelSide : std::uint8_t
+    {
+        PosX = 0,
+        NegX = 1,
+        PosY = 2,
+        NegY = 3,
+        PosZ = 4,
+        NegZ = 5
+    };
+
     constexpr std::uint32_t EncodeVoxel(
         const std::uint32_t x,
         const std::uint32_t y,
         const std::uint32_t z,
+        const std::uint8_t side,
         const std::uint32_t uvID)
     {
         return  (x & 0x1F) |
                 ((y & 0x1F) << 5) |
                 ((z & 0x1F) << 10) |
+                ((side & 0x7) << 15) |
                 ((uvID & 0x1FF) << 23);
     }
 
@@ -58,14 +70,13 @@ namespace
     bool IsSolid(const BlockList& data, int x, int y, int z)
     {
         if (x < 0 || x >= Chunk::ChunkSize() || y < 0 || y >= Chunk::ChunkSize() || z < 0 || z >= Chunk::ChunkSize())
-            return true;
+            return false;
         return data[Index(x, y, z)] != BlockId::Air;
     }
 
     void CreateMesh(const BlockList& data, std::vector<std::uint32_t>& indices, CraftScene* scene)
     {
         indices.reserve(data.size());
-
         for (int y = 0; y < Chunk::ChunkSize(); ++y)
         {
             for (int z = 0; z < Chunk::ChunkSize(); ++z)
@@ -76,30 +87,41 @@ namespace
                     if (voxel == BlockId::Air)
                         continue;
 
-                    // Vérifie si au moins un voisin est vide
-                    if (IsSolid(data, x+1, y, z) &&
-                        IsSolid(data, x-1, y, z) &&
-                        IsSolid(data, x, y+1, z) &&
-                        IsSolid(data, x, y-1, z) &&
-                        IsSolid(data, x, y, z+1) &&
-                        IsSolid(data, x, y, z-1))
+                    auto getUv = [&](VoxelSide side)
                     {
-                        continue;
-                    }
+                        if (voxel == BlockId::Stone)
+                            return scene->m_TexturesManager.Get("stone.png");
+                        // exemple : herbe
+                        if (side == PosY)
+                            return scene->m_TexturesManager.Get("grass_block_top.png");
+                        if (side == NegY)
+                            return scene->m_TexturesManager.Get("dirt.png");
 
-                    uint32_t uvId;
-                    uvId = scene->m_TexturesManager.Get("grass_block_side.png");
+                        return scene->m_TexturesManager.Get("grass_block_side.png");
+                    };
 
-                    if (voxel == BlockId::Stone)
-                    {
-                        uvId = scene->m_TexturesManager.Get("stone.png");
-                    }
-
-                    std::uint32_t index = EncodeVoxel(x, y, z, uvId);
-                    indices.push_back(index);
+                    // +X
+                    if (!IsSolid(data, x + 1, y, z))
+                        indices.push_back(EncodeVoxel(x, y, z, PosX, getUv(PosX)));
+                    // -X
+                    if (!IsSolid(data, x - 1, y, z))
+                        indices.push_back(EncodeVoxel(x, y, z, NegX, getUv(NegX)));
+                    // +Y
+                    if (!IsSolid(data, x, y + 1, z))
+                        indices.push_back(EncodeVoxel(x, y, z, PosY, getUv(PosY)));
+                    // -Y
+                    if (!IsSolid(data, x, y - 1, z))
+                        indices.push_back(EncodeVoxel(x, y, z, NegY, getUv(NegY)));
+                    // +Z
+                    if (!IsSolid(data, x, y, z + 1))
+                        indices.push_back(EncodeVoxel(x, y, z, PosZ, getUv(PosZ)));
+                    // -Z
+                    if (!IsSolid(data, x, y, z - 1))
+                        indices.push_back(EncodeVoxel(x, y, z, NegZ, getUv(NegZ)));
                 }
             }
         }
+
     }
 
     float smoothNoise(int x, int z, int seed)
@@ -229,7 +251,6 @@ void Chunk::SetBlockId(const glm::ivec3& pos, BlockId blockId)
 {
     const glm::ivec3 i = WorldToChunk(position, pos);
     data[Index(i.x, i.y, i.z)] = blockId;
-    LOG("I {}, coord in chunks : {}", Index(i.x, i.y, i.z), i);
     std::vector<std::uint32_t> vertices;
     CreateMesh(data, vertices, m_Scene);
 

@@ -49,7 +49,7 @@ namespace SunsetEngine
     void Drawable::Draw() const
     {
         glBindVertexArray(vao);
-        glDrawArraysInstanced(GL_TRIANGLES, 0, 36, static_cast<GLsizei>(vertexCount));
+        glDrawArraysInstanced(GL_TRIANGLES, 0, 6, static_cast<GLsizei>(vertexCount));
         glBindVertexArray(0);
     }
 }

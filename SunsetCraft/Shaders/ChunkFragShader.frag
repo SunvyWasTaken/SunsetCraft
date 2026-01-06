@@ -15,7 +15,12 @@ vec3 lightColor = vec3(1.0, 1.0, 1.0);
 vec3 objectColor = vec3(1.0, 0.5, 0.2);
 
 vec2 tileSize = vec2(32.0, 32.0);
-vec2 atlasSize = vec2(32.0, 64.0);
+vec2 atlasSize = vec2(32.0, 128.0);
+
+vec3 GetTint()
+{
+    return vec3(0.55, 0.85, 0.35);
+}
 
 void main()
 {
@@ -24,10 +29,15 @@ void main()
 
     vec2 tileUVSize = tileSize / atlasSize;
     vec2 tileOffset = vec2(0.0, float(UvId) * tileUVSize.y);
+    vec3 tint = vec3(1.0);
+    if (UvId == 2u)
+    {
+        tint = GetTint();
+    }
 
     vec4 texColor = texture(atlasTexture, tileOffset + TexCoord * tileUVSize);
 
-    vec3 color = texColor.rgb * (0.2 + 0.8 * diff); // 0.2 = ambient
+    vec3 color = texColor.rgb * (0.2 + 0.8 * diff) * tint; // 0.2 = ambient
     FragColor = vec4(color, 1.0);
 }
 

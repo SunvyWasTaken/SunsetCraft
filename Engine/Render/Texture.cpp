@@ -48,7 +48,6 @@ namespace SunsetEngine
 
         stbi_image_free(m_Data);
         m_Data = nullptr;
-        LOG("Image Destroy")
     }
 
     void Image::SetData(unsigned char* data)
@@ -73,7 +72,6 @@ namespace SunsetEngine
     Texture::~Texture()
     {
         glDeleteTextures(1, &Id);
-        LOG("Texture destroy");
     }
 
     void Texture::Use(const Shader* shader) const
@@ -96,7 +94,6 @@ namespace SunsetEngine
         {
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_image->width, m_image->height, 0, GL_RGB, GL_UNSIGNED_BYTE, m_image->m_Data);
             glGenerateMipmap(GL_TEXTURE_2D);
-            LOG("Texture generated")
         }
 
         m_image->Clear();

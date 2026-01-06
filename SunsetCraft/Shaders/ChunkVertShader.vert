@@ -26,6 +26,21 @@ uint DecodeUV(uint v)
     return uint((v >> 23)& 511u);
 }
 
+uint DecodeSide(uint v)
+{
+    return (v >> 15u) & 7u; // 3 bits pour side (0–5)
+}
+
+int FaceOffset(uint side)
+{
+    if (side == 0u) return 18; // +X
+    if (side == 1u) return 12; // -X
+    if (side == 2u) return 24; // +Y
+    if (side == 3u) return 30; // -Y
+    if (side == 4u) return 6;  // +Z
+    return 0;                  // -Z
+}
+
 // 36 sommets d'un cube 1x1x1
 const vec3 cubeVerts[36] = vec3[](
     // front face
@@ -98,13 +113,20 @@ vec2(0,0), vec2(1,1), vec2(0,1)
 
 void main()
 {
-    vec3 localPos = cubeVerts[gl_VertexID % 36];
+    uint side = DecodeSide(vData);
+    int faceOffset = FaceOffset(side);
+
+    int vertId = faceOffset + (gl_VertexID % 6);
+
+    vec3 localPos = cubeVerts[vertId];
     vec3 blockPos = DecodePos(vData);
-    vec3 worldPos = blockPos + localPos + chunkLocation * 16;
-    gl_Position = projection * view * vec4(worldPos,1.0);
+
+    vec3 worldPos = blockPos + localPos + chunkLocation * 16.0;
+
+    gl_Position = projection * view * vec4(worldPos, 1.0);
 
     FragPos = worldPos;
-    Normal = normalize(cubeNormals[gl_VertexID % 36]);
-    TexCoord = cubeUV[gl_VertexID % 36];
+    Normal = cubeNormals[vertId];
+    TexCoord = cubeUV[vertId];
     UvId = DecodeUV(vData);
 }
