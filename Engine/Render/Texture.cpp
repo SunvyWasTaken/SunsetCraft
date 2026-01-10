@@ -81,20 +81,18 @@ namespace SunsetEngine
 
     Textures::Textures(std::vector<Image>& images, const int width, const int height)
         : m_Width(width)
-        , m_Height(height+ (1 * 2 * images.size()))
+        , m_Height(height)
         , m_Id(0)
         , m_Nbr(images.size())
     {
-        constexpr int padding = 1;
-
         SendTextureToGpu(m_Id, m_Width, m_Height);
 
         int currentY = 0;
 
         for (const auto& image : images)
         {
-            glTexSubImage2D(GL_TEXTURE_2D, 0, 0, currentY + padding, image.width, image.height, GL_RGB, GL_UNSIGNED_BYTE, image.m_Data);
-            currentY += image.width + padding * 2;
+            glTexSubImage2D(GL_TEXTURE_2D, 0, 0, currentY, image.width, image.height, GL_RGB, GL_UNSIGNED_BYTE, image.m_Data);
+            currentY += image.width;
         }
     }
 
