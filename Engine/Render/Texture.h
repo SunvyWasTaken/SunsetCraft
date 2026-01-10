@@ -20,6 +20,7 @@ namespace SunsetEngine
         void SetData(unsigned char* data);
         explicit operator bool() const;
 
+        std::string m_ImageName;
         unsigned char* m_Data;
         int width, height, nbrChannels;
     };

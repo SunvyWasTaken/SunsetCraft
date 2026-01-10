@@ -115,11 +115,11 @@ void main()
 {
     uint side = DecodeSide(vData);
     int faceOffset = FaceOffset(side);
+    vec3 blockPos = DecodePos(vData);
 
     int vertId = faceOffset + (gl_VertexID % 6);
 
     vec3 localPos = cubeVerts[vertId];
-    vec3 blockPos = DecodePos(vData);
 
     vec3 worldPos = blockPos + localPos + chunkLocation * 16.0;
 

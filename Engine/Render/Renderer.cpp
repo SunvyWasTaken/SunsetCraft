@@ -52,7 +52,7 @@ namespace SunsetEngine
 
         glfwSetFramebufferSizeCallback(m_Window, framebuffer_size_callback);
 
-        glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        // glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
         if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
         {

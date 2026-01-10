@@ -11,6 +11,8 @@
 
 namespace
 {
+    constexpr int TILE_SIZE = 32;
+
     std::unordered_map<std::string, std::uint32_t> _textures;
 
     void GetTextureFiles(const std::string_view& path, std::vector<std::string>& files)
@@ -29,27 +31,29 @@ namespace
         }
     }
 
-    unsigned char* CreateAtlas(int atlasWidth, int atlasHeight, const std::vector<SunsetEngine::Image>& m_Textures)
+    void CreateAtlas(unsigned char* atlasData, int atlasWidth, int atlasHeight, const std::vector<SunsetEngine::Image>& m_Textures)
     {
-        unsigned char* atlasData = new unsigned char[atlasWidth * atlasHeight * 4]; // RGBA
+        std::memset(atlasData, 0, atlasWidth * atlasHeight * 4);
+
         int currentY = 0;
 
         for (const auto& tex : m_Textures)
         {
-            for (int y = 0; y < tex.height; ++y)
-            {
-                for (int x = 0; x < tex.width; ++x)
+            for (int y = 0; y < TILE_SIZE; ++y)
+                for (int x = 0; x < TILE_SIZE; ++x)
                 {
-                    for (int c = 0; c < 4; ++c)
-                    {
-                        atlasData[((currentY + y) * atlasWidth + x) * 4 + c] = tex.m_Data[(y * tex.width + x) * 4 + c];
-                    }
-                }
-            }
-            currentY += tex.height;
-        }
+                    int dst = ((currentY + y) * atlasWidth + x) * 4;
+                    int src = (y * TILE_SIZE + x) * 4;
 
-        return atlasData;
+                    atlasData[dst + 0] = tex.m_Data[src + 0];
+                    atlasData[dst + 1] = tex.m_Data[src + 1];
+                    atlasData[dst + 2] = tex.m_Data[src + 2];
+                    atlasData[dst + 3] = tex.m_Data[src + 3];
+                }
+
+            currentY += TILE_SIZE;
+            LOG("Textures loaded: {}", tex.m_ImageName);
+        }
     }
 
     SunsetEngine::Texture LoadTextures(const std::string_view& path)
@@ -74,9 +78,11 @@ namespace
                 tmp.erase(0, path.length());
             }
             _textures.emplace(tmp, m_Textures.size() - 1);
+            LOG("{} Textures loaded: {}", m_Textures.size() - 1, tmp);
         }
 
-        unsigned char* atlasData = CreateAtlas(atlasWidth, atlasHeight, m_Textures);
+        unsigned char* atlasData = new unsigned char[atlasWidth * atlasHeight * 4];
+        CreateAtlas(atlasData, atlasWidth, atlasHeight, m_Textures);
 
         std::shared_ptr<SunsetEngine::Image> image = std::make_shared<SunsetEngine::Image>();
         image->SetData(atlasData);
@@ -87,8 +93,6 @@ namespace
         SunsetEngine::Texture texture{image};
         return texture;
     }
-
-
 }
 
 TexturesManager::TexturesManager()
