@@ -96,6 +96,21 @@ namespace SunsetEngine
         glUseProgram(id);
     }
 
+    void Shader::SetFloat(const std::string_view& name, float value) const
+    {
+        glUniform1f(glGetUniformLocation(id, name.data()), value);
+    }
+
+    void Shader::SetInt(const std::string_view& name, const int value) const
+    {
+        glUniform1i(glGetUniformLocation(id, name.data()), value);
+    }
+
+    void Shader::SetVec2(const std::string_view& name, const glm::vec2& vec) const
+    {
+        glUniform2fv(glGetUniformLocation(id, name.data()), 1, glm::value_ptr(vec));
+    }
+
     void Shader::SetVec3(const std::string_view& name, const glm::vec3& value) const
     {
         glUniform3f(glGetUniformLocation(id, name.data()), value.x, value.y, value.z);

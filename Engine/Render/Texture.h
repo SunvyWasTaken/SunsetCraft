@@ -25,25 +25,24 @@ namespace SunsetEngine
         int width, height, nbrChannels;
     };
 
-    class Texture
+    class Textures
     {
     public:
+        Textures(std::vector<Image>& images, int width, int height);
 
-        explicit Texture(const std::shared_ptr<Image>& image);
+        virtual ~Textures();
 
-        virtual ~Texture();
+        void Use(const Shader* shader, const std::string_view& name) const;
 
-        void Use(const Shader* shader) const;
+        size_t Nbr() const;
+
+        std::uint32_t operator()() const;
+
+        int m_Width, m_Height;
 
     private:
-
-        void SenbToGpu();
-
-    private:
-
-        std::shared_ptr<Image> m_image;
-
-        std::uint32_t Id;
+        std::uint32_t m_Id;
+        size_t m_Nbr;
     };
 }
 

@@ -12,6 +12,22 @@
 
 #include "stb_image.h"
 
+namespace
+{
+    void SendTextureToGpu(std::uint32_t& id, const int width, const int height, void* data = nullptr)
+    {
+        glGenTextures(1, &id);
+        glBindTexture(GL_TEXTURE_2D, id);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    }
+}
+
 namespace SunsetEngine
 {
     Image::Image(const std::string_view& path)
@@ -63,41 +79,45 @@ namespace SunsetEngine
 
     /// Texture
 
-    Texture::Texture(const std::shared_ptr<Image>& image)
-        : m_image(image)
-        , Id(0)
+    Textures::Textures(std::vector<Image>& images, const int width, const int height)
+        : m_Width(width)
+        , m_Height(height+ (1 * 2 * images.size()))
+        , m_Id(0)
+        , m_Nbr(images.size())
     {
-        SenbToGpu();
+        constexpr int padding = 1;
+
+        SendTextureToGpu(m_Id, m_Width, m_Height);
+
+        int currentY = 0;
+
+        for (const auto& image : images)
+        {
+            glTexSubImage2D(GL_TEXTURE_2D, 0, 0, currentY + padding, image.width, image.height, GL_RGB, GL_UNSIGNED_BYTE, image.m_Data);
+            currentY += image.width + padding * 2;
+        }
     }
 
-    Texture::~Texture()
+    Textures::~Textures()
     {
-        glDeleteTextures(1, &Id);
+        glDeleteTextures(1, &m_Id);
     }
 
-    void Texture::Use(const Shader* shader) const
+    void Textures::Use(const Shader* shader, const std::string_view& name) const
     {
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D,Id);
-        glUniform1i(glGetUniformLocation(shader->GetId(), "atlasTexture"), 0);
+        glBindTexture(GL_TEXTURE_2D,m_Id);
+        const GLint loc = glGetUniformLocation(shader->GetId(), name.data());
+        glUniform1i(loc, 0);
     }
 
-    void Texture::SenbToGpu()
+    size_t Textures::Nbr() const
     {
-        glGenTextures(1, &Id);
-        glBindTexture(GL_TEXTURE_2D, Id);
+        return m_Nbr;
+    }
 
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-        if (m_image)
-        {
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_image->width, m_image->height, 0, GL_RGB, GL_UNSIGNED_BYTE, m_image->m_Data);
-            glGenerateMipmap(GL_TEXTURE_2D);
-        }
-
-        m_image->Clear();
+    std::uint32_t Textures::operator()() const
+    {
+        return m_Id;
     }
 }

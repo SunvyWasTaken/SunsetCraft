@@ -22,8 +22,10 @@ public:
 
     std::uint32_t Get(const std::string_view& name);
 
+    SunsetEngine::Textures& GetImage();
+
 private:
-    SunsetEngine::Texture m_Texture;
+    SunsetEngine::Textures m_Texture;
 };
 
 #endif //SUNSETCRAFT_TEXTURESMANAGER_H
