@@ -98,6 +98,7 @@ namespace SunsetEngine
     {
         m_Shader->Use();
         m_Shader->SetVec2("u_ScreenSize", Application::GetSetting().WindowSize);
+        m_Shader->SetVec4("u_Color", m_Color);
 
         glBindVertexArray(m_VAO);
         glDrawArrays(GL_TRIANGLE_FAN, 0, NbrPoints);

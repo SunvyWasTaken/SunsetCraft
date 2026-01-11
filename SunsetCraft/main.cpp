@@ -6,6 +6,7 @@
 #include "Sources/World/CraftScene.h"
 #include "Core/Application.h"
 #include "Core/ApplicationSetting.h"
+#include "Layers/ToolbarLayer.h"
 
 int main()
 {
@@ -15,7 +16,8 @@ int main()
 
     app.PushLayer<CraftLayer>();
     app.PushLayer<CameraLayer>();
-    app.PushLayer<DebugLayer>();
+    app.PushLayer<ToolbarLayer>();
+    //app.PushLayer<DebugLayer>();
 
     app.Run();
     return 0;

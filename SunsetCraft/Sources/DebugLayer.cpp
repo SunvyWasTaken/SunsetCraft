@@ -39,7 +39,7 @@ void DebugLayer::OnDraw()
     if (CraftScene* tmp = static_cast<CraftScene*>(this->GetScene()))
     {
 
-        SunsetEngine::Square sq{{640, 360}, {250, 150}, {1, 1, 1, 1}, radius};
+        SunsetEngine::Square sq{{640, 360}, {250, 150}, {1, 0.5, 0.5, 1}, radius};
         sq.Draw();
 
         ImGui::Begin("DrawImage");

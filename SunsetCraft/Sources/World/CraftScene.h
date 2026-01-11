@@ -10,7 +10,6 @@
 #include "Core/Scene.h"
 #include "Render/Camera.h"
 
-
 struct RaycastHit;
 
 struct CraftScene : public SunsetEngine::Scene
@@ -25,6 +24,9 @@ struct CraftScene : public SunsetEngine::Scene
     SunsetEngine::Camera m_Camera;
     ChunkManager m_Chunks;
     TexturesManager m_TexturesManager;
+
+    // Toolbar
+    std::uint8_t currentSelectTool;
 };
 
 

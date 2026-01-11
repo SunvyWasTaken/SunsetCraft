@@ -7,13 +7,22 @@
 
 #include "Core/Layer.h"
 
+class CraftScene;
 
 class ToolbarLayer : public SunsetEngine::Layer
 {
-    virtual void OnAttach() = 0;
+    public:
+    ToolbarLayer(class SunsetEngine::Scene* scene);
+    virtual ~ToolbarLayer();
 
-    virtual void OnUpdate(float dt) = 0;
-    virtual void OnDraw() = 0;
+    virtual void OnAttach();
+
+    virtual void OnUpdate(float dt);
+    virtual void OnDraw();
+
+    private:
+
+    CraftScene* GetCraftScene();
 };
 
 
