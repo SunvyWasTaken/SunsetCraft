@@ -9,6 +9,11 @@
 #include "Slate/Square.h"
 #include "World/CraftScene.h"
 
+namespace
+{
+    float radius = 15.f;
+}
+
 DebugLayer::DebugLayer(SunsetEngine::Scene* scene)
     : SunsetEngine::Layer(scene)
 {
@@ -31,13 +36,14 @@ void DebugLayer::OnUpdate(float dt)
 
 void DebugLayer::OnDraw()
 {
-    SunsetEngine::Square sq{{640, 360}, {50, 10}, {1, 1, 1, 1}, 50.f};
-    sq.Draw();
-
     if (CraftScene* tmp = static_cast<CraftScene*>(this->GetScene()))
     {
-        // ImGui::Begin("DrawImage");
-        // ImGui::Image((ImTextureID)(intptr_t)tmp->m_TexturesManager.GetImage()(), ImVec2(32, 128));
-        // ImGui::End();
+
+        SunsetEngine::Square sq{{640, 360}, {250, 150}, {1, 1, 1, 1}, radius};
+        sq.Draw();
+
+        ImGui::Begin("DrawImage");
+        ImGui::InputFloat("Radius", &radius);
+        ImGui::End();
     }
 }

@@ -29,10 +29,10 @@ namespace
         constexpr int Nbr = NbrPoints / 4;
 
         const std::array<glm::ivec2, 4> offsetPos {
-            glm::ivec2{pos.x + size.x / 2, pos.y + size.y / 2},
-            {pos.x - size.x / 2, pos.y + size.y / 2},
-            {pos.x - size.x / 2, pos.y - size.y / 2},
-            {pos.x + size.x / 2, pos.y - size.y / 2}
+            glm::ivec2{pos.x + size.x / 2 - roundness, pos.y + size.y / 2 - roundness},
+            {pos.x - size.x / 2 + roundness, pos.y + size.y / 2 - roundness},
+            {pos.x - size.x / 2 + roundness, pos.y - size.y / 2 + roundness},
+            {pos.x + size.x / 2 - roundness, pos.y - size.y / 2 + roundness}
         };
 
         int currentSide = 0;
