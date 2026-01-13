@@ -52,14 +52,15 @@ namespace
 namespace SunsetEngine
 {
     Square::Square(const glm::ivec2& pos, const glm::ivec2& size, const glm::vec4& color, float roundness)
-        : m_Pos(pos)
-        , m_Size(size)
-        , m_Color(color)
+        : m_Color(color)
         , m_Roundness(roundness)
         , m_VAO(0)
         , m_VBO(0)
         , m_Shader(nullptr)
     {
+        SetPosition(pos);
+        SetSize(size);
+
         if (_shader.expired())
         {
             m_Shader =std::make_shared<Shader>("Engine/Shaders/Square.vert", "Engine/Shaders/Square.frag");
@@ -67,9 +68,44 @@ namespace SunsetEngine
         }
         else
             m_Shader = _shader.lock();
+    }
+
+    Square::~Square()
+    {
+        Clear();
+    }
+
+    void Square::Draw() const
+    {
+        const_cast<Square*>(this)->Rebuild();
+
+        m_Shader->Use();
+        m_Shader->SetVec2("u_ScreenSize", Application::GetSetting().WindowSize);
+        m_Shader->SetVec4("u_Color", m_Color);
+
+        glBindVertexArray(m_VAO);
+        glDrawArrays(GL_TRIANGLE_FAN, 0, NbrPoints);
+        glBindVertexArray(0);
+    }
+
+    void Square::Clear()
+    {
+        glDeleteVertexArrays(1, &m_VAO);
+        glDeleteBuffers(1, &m_VBO);
+
+        m_VAO = 0;
+        m_VBO = 0;
+    }
+
+    void Square::Rebuild()
+    {
+        if (!bIsDirty)
+            return;
+
+        Clear();
 
         std::vector<glm::vec2> points;
-        ComputeRoundedSquare(points, m_Pos, m_Size, m_Roundness);
+        ComputeRoundedSquare(points, m_Position, m_Size, m_Roundness);
 
         glGenVertexArrays(1, &m_VAO);
         glGenBuffers(1, &m_VBO);
@@ -83,25 +119,7 @@ namespace SunsetEngine
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glEnableVertexAttribArray(0);
-    }
 
-    Square::~Square()
-    {
-        glDeleteVertexArrays(1, &m_VAO);
-        glDeleteBuffers(1, &m_VBO);
-
-        m_VAO = 0;
-        m_VBO = 0;
-    }
-
-    void Square::Draw() const
-    {
-        m_Shader->Use();
-        m_Shader->SetVec2("u_ScreenSize", Application::GetSetting().WindowSize);
-        m_Shader->SetVec4("u_Color", m_Color);
-
-        glBindVertexArray(m_VAO);
-        glDrawArrays(GL_TRIANGLE_FAN, 0, NbrPoints);
-        glBindVertexArray(0);
+        bIsDirty = true;
     }
 }

@@ -5,11 +5,13 @@
 #ifndef SUNSETCRAFT_SQUARE_H
 #define SUNSETCRAFT_SQUARE_H
 
+#include "Slate.h"
+
 namespace SunsetEngine
 {
     class Shader;
 
-    class Square
+    class Square : public Slate
     {
     public:
 
@@ -17,10 +19,15 @@ namespace SunsetEngine
 
         virtual ~Square();
 
-        void Draw() const;
+        void Draw() const override;
+
+    private:
+
+        void Clear();
+
+        void Rebuild();
+
     protected:
-        glm::ivec2 m_Pos;
-        glm::ivec2 m_Size;
         glm::vec4 m_Color;
         float m_Roundness;
     private:
