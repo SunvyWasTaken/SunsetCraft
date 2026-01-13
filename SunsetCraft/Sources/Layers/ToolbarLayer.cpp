@@ -4,8 +4,11 @@
 
 #include "ToolbarLayer.h"
 
+#include <GLFW/glfw3.h>
 #include <glm/ext/quaternion_common.hpp>
 
+#include "Core/Input.h"
+#include "Imgui/imgui.h"
 #include "Slate/HorizontalBox.h"
 #include "Slate/Square.h"
 #include "World/CraftScene.h"
@@ -28,9 +31,11 @@ ToolbarLayer::~ToolbarLayer()
 
 void ToolbarLayer::OnAttach()
 {
-    ToolbarSlate.SetPosition({1280/2, 720-74/2});
+    ToolbarSlate.SetPosition({1280/2, 720});
     ToolbarSlate.SetPadding({5, 0});
     ToolbarSlate.Reserve(ToolbarSize);
+    ToolbarSlate.SetAnchor(SunsetEngine::Anchor::Bottom{});
+
     for (std::uint8_t i = 0; i < ToolbarSize; ++i)
     {
         std::shared_ptr<SunsetEngine::Slate> Square = std::make_shared<SunsetEngine::Square>(glm::ivec2{0,0}, glm::ivec2{74, 74}, glm::vec4{1.0, 0.3, 0.3, 1.0}, 15.f);
@@ -40,6 +45,33 @@ void ToolbarLayer::OnAttach()
 
 void ToolbarLayer::OnUpdate(float dt)
 {
+    if (CraftScene* craft_scene = GetCraftScene())
+    {
+        if (SunsetEngine::Input::IsMouseButtonClick(3))
+        {
+            craft_scene->currentSelectTool -= 1;
+            if (0 > craft_scene->currentSelectTool)
+                craft_scene->currentSelectTool = ToolbarSize - 1;
+        }
+        if (SunsetEngine::Input::IsMouseButtonClick(4))
+        {
+            craft_scene->currentSelectTool += 1;
+            if (ToolbarSize - 1 < craft_scene->currentSelectTool)
+                craft_scene->currentSelectTool = 0;
+        }
+
+        const int8_t currTool = craft_scene->currentSelectTool;
+
+        if (ToolbarSize <= currTool)
+            return;
+
+        for (auto& tool : ToolbarSlate)
+        {
+            tool->SetSize({75, 75});
+        }
+
+        ToolbarSlate[currTool]->SetSize({90, 90});
+    }
 }
 
 void ToolbarLayer::OnDraw()

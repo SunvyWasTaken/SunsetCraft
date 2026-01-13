@@ -7,6 +7,15 @@
 
 namespace SunsetEngine
 {
+    struct Anchor
+    {
+        struct Top { int8_t val = 1; };
+        struct Center { int8_t val = 0; };
+        struct Bottom { int8_t val = -1; };
+
+        using Type = std::variant<Center, Top, Bottom>;
+    };
+
     class Slate
     {
     public:

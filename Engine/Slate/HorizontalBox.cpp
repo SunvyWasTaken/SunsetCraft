@@ -30,10 +30,32 @@ namespace SunsetEngine
         bIsDirty = true;
     }
 
+    void HorizontalBox::SetAnchor(const Anchor::Type &val)
+    {
+        m_Anchor = val;
+        bIsDirty = true;
+    }
+
+    std::shared_ptr<Slate> & HorizontalBox::operator[](const uint8_t index)
+    {
+        bIsDirty = true;
+        return m_Children[index];
+    }
+
     void HorizontalBox::AddChild(const std::shared_ptr<Slate>& child)
     {
         m_Children.emplace_back(child);
         bIsDirty = true;
+    }
+
+    std::vector<std::shared_ptr<Slate>>::iterator HorizontalBox::begin()
+    {
+        return m_Children.begin();
+    }
+
+    std::vector<std::shared_ptr<Slate>>::iterator HorizontalBox::end()
+    {
+        return m_Children.end();
     }
 
     void HorizontalBox::Rebuild()
@@ -46,18 +68,20 @@ namespace SunsetEngine
         for (auto& child : m_Children)
         {
             m_Size.x += child->GetSize().x + m_Padding.x;
-            if (m_Size.y < child->GetSize().y)
-                m_Size.y = child->GetSize().y;
         }
-        m_Size.y += m_Padding.y * 2;
 
-        const size_t step = m_Size.x / m_Children.size();
         const size_t HalfSize = m_Size.x / 2;
-        const size_t StartPosition = m_Position.x - HalfSize;
+        size_t CurrentPosition = m_Position.x - HalfSize;
 
-        for (size_t i = 0; i < m_Children.size(); ++i)
+        for (auto & i : m_Children)
         {
-            m_Children[i]->SetPosition({StartPosition + step * i, m_Position.y});
+            size_t x = 0, y = 0;
+
+            x = CurrentPosition + i->GetSize().x / 2;
+            y = m_Position.y + (i->GetSize().y / 2) * std::visit([](auto&& curr)->int8_t{ return curr.val; }, m_Anchor);
+
+            i->SetPosition({x, y});
+            CurrentPosition += i->GetSize().x + m_Padding.x;
         }
 
         bIsDirty = false;

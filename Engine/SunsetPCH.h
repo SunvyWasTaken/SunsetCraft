@@ -17,6 +17,7 @@
 #include <memory>
 #include <ranges>
 #include <string>
+#include <variant>
 #include <vector>
 
 #include <glm/glm.hpp>

@@ -26,7 +26,7 @@ struct CraftScene : public SunsetEngine::Scene
     TexturesManager m_TexturesManager;
 
     // Toolbar
-    std::uint8_t currentSelectTool;
+    std::int8_t currentSelectTool = 1;
 };
 
 
