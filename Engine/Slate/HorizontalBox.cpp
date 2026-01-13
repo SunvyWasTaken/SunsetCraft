@@ -30,7 +30,7 @@ namespace SunsetEngine
         bIsDirty = true;
     }
 
-    void HorizontalBox::SetAnchor(const Anchor::Type &val)
+    void HorizontalBox::SetAnchor(const glm::vec2& val)
     {
         m_Anchor = val;
         bIsDirty = true;
@@ -78,7 +78,7 @@ namespace SunsetEngine
             size_t x = 0, y = 0;
 
             x = CurrentPosition + i->GetSize().x / 2;
-            y = m_Position.y + (i->GetSize().y / 2) * std::visit([](auto&& curr)->int8_t{ return curr.val; }, m_Anchor);
+            y = m_Position.y + (i->GetSize().y / 2) * m_Anchor.y;
 
             i->SetPosition({x, y});
             CurrentPosition += i->GetSize().x + m_Padding.x;

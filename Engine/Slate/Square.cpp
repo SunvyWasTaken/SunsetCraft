@@ -16,44 +16,13 @@ namespace
     constexpr int NbrPoints = 32;
 
     std::weak_ptr<SunsetEngine::Shader> _shader;
-
-    void ComputeRoundedSquare(std::vector<glm::vec2>& points, const glm::ivec2& pos, const glm::ivec2& size, float roundness)
-    {
-        constexpr float TwoPi = glm::two_pi<float>();
-
-        points.clear();
-        points.reserve(NbrPoints);
-
-        constexpr float step = TwoPi / NbrPoints;
-
-        constexpr int Nbr = NbrPoints / 4;
-
-        const std::array<glm::ivec2, 4> offsetPos {
-            glm::ivec2{pos.x + size.x / 2 - roundness, pos.y + size.y / 2 - roundness},
-            {pos.x - size.x / 2 + roundness, pos.y + size.y / 2 - roundness},
-            {pos.x - size.x / 2 + roundness, pos.y - size.y / 2 + roundness},
-            {pos.x + size.x / 2 - roundness, pos.y - size.y / 2 + roundness}
-        };
-
-        int currentSide = 0;
-        for (int i = 0; i < NbrPoints; ++i)
-        {
-            if (i >= currentSide * Nbr)
-                ++currentSide;
-
-            const glm::ivec2& currentOffset = offsetPos[currentSide - 1];
-            const float xi = roundness * glm::cos(step * i);
-            const float yi = roundness * glm::sin(step * i);
-            points.emplace_back(currentOffset.x + xi, currentOffset.y + yi);
-        }
-    }
 }
 
 namespace SunsetEngine
 {
-    Square::Square(const glm::ivec2& pos, const glm::ivec2& size, const glm::vec4& color, float roundness)
+    Square::Square(const glm::ivec2& pos, const glm::ivec2& size, const glm::vec4& color, int radius)
         : m_Color(color)
-        , m_Roundness(roundness)
+        , m_Radius(radius)
         , m_VAO(0)
         , m_VBO(0)
         , m_Shader(nullptr)
@@ -88,6 +57,12 @@ namespace SunsetEngine
         glBindVertexArray(0);
     }
 
+    void Square::SetAnchor(const glm::vec2 &val)
+    {
+        m_Anchor = val;
+        bIsDirty = true;
+    }
+
     void Square::Clear()
     {
         glDeleteVertexArrays(1, &m_VAO);
@@ -105,7 +80,7 @@ namespace SunsetEngine
         Clear();
 
         std::vector<glm::vec2> points;
-        ComputeRoundedSquare(points, m_Position, m_Size, m_Roundness);
+        ComputePoints(points);
 
         glGenVertexArrays(1, &m_VAO);
         glGenBuffers(1, &m_VBO);
@@ -121,5 +96,41 @@ namespace SunsetEngine
         glEnableVertexAttribArray(0);
 
         bIsDirty = true;
+    }
+
+    void Square::ComputePoints(std::vector<glm::vec2> &points)
+    {
+        constexpr float TwoPi = glm::two_pi<float>();
+
+        points.clear();
+        points.reserve(NbrPoints);
+
+        constexpr float step = TwoPi / NbrPoints;
+
+        constexpr int Nbr = NbrPoints / 4;
+
+        const int HalfSizeX = (m_Size.x / 2);
+        const int HalfSizeY = (m_Size.y / 2);
+
+        const std::array<glm::ivec2, 4> offsetPos
+        {
+            glm::ivec2{ m_Position.x + (HalfSizeX * (1 + m_Anchor.x)) - m_Radius, m_Position.y + (HalfSizeY * (1 + m_Anchor.y)) - m_Radius},
+            glm::ivec2{ m_Position.x - (HalfSizeX * (1 - m_Anchor.x)) + m_Radius, m_Position.y + (HalfSizeY * (1 + m_Anchor.y)) - m_Radius},
+            glm::ivec2{ m_Position.x - (HalfSizeX * (1 - m_Anchor.x)) + m_Radius, m_Position.y - (HalfSizeY * (1 - m_Anchor.y)) + m_Radius},
+            glm::ivec2{ m_Position.x + (HalfSizeX * (1 + m_Anchor.x)) - m_Radius, m_Position.y - (HalfSizeY * (1 - m_Anchor.y)) + m_Radius}
+        };
+
+
+        int currentSide = 0;
+        for (int i = 0; i < NbrPoints; ++i)
+        {
+            if (i >= currentSide * Nbr)
+                ++currentSide;
+
+            const glm::ivec2& currentOffset = offsetPos[currentSide - 1];
+            const float xi = static_cast<float>(m_Radius) * glm::cos(step * i);
+            const float yi = static_cast<float>(m_Radius) * glm::sin(step * i);
+            points.emplace_back(currentOffset.x + xi, currentOffset.y + yi);
+        }
     }
 }

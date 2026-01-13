@@ -34,7 +34,7 @@ void ToolbarLayer::OnAttach()
     ToolbarSlate.SetPosition({1280/2, 720});
     ToolbarSlate.SetPadding({5, 0});
     ToolbarSlate.Reserve(ToolbarSize);
-    ToolbarSlate.SetAnchor(SunsetEngine::Anchor::Bottom{});
+    ToolbarSlate.SetAnchor({0, -1});
 
     for (std::uint8_t i = 0; i < ToolbarSize; ++i)
     {
@@ -47,13 +47,13 @@ void ToolbarLayer::OnUpdate(float dt)
 {
     if (CraftScene* craft_scene = GetCraftScene())
     {
-        if (SunsetEngine::Input::IsMouseButtonClick(3))
+        if (SunsetEngine::Input::IsMouseButtonClick(4))
         {
             craft_scene->currentSelectTool -= 1;
             if (0 > craft_scene->currentSelectTool)
                 craft_scene->currentSelectTool = ToolbarSize - 1;
         }
-        if (SunsetEngine::Input::IsMouseButtonClick(4))
+        if (SunsetEngine::Input::IsMouseButtonClick(3))
         {
             craft_scene->currentSelectTool += 1;
             if (ToolbarSize - 1 < craft_scene->currentSelectTool)

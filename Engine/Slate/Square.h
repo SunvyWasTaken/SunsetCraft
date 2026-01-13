@@ -15,11 +15,13 @@ namespace SunsetEngine
     {
     public:
 
-        Square(const glm::ivec2& pos, const glm::ivec2& size, const glm::vec4& color = glm::vec4{1.f}, float roundness = 0.f);
+        Square(const glm::ivec2& pos, const glm::ivec2& size, const glm::vec4& color = glm::vec4{1.f}, int radius = 0);
 
         virtual ~Square();
 
         void Draw() const override;
+
+        void SetAnchor(const glm::vec2& val);
 
     private:
 
@@ -27,9 +29,11 @@ namespace SunsetEngine
 
         void Rebuild();
 
+        void ComputePoints(std::vector<glm::vec2>& points);
+
     protected:
         glm::vec4 m_Color;
-        float m_Roundness;
+        int m_Radius;
     private:
         std::uint32_t m_VAO;
         std::uint32_t m_VBO;

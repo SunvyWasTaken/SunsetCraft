@@ -12,14 +12,14 @@
 #include "World/CraftScene.h"
 #include "World/RaycastHit.h"
 
-#include <GLFW/glfw3.h>
+#include "Core/Application.h"
+#include "Core/ApplicationSetting.h"
+#include "Slate/Square.h"
 
 namespace
 {
     float yaw = -90.f;
     float pitch = 0.f;
-
-    SunsetEngine::Shader* m_Shader = nullptr;
 
     void ProcessInput(SunsetEngine::Camera& camera, const float dt)
     {
@@ -68,12 +68,10 @@ CameraLayer::CameraLayer(SunsetEngine::Scene* scene)
 
 CameraLayer::~CameraLayer()
 {
-    delete m_Shader;
 }
 
 void CameraLayer::OnAttach()
 {
-    m_Shader = new SunsetEngine::Shader("SunsetCraft/Shaders/CubeOutline.vert", "SunsetCraft/Shaders/CubeOutline.frag");
 }
 
 void CameraLayer::OnUpdate(float dt)
@@ -82,26 +80,47 @@ void CameraLayer::OnUpdate(float dt)
     {
         ProcessInput(scene->m_Camera, dt);
 
+
+
         RaycastHit hit;
         scene->LineTrace(hit , scene->m_Camera.GetPosition(), scene->m_Camera.GetForward(), 10.f);
         if (hit)
         {
-            if (SunsetEngine::Input::IsMouseButtonClick(GLFW_MOUSE_BUTTON_1))
-                hit.chunk->SetBlockId(hit.blockPose + hit.hitNormal, BlockId::Dirt);
-            else if (SunsetEngine::Input::IsMouseButtonClick(GLFW_MOUSE_BUTTON_2))
-                hit.chunk->SetBlockId(hit.blockPose, BlockId::Air);
+            if (SunsetEngine::Input::IsMouseButtonClick(1))
+            {
+                if (scene->currentSelectTool == 0)
+                    hit.chunk->SetBlockId(hit.blockPose + hit.hitNormal, BlockId::Dirt);
+                else if (scene->currentSelectTool == 1)
+                    hit.chunk->SetBlockId(hit.blockPose + hit.hitNormal, BlockId::Stone);
 
-            m_Shader->Use();
-            m_Shader->SetVec3("BlockLocation", hit.blockPose);
-            m_Shader->SetMat4("view", scene->m_Camera.GetViewMatrix());
-            m_Shader->SetMat4("projection", scene->m_Camera.GetProjection());
-            SunsetEngine::Render::SetWireframe(true);
-            SunsetEngine::Render::DrawCube();
-            SunsetEngine::Render::SetWireframe(false);
+            }
+            else if (SunsetEngine::Input::IsMouseButtonClick(0))
+                hit.chunk->SetBlockId(hit.blockPose, BlockId::Air);
         }
     }
 }
 
 void CameraLayer::OnDraw()
 {
+    int length = 15;
+    int width = 5;
+    int radius = 2;
+    glm::vec4 color{1.0, 0.2, 0.2, 0.5};
+    int spacecing = 2;
+
+    glm::ivec2 WinSize = SunsetEngine::Application::GetSetting().WindowSize;
+
+    SunsetEngine::Square crossTop{{WinSize.x / 2, WinSize.y / 2 - spacecing}, {width, length}, color, radius};
+    crossTop.SetAnchor({0, -1});
+    SunsetEngine::Square crossDown{{WinSize.x / 2, WinSize.y / 2 + spacecing}, {width, length}, color, radius};
+    crossDown.SetAnchor({0, 1});
+    SunsetEngine::Square crossLeft{{WinSize.x / 2 - spacecing, WinSize.y / 2}, {length, width}, color, radius};
+    crossLeft.SetAnchor({-1, 0});
+    SunsetEngine::Square crossRight{{WinSize.x / 2 + spacecing, WinSize.y / 2}, {length, width}, color, radius};
+    crossRight.SetAnchor({1, 0});
+
+    crossTop.Draw();
+    crossDown.Draw();
+    crossLeft.Draw();
+    crossRight.Draw();
 }

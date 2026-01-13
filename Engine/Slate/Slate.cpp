@@ -10,6 +10,7 @@ namespace SunsetEngine
         : bIsDirty(true)
         , m_Position(0, 0)
         , m_Size(0, 0)
+        , m_Anchor(0.f, 0.f)
     {
     }
 

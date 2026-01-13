@@ -21,7 +21,7 @@ namespace SunsetEngine
 
         void SetPadding(const glm::ivec2& padding);
 
-        void SetAnchor(const Anchor::Type& val);
+        void SetAnchor(const glm::vec2& val);
 
         std::shared_ptr<Slate>& operator[](const uint8_t index);
 
@@ -40,7 +40,6 @@ namespace SunsetEngine
     protected:
         glm::ivec2 m_Padding = {0, 0};
         std::vector<std::shared_ptr<Slate>> m_Children;
-        Anchor::Type m_Anchor;
     };
 }
 
