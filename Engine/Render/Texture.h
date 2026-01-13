@@ -9,21 +9,7 @@
 namespace SunsetEngine
 {
     class Shader;
-
-    struct Image
-    {
-    public:
-        explicit Image(const std::string_view& path = std::string_view{});
-        virtual ~Image();
-        void LoadImage(const std::string_view& path);
-        void Clear();
-        void SetData(unsigned char* data);
-        explicit operator bool() const;
-
-        std::string m_ImageName;
-        unsigned char* m_Data;
-        int width, height, nbrChannels;
-    };
+    struct Image;
 
     class Textures
     {

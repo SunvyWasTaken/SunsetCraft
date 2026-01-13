@@ -4,10 +4,10 @@
 
 #include "TexturesManager.h"
 
-#include <filesystem>
-#include <iostream>
-
+#include "Render/Image.h"
 #include "Render/Shader.h"
+
+#include <filesystem>
 
 namespace
 {
