@@ -9,13 +9,17 @@
 
 namespace SunsetEngine
 {
+    class Shader;
+
     class SlateImage : public Slate
     {
+    public:
         SlateImage();
         virtual ~SlateImage();
         void LoadImage(const std::string_view& path);
         void Draw() const override;
     private:
+        std::shared_ptr<Shader> m_Shader;
         uint32_t VAO;
         uint32_t VBO;
         uint32_t m_Id;

@@ -14,10 +14,10 @@ int main()
     SunsetEngine::Application app{AppSetting};
     app.SetScene<CraftScene>();
 
-    app.PushLayer<CraftLayer>();
-    app.PushLayer<CameraLayer>();
-    app.PushLayer<ToolbarLayer>();
-    //app.PushLayer<DebugLayer>();
+    //app.PushLayer<CraftLayer>();
+    //app.PushLayer<CameraLayer>();
+    //app.PushLayer<ToolbarLayer>();
+    app.PushLayer<DebugLayer>();
 
     app.Run();
     return 0;
