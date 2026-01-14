@@ -102,25 +102,5 @@ void CameraLayer::OnUpdate(float dt)
 
 void CameraLayer::OnDraw()
 {
-    int length = 15;
-    int width = 5;
-    int radius = 2;
-    glm::vec4 color{1.0, 0.2, 0.2, 0.5};
-    int spacecing = 2;
-
-    glm::ivec2 WinSize = SunsetEngine::Application::GetSetting().WindowSize;
-
-    SunsetEngine::Square crossTop{{WinSize.x / 2, WinSize.y / 2 - spacecing}, {width, length}, color, radius};
-    crossTop.SetAnchor({0, -1});
-    SunsetEngine::Square crossDown{{WinSize.x / 2, WinSize.y / 2 + spacecing}, {width, length}, color, radius};
-    crossDown.SetAnchor({0, 1});
-    SunsetEngine::Square crossLeft{{WinSize.x / 2 - spacecing, WinSize.y / 2}, {length, width}, color, radius};
-    crossLeft.SetAnchor({-1, 0});
-    SunsetEngine::Square crossRight{{WinSize.x / 2 + spacecing, WinSize.y / 2}, {length, width}, color, radius};
-    crossRight.SetAnchor({1, 0});
-
-    crossTop.Draw();
-    crossDown.Draw();
-    crossLeft.Draw();
-    crossRight.Draw();
+    HUD("CameraLayer Draw");
 }

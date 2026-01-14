@@ -25,13 +25,13 @@ namespace
     };
 
     std::array<vertice, 6> Square{
-        vertice{{-1.f,  1.f}, {1, 1}}, // top-left
-        vertice{{ 1.f,  1.f}, {0, 1}}, // top-right
-        vertice{{ 1.f, -1.f}, {0, 0}}, // bottom-right
+        vertice{{-1.f,  1.f}, {0, 0}}, // top-left
+        vertice{{ 1.f,  1.f}, {1, 0}}, // top-right
+        vertice{{ 1.f, -1.f}, {1, 1}}, // bottom-right
 
-        vertice{{ 1.f, -1.f}, {0, 0}},
-        vertice{{-1.f, -1.f}, {1, 0}},
-        vertice{{-1.f,  1.f}, {1, 1}}
+        vertice{{ 1.f, -1.f}, {1, 1}},
+        vertice{{-1.f, -1.f}, {0, 1}},
+        vertice{{-1.f,  1.f}, {0, 0}}
     };
 
 
@@ -78,12 +78,12 @@ namespace SunsetEngine
         SendTextureToGpu(m_Id, img.width, img.height, img.m_Data);
     }
 
-    void SlateImage::Draw(const Camera& cam) const
+    void SlateImage::Draw() const
     {
         const_cast<SlateImage*>(this)->Rebuild();
         glm::ivec2 WindowSize = Application::GetSetting().WindowSize;
         m_Shader->Use();
-        m_Shader->SetMat4("u_Proj", glm::ortho(0.0f, (float)WindowSize.x, 0.0f, (float)WindowSize.y, -1.0f, 1.0f));
+        m_Shader->SetMat4("u_Proj", glm::ortho(0.0f, (float)WindowSize.x, (float)WindowSize.y, 0.0f, -1.0f, 1.0f));
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D,m_Id);
         const GLint loc = glGetUniformLocation(m_Shader->GetId(), "U_Image");

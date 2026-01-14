@@ -15,11 +15,13 @@ namespace SunsetEngine
 
         virtual void Draw() const {};
 
+        [[nodiscard]]
         glm::ivec2 GetPosition() const;
-        void SetPosition(const glm::ivec2& position);
+        virtual void SetPosition(const glm::ivec2& position);
 
+        [[nodiscard]]
         glm::ivec2 GetSize() const;
-        void SetSize(const glm::ivec2& size);
+        virtual void SetSize(const glm::ivec2& size);
 
     protected:
         bool bIsDirty;

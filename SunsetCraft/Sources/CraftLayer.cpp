@@ -38,6 +38,7 @@ void CraftLayer::OnUpdate(float dt)
 
 void CraftLayer::OnDraw()
 {
+    HUD("CraftLayerDraw");
     if (CraftScene* scene = static_cast<CraftScene*>(GetScene()))
     {
         scene->m_Chunks.Draw();

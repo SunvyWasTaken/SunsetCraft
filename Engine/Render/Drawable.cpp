@@ -50,6 +50,9 @@ namespace SunsetEngine
 
     void Drawable::Draw() const
     {
+        glEnable(GL_CULL_FACE);
+        glEnable(GL_DEPTH_TEST);
+
         glBindVertexArray(vao);
         glDrawArraysInstanced(GL_TRIANGLES, 0, 6, static_cast<GLsizei>(vertexCount));
         glBindVertexArray(0);

@@ -23,6 +23,12 @@ namespace SunsetEngine
 
         void SetAnchor(const glm::vec2& val);
 
+        void AddChild(const std::shared_ptr<Slate>& child);
+
+        virtual void SetPosition(const glm::ivec2& pos) override;
+
+        virtual void SetSize(const glm::ivec2& size) override;
+
     private:
 
         void Clear();
@@ -34,6 +40,7 @@ namespace SunsetEngine
     protected:
         glm::vec4 m_Color;
         int m_Radius;
+        std::shared_ptr<Slate> m_Child;
     private:
         std::uint32_t m_VAO;
         std::uint32_t m_VBO;

@@ -23,7 +23,7 @@ namespace SunsetEngine
         SlateImage();
         virtual ~SlateImage();
         void LoadImage(const std::string_view& path);
-        void Draw(const Camera& cam) const;
+        void Draw() const override;
     private:
         void Rebuild();
         void ComputeVertex(std::vector<vertice>& vertices);

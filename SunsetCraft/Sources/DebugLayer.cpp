@@ -44,6 +44,6 @@ void DebugLayer::OnDraw()
 {
     if (CraftScene* tmp = static_cast<CraftScene*>(this->GetScene()))
     {
-        image->Draw(tmp->m_Camera);
+        image->Draw();
     }
 }

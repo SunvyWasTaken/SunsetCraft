@@ -23,6 +23,7 @@ namespace SunsetEngine
     Square::Square(const glm::ivec2& pos, const glm::ivec2& size, const glm::vec4& color, int radius)
         : m_Color(color)
         , m_Radius(radius)
+        , m_Child(nullptr)
         , m_VAO(0)
         , m_VBO(0)
         , m_Shader(nullptr)
@@ -55,12 +56,37 @@ namespace SunsetEngine
         glBindVertexArray(m_VAO);
         glDrawArrays(GL_TRIANGLE_FAN, 0, NbrPoints);
         glBindVertexArray(0);
+
+        if (m_Child)
+            m_Child->Draw();
+
     }
 
     void Square::SetAnchor(const glm::vec2 &val)
     {
         m_Anchor = val;
         bIsDirty = true;
+    }
+
+    void Square::AddChild(const std::shared_ptr<Slate> &child)
+    {
+        m_Child = child;
+        m_Child->SetPosition(m_Position);
+        m_Child->SetSize(m_Size - glm::ivec2{m_Radius + 5, m_Radius + 5});
+    }
+
+    void Square::SetPosition(const glm::ivec2 &pos)
+    {
+        Slate::SetPosition(pos);
+        if (m_Child)
+            m_Child->SetPosition(pos);
+    }
+
+    void Square::SetSize(const glm::ivec2 &size)
+    {
+        Slate::SetSize(size);
+        if (m_Child)
+            m_Child->SetSize(size - glm::ivec2{m_Radius + 5, m_Radius + 5});
     }
 
     void Square::Clear()

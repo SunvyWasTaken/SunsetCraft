@@ -83,7 +83,6 @@ namespace SunsetEngine
 
     Shader::~Shader()
     {
-        LOG("Shader {} destroy", id)
         glDeleteProgram(id);
     }
 
