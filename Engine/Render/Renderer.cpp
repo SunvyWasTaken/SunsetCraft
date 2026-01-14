@@ -52,7 +52,9 @@ namespace SunsetEngine
 
         glfwSetFramebufferSizeCallback(m_Window, framebuffer_size_callback);
 
+    #ifdef NDEBUG
         glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    #endif
 
         if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
         {
@@ -112,8 +114,8 @@ namespace SunsetEngine
             Hud::Clear();
         }
 
-        ImGui::SetNextWindowPos(ImVec2(0, Application::GetSetting().WindowSize.y - 150), ImGuiCond_Always);
-        ImGui::SetNextWindowSize(ImVec2(Application::GetSetting().WindowSize.x, 150), ImGuiCond_Always);
+        ImGui::SetNextWindowPos(ImVec2(Application::GetSetting().WindowSize.x - 200, 0), ImGuiCond_Always);
+        ImGui::SetNextWindowSize(ImVec2(200, Application::GetSetting().WindowSize.y), ImGuiCond_Always);
         ImGui::Begin("Log", nullptr);
         for (std::vector<std::string>::iterator it = Logger::begin(); it != Logger::end(); ++it)
         {

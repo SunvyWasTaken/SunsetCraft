@@ -7,8 +7,14 @@
 
 #include "Slate.h"
 
+namespace
+{
+    struct vertice;
+}
+
 namespace SunsetEngine
 {
+    class Camera;
     class Shader;
 
     class SlateImage : public Slate
@@ -17,7 +23,11 @@ namespace SunsetEngine
         SlateImage();
         virtual ~SlateImage();
         void LoadImage(const std::string_view& path);
-        void Draw() const override;
+        void Draw(const Camera& cam) const;
+    private:
+        void Rebuild();
+        void ComputeVertex(std::vector<vertice>& vertices);
+        void Clear();
     private:
         std::shared_ptr<Shader> m_Shader;
         uint32_t VAO;
