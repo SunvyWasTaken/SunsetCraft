@@ -65,21 +65,37 @@ void ToolbarLayer::OnAttach()
     }
 }
 
+static bool isKeyPress = false;
+
 void ToolbarLayer::OnUpdate(float dt)
 {
     if (CraftScene* craft_scene = GetCraftScene())
     {
-        if (SunsetEngine::Input::IsMouseButtonClick(4))
+        if (SunsetEngine::Input::IsMouseButtonClick(4) || SunsetEngine::Input::IsKeyPress(GLFW_KEY_LEFT))
         {
+            if (isKeyPress)
+                return;
+
             craft_scene->currentSelectTool -= 1;
             if (0 > craft_scene->currentSelectTool)
                 craft_scene->currentSelectTool = ToolbarSize - 1;
+
+            isKeyPress = true;
         }
-        if (SunsetEngine::Input::IsMouseButtonClick(3))
+        else if (SunsetEngine::Input::IsMouseButtonClick(3) || SunsetEngine::Input::IsKeyPress(GLFW_KEY_RIGHT))
         {
+            if (isKeyPress)
+                return;
+
             craft_scene->currentSelectTool += 1;
             if (ToolbarSize - 1 < craft_scene->currentSelectTool)
                 craft_scene->currentSelectTool = 0;
+
+            isKeyPress = true;
+        }
+        else
+        {
+            isKeyPress = false;
         }
 
         const int8_t currTool = craft_scene->currentSelectTool;

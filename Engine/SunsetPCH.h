@@ -22,34 +22,7 @@
 
 #include <glm/glm.hpp>
 
-#include  "Log/Logger.h"
-
-template <typename T>
-struct std::formatter<glm::vec<3, T, glm::defaultp>> : std::formatter<T>
-{
-    template <typename FormatContext>
-    auto format(const glm::vec<3, T, glm::defaultp>& v, FormatContext& ctx) const
-    {
-        return std::format_to(
-            ctx.out(),
-            "(x:{}, y:{}, z:{})",
-            v.x, v.y, v.z
-        );
-    }
-};
-
-template <typename T>
-struct std::formatter<glm::vec<2, T, glm::defaultp>> : std::formatter<T>
-{
-    template <typename FormatContext>
-auto format(const glm::vec<2, T, glm::defaultp>& v, FormatContext& ctx) const
-    {
-        return std::format_to(
-            ctx.out(),
-            "(x:{}, y:{})",
-            v.x, v.y
-        );
-    }
-};
+#include "Log/Logger.h"
+#include "Utility/DebugGLM.h"
 
 #endif //SUNSETCRAFT_SUNSETPCH_H
