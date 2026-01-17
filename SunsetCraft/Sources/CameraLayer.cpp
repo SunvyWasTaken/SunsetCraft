@@ -15,6 +15,7 @@
 #include "Core/Application.h"
 #include "Core/ApplicationSetting.h"
 #include "Slate/Square.h"
+#include "Utility/BlockRegistry.h"
 
 namespace
 {
@@ -89,13 +90,15 @@ void CameraLayer::OnUpdate(float dt)
             if (SunsetEngine::Input::IsMouseButtonClick(1))
             {
                 if (scene->currentSelectTool == 0)
-                    hit.chunk->SetBlockId(hit.blockPose + hit.hitNormal, BlockId::Dirt);
+                    hit.chunk->SetBlockId(hit.blockPose + hit.hitNormal, BlockRegistry::DIRT);
                 else if (scene->currentSelectTool == 1)
-                    hit.chunk->SetBlockId(hit.blockPose + hit.hitNormal, BlockId::Stone);
+                    hit.chunk->SetBlockId(hit.blockPose + hit.hitNormal, BlockRegistry::STONE);
+                else if (scene->currentSelectTool == 2)
+                    hit.chunk->SetBlockId(hit.blockPose + hit.hitNormal, BlockRegistry::Get("wood").id);
 
             }
             else if (SunsetEngine::Input::IsMouseButtonClick(0))
-                hit.chunk->SetBlockId(hit.blockPose, BlockId::Air);
+                hit.chunk->SetBlockId(hit.blockPose, BlockRegistry::AIR);
         }
     }
 }

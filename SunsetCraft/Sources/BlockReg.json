@@ -1,7 +1,9 @@
 [
   {
+    "name": "air"
+  },
+  {
   "name": "grass",
-  "id": 2,
   "textures":
     {
       "all" : "grass_block_side.png",
@@ -11,7 +13,6 @@
   },
   {
     "name": "dirt",
-    "id": 1,
     "textures":
     {
       "all" : "dirt.png"
@@ -19,10 +20,18 @@
   },
   {
     "name": "stone",
-    "id": 1,
     "textures":
     {
       "all" : "stone.png"
+    }
+  },
+  {
+    "name" : "wood",
+    "textures":
+    {
+      "all": "oak_log.png",
+      "top": "oak_log_top.png",
+      "bottom": "oak_log_top.png"
     }
   }
 ]

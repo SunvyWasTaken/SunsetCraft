@@ -9,6 +9,7 @@
 #include "RaycastHit.h"
 #include "Chunk/Chunk.h"
 #include "Block.h"
+#include "Utility/BlockRegistry.h"
 
 void CraftScene::LineTrace(RaycastHit& hit, const glm::vec3& start, const glm::vec3& forward, const float distance)
 {
@@ -57,7 +58,7 @@ void CraftScene::LineTrace(RaycastHit& hit, const glm::vec3& start, const glm::v
         if (chunk)
         {
             BlockId blockId = chunk->GetBlockId(voxelPos);
-            if (blockId != BlockId::Air)
+            if (blockId != BlockRegistry::AIR)
             {
                 hit.Hit = true;
                 hit.blockPose = voxelPos;

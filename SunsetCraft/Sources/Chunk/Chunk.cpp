@@ -58,7 +58,7 @@ namespace
     {
         if (x < 0 || x >= Chunk::ChunkSize() || y < 0 || y >= Chunk::ChunkSize() || z < 0 || z >= Chunk::ChunkSize())
             return false;
-        return data[Index(x, y, z)] != BlockId::Air;
+        return data[Index(x, y, z)] != BlockRegistry::AIR;
     }
 
     void CreateMesh(const BlockList& data, std::vector<std::uint32_t>& indices, CraftScene* scene)
@@ -71,14 +71,14 @@ namespace
                 for (int x = 0; x < Chunk::ChunkSize(); ++x)
                 {
                     const BlockId voxel = data[Index(x, y, z)];
-                    if (voxel == BlockId::Air)
+                    if (voxel == BlockRegistry::AIR)
                         continue;
 
                     auto getUv = [&](BlockFace side)
                     {
                         const BlockType& block = BlockRegistry::Get(voxel);
 
-                        return scene->m_TexturesManager.Get(block.textures[(uint8_t)side]);
+                        return scene->m_TexturesManager.Get(block.textures[static_cast<uint8_t>(side)]);
                     };
 
                     // +X
@@ -205,14 +205,14 @@ void Chunk::Generate()
             for (int y = 0; y < Chunk::ChunkSize(); ++y)
             {
                 int WorldY = y + static_cast<int>(position.y) * m_chunkSize;
-                if (WorldY < noise - 3)
-                    data[Index(x, y, z)] = BlockId::Stone;
-                else if (WorldY < noise - 1)
-                    data[Index(x, y, z)] = BlockId::Dirt;
-                else if (WorldY < noise)
-                    data[Index(x, y, z)] = BlockId::Grass;
+                if (WorldY > noise)
+                    data[Index(x, y, z)] = BlockRegistry::AIR;
+                else if (WorldY >= noise - 1)
+                    data[Index(x, y, z)] = BlockRegistry::GRASS;
+                else if (WorldY > noise - 3)
+                    data[Index(x, y, z)] = BlockRegistry::DIRT;
                 else
-                    data[Index(x, y, z)] = BlockId::Air;
+                    data[Index(x, y, z)] = BlockRegistry::STONE;
             }
         }
     }

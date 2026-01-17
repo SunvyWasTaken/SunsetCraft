@@ -7,13 +7,13 @@
 
 #include "Block.h"
 
-enum class BlockId : uint8_t;
+using BlockId = uint8_t;
 class Chunk;
 
 struct RaycastHit
 {
     bool Hit = false;
-    BlockId BlockType = BlockId::Null;
+    BlockId BlockType = 0;
     Chunk* chunk = nullptr;
     glm::ivec3 blockPose;
     glm::ivec3 hitNormal;
@@ -26,7 +26,7 @@ struct RaycastHit
     void Clear()
     {
         Hit = false;
-        BlockType = BlockId::Null;
+        BlockType = 0;
         chunk = nullptr;
         blockPose = glm::ivec3(0);
         hitNormal = glm::ivec3(0);

@@ -5,14 +5,7 @@
 #ifndef SUNSETCRAFT_BLOCK_H
 #define SUNSETCRAFT_BLOCK_H
 
-enum class BlockId : uint8_t
-{
-    Null    = 0,
-    Air     = 1,
-    Dirt    = 2,
-    Grass   = 3,
-    Stone   = 4
-};
+using BlockId = uint8_t;
 
 enum class BlockFace : uint8_t
 {
@@ -26,7 +19,7 @@ enum class BlockFace : uint8_t
 
 struct BlockType
 {
-    BlockId id = BlockId::Null;
+    BlockId id = 0;
     std::string name = "unknow";
     std::array<std::string, 6> textures = {"SunsetShimmer.png", "SunsetShimmer.png", "SunsetShimmer.png", "SunsetShimmer.png", "SunsetShimmer.png", "SunsetShimmer.png"};
     bool IsSolid = false;

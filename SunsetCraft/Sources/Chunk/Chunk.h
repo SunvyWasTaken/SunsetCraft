@@ -5,7 +5,7 @@
 #ifndef SUNSETCRAFT_CHUNK_H
 #define SUNSETCRAFT_CHUNK_H
 
-#include "../World/Block.h"
+#include "World/Block.h"
 
 namespace SunsetEngine
 {
