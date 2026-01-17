@@ -1,9 +1,7 @@
 #version 330 core
 
-in vec3 FragPos;
 in vec3 Normal;
 in vec2 TexCoord;
-flat in uint fNbrTile;
 flat in uint UvId;
 
 uniform sampler2D atlasTexture;
@@ -35,7 +33,4 @@ void main()
     vec3 color = texColor.rgb * (0.2 + 0.8 * diff);
 
     FragColor = vec4(color, 1.0);
-    //FragColor = vec4(tileUVSize, 0.0, 0.0, 1.0);
-    //FragColor = vec4(texture(atlasTexture, TexCoord));
-    // FragColor = texture(atlasTexture, vec2(0.2, 0.2));
 }

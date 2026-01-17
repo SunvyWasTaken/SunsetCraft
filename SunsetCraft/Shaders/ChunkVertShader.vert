@@ -7,7 +7,6 @@ uniform mat4 projection;
 uniform mat4 view;
 uniform uint NbrTile;
 
-out vec3 FragPos;
 out vec3 Normal;
 out vec2 TexCoord;
 flat out uint fNbrTile;
@@ -127,7 +126,6 @@ void main()
 
     gl_Position = projection * view * vec4(worldPos, 1.0);
 
-    FragPos = worldPos;
     Normal = cubeNormals[vertId];
     TexCoord = cubeUV[vertId];
     UvId = DecodeUV(vData);

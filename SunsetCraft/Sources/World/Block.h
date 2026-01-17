@@ -16,12 +16,12 @@ enum class BlockId : uint8_t
 
 enum class BlockFace : uint8_t
 {
-    South   = 0,
-    North   = 1,
-    East    = 2,
-    West    = 3,
-    Top     = 4,
-    Bottom  = 5
+    East    = 0, // +X
+    West    = 1, // -X
+    Top     = 2, // +Y
+    Bottom  = 3, // -Y
+    North   = 4, // +Z
+    South   = 5  // -Z
 };
 
 struct BlockType
