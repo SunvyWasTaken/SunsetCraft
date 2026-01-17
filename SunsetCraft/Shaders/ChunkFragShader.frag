@@ -22,7 +22,7 @@ void main()
     float diff = max(dot(normalize(Normal), -lightDir), 0.0);
 
     // taille UV d'une tile
-    float tileUVSize = 1.0 / 4.0;
+    float tileUVSize = 1.0 / 5.0;
 
     // offset UV correct (atlas vertical)
     float tileOffset = float(UvId) * tileUVSize;

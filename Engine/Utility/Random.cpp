@@ -154,10 +154,10 @@ namespace SunsetEngine
         int jj = j & 255;
         int kk = k & 255;
 
-        int gi0 = perm[ii + perm[jj + perm[kk]]] % 12;
-        int gi1 = perm[ii + i1 + perm[jj + j1 + perm[kk + k1]]] % 12;
-        int gi2 = perm[ii + i2 + perm[jj + j2 + perm[kk + k2]]] % 12;
-        int gi3 = perm[ii + 1 + perm[jj + 1 + perm[kk + 1]]] % 12;
+        int gi0 = perm()[ii + perm()[jj + perm()[kk]]] % 12;
+        int gi1 = perm()[ii + i1 + perm()[jj + j1 + perm()[kk + k1]]] % 12;
+        int gi2 = perm()[ii + i2 + perm()[jj + j2 + perm()[kk + k2]]] % 12;
+        int gi3 = perm()[ii + 1 + perm()[jj + 1 + perm()[kk + 1]]] % 12;
 
         // Gradients for 3D (from classic Simplex Noise)
         static const float grad3[12][3] = {

@@ -1,0 +1,28 @@
+[
+  {
+  "name": "grass",
+  "id": 2,
+  "textures":
+    {
+      "all" : "grass_block_side.png",
+      "top": "grass_block_top.png",
+      "bottom": "dirt.png"
+    }
+  },
+  {
+    "name": "dirt",
+    "id": 1,
+    "textures":
+    {
+      "all" : "dirt.png"
+    }
+  },
+  {
+    "name": "stone",
+    "id": 1,
+    "textures":
+    {
+      "all" : "stone.png"
+    }
+  }
+]

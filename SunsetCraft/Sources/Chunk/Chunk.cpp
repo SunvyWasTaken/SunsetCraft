@@ -8,25 +8,15 @@
 #include "Render/Camera.h"
 #include "Render/Drawable.h"
 #include "Render/Shader.h"
+#include "World/CraftScene.h"
+#include "Utility/BlockRegistry.h"
+#include "World/Block.h"
 
 #include <glm/gtc/noise.hpp>
-
-#include "../World/CraftScene.h"
-#include "World/Block.h"
 
 namespace
 {
     CraftScene* m_Scene = nullptr;
-
-    enum VoxelSide : std::uint8_t
-    {
-        PosX = 0,
-        NegX = 1,
-        PosY = 2,
-        NegY = 3,
-        PosZ = 4,
-        NegZ = 5
-    };
 
     constexpr std::uint32_t EncodeVoxel(
         const std::uint32_t x,
@@ -84,37 +74,31 @@ namespace
                     if (voxel == BlockId::Air)
                         continue;
 
-                    auto getUv = [&](VoxelSide side)
+                    auto getUv = [&](BlockFace side)
                     {
-                        if (voxel == BlockId::Stone)
-                            return scene->m_TexturesManager.Get("stone.png");
-                        // exemple : herbe
-                        if (side == PosY)
-                            return scene->m_TexturesManager.Get("grass_block_top.png");
-                        if (side == NegY)
-                            return scene->m_TexturesManager.Get("dirt.png");
+                        const BlockType& block = BlockRegistry::Get(voxel);
 
-                        return scene->m_TexturesManager.Get("grass_block_side.png");
+                        return scene->m_TexturesManager.Get(block.textures[(uint8_t)side]);
                     };
 
                     // +X
                     if (!IsSolid(data, x + 1, y, z))
-                        indices.push_back(EncodeVoxel(x, y, z, PosX, getUv(PosX)));
+                        indices.push_back(EncodeVoxel(x, y, z, static_cast<uint8_t>(BlockFace::East), getUv(BlockFace::East)));
                     // -X
                     if (!IsSolid(data, x - 1, y, z))
-                        indices.push_back(EncodeVoxel(x, y, z, NegX, getUv(NegX)));
+                        indices.push_back(EncodeVoxel(x, y, z, static_cast<uint8_t>(BlockFace::West), getUv(BlockFace::West)));
                     // +Y
                     if (!IsSolid(data, x, y + 1, z))
-                        indices.push_back(EncodeVoxel(x, y, z, PosY, getUv(PosY)));
+                        indices.push_back(EncodeVoxel(x, y, z, static_cast<uint8_t>(BlockFace::Top), getUv(BlockFace::Top)));
                     // -Y
                     if (!IsSolid(data, x, y - 1, z))
-                        indices.push_back(EncodeVoxel(x, y, z, NegY, getUv(NegY)));
+                        indices.push_back(EncodeVoxel(x, y, z, static_cast<uint8_t>(BlockFace::Bottom), getUv(BlockFace::Bottom)));
                     // +Z
                     if (!IsSolid(data, x, y, z + 1))
-                        indices.push_back(EncodeVoxel(x, y, z, PosZ, getUv(PosZ)));
+                        indices.push_back(EncodeVoxel(x, y, z, static_cast<uint8_t>(BlockFace::North), getUv(BlockFace::North)));
                     // -Z
                     if (!IsSolid(data, x, y, z - 1))
-                        indices.push_back(EncodeVoxel(x, y, z, NegZ, getUv(NegZ)));
+                        indices.push_back(EncodeVoxel(x, y, z, static_cast<uint8_t>(BlockFace::South), getUv(BlockFace::South)));
                 }
             }
         }
@@ -221,10 +205,12 @@ void Chunk::Generate()
             for (int y = 0; y < Chunk::ChunkSize(); ++y)
             {
                 int WorldY = y + static_cast<int>(position.y) * m_chunkSize;
-                if (WorldY < noise - 2)
+                if (WorldY < noise - 3)
                     data[Index(x, y, z)] = BlockId::Stone;
-                else if (WorldY < noise)
+                else if (WorldY < noise - 1)
                     data[Index(x, y, z)] = BlockId::Dirt;
+                else if (WorldY < noise)
+                    data[Index(x, y, z)] = BlockId::Grass;
                 else
                     data[Index(x, y, z)] = BlockId::Air;
             }
