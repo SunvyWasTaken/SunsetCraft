@@ -91,47 +91,6 @@ namespace SunsetEngine
         return !glfwWindowShouldClose(m_Window);
     }
 
-    void Renderer::BeginFrame()
-    {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-    }
-
-    void Renderer::EndFrame()
-    {
-        if (!Hud::IsEmpty())
-        {
-            ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
-            ImGui::Begin("Stats", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
-            for (std::vector<std::string>::iterator it = Hud::begin(); it != Hud::end(); ++it)
-            {
-                ImGui::Text("%s", it->c_str());
-            }
-            ImGui::End();
-            Hud::Clear();
-        }
-
-        ImGui::SetNextWindowPos(ImVec2(Application::GetSetting().WindowSize.x - 200, 0), ImGuiCond_Always);
-        ImGui::SetNextWindowSize(ImVec2(200, Application::GetSetting().WindowSize.y), ImGuiCond_Always);
-        ImGui::Begin("Log", nullptr);
-        for (std::vector<std::string>::iterator it = Logger::begin(); it != Logger::end(); ++it)
-        {
-             ImGui::Text("%s", it->c_str());
-        }
-        ImGui::SetScrollHereY(1.0f);
-        ImGui::End();
-
-        ImGui::Render();
-
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-        glfwSwapBuffers(m_Window);
-        glfwPollEvents();
-    }
-
     void* Renderer::Get()
     {
         return m_Window;

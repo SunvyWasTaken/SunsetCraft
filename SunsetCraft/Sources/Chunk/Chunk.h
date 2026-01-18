@@ -11,7 +11,8 @@ namespace SunsetEngine
 {
     class Camera;
     class Shader;
-    class Drawable;
+    template <typename t>
+    class VertexArray;
 }
 
 class CraftScene;
@@ -48,7 +49,7 @@ private:
     glm::vec3 position;
     BlockList data;
 
-    std::unique_ptr<SunsetEngine::Drawable> m_Drawable;
+    std::shared_ptr<SunsetEngine::VertexArray<uint32_t>> m_Drawable;
     std::unique_ptr<SunsetEngine::Shader> m_Shader;
 };
 

@@ -6,13 +6,14 @@
 
 #include "Math/AABB.h"
 #include "Render/Camera.h"
-#include "Render/Drawable.h"
 #include "Render/Shader.h"
-#include "World/CraftScene.h"
+#include "Render/RenderCommande.h"
 #include "Utility/BlockRegistry.h"
+#include "World/CraftScene.h"
 #include "World/Block.h"
 
 #include <glm/gtc/noise.hpp>
+
 
 namespace
 {
@@ -165,7 +166,10 @@ Chunk::Chunk(const glm::vec3& pos, CraftScene* scene)
     std::vector<std::uint32_t> vertices;
     CreateMesh(data, vertices, m_Scene);
 
-    m_Drawable = std::make_unique<SunsetEngine::Drawable>(vertices);
+    m_Drawable = std::make_shared<SunsetEngine::VertexArray<uint32_t>>();
+    std::shared_ptr<SunsetEngine::VertexBuffer<uint32_t>> vertex_buffer = std::make_shared<SunsetEngine::VertexBuffer<uint32_t>>(vertices);
+    vertex_buffer->SetLayout({SunsetEngine::BufferElement{SunsetEngine::ShaderType::UInt{}, "vData"}});
+    m_Drawable->AddBuffers(vertex_buffer);
     m_Shader = std::make_unique<SunsetEngine::Shader>("SunsetCraft/Shaders/ChunkVertShader.vert", "SunsetCraft/Shaders/ChunkFragShader.frag");
 }
 
@@ -183,7 +187,10 @@ void Chunk::UseShader(const SunsetEngine::Camera& camera) const
 
 void Chunk::Draw() const
 {
-    m_Drawable->Draw();
+    if (!m_Drawable)
+        return;
+
+    SunsetEngine::RenderCommande::SubmitInstance(m_Drawable, 6);
 }
 
 void Chunk::Generate()
@@ -237,6 +244,10 @@ void Chunk::SetBlockId(const glm::ivec3& pos, BlockId blockId)
     std::vector<std::uint32_t> vertices;
     CreateMesh(data, vertices, m_Scene);
 
-    m_Drawable->Clear();
-    m_Drawable->Create(vertices);
+    m_Drawable.reset();
+
+    m_Drawable = std::make_shared<SunsetEngine::VertexArray<uint32_t>>();
+    std::shared_ptr<SunsetEngine::VertexBuffer<uint32_t>> vertex_buffer = std::make_shared<SunsetEngine::VertexBuffer<uint32_t>>(vertices);
+    vertex_buffer->SetLayout({SunsetEngine::BufferElement{SunsetEngine::ShaderType::UInt{}, "vData"}});
+    m_Drawable->AddBuffers(vertex_buffer);
 }

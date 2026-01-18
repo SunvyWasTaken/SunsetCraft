@@ -141,4 +141,85 @@ namespace SunsetEngine
     {
         m_Stride = CalculateStride(m_Elements);
     }
+
+    template<typename T>
+   VertexBuffer<T>::VertexBuffer(const std::vector<T> &vertices)
+        : m_Id(0)
+        , m_Layout({})
+        , m_Size(vertices.size())
+    {
+        glGenBuffers(1, &m_Id);
+        Bind();
+        glBufferData(GL_ARRAY_BUFFER, sizeof(T) * vertices.size(), vertices.data(), GL_STATIC_DRAW);
+        Unbind();
+    }
+
+    template<typename T>
+    VertexBuffer<T>::~VertexBuffer()
+    {
+        glDeleteBuffers(1, &m_Id);
+    }
+
+    template<typename T>
+    void VertexBuffer<T>::Bind() const
+    {
+        glBindBuffer(GL_ARRAY_BUFFER, m_Id);
+    }
+
+    template<typename T>
+    void VertexBuffer<T>::Unbind() const
+    {
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
+
+    template<typename T>
+    void VertexBuffer<T>::SetLayout(const std::initializer_list<BufferElement> &elements)
+    {
+        m_Layout = elements;
+    }
+
+    template<typename T>
+    BufferLayout VertexBuffer<T>::GetLayout() const
+    {
+        return m_Layout;
+    }
+
+    template<typename T>
+    size_t VertexBuffer<T>::GetSize() const
+    {
+        return m_Size;
+    }
+
+    IndiceBuffer::IndiceBuffer(const std::vector<uint32_t> &indices)
+        : m_Id(0)
+        , m_Count(indices.size())
+    {
+        glGenBuffers(1, &m_Id);
+        Bind();
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint32_t) * indices.size(), indices.data(), GL_STATIC_DRAW);
+        Unbind();
+    }
+
+    IndiceBuffer::~IndiceBuffer()
+    {
+        glDeleteBuffers(1, &m_Id);
+    }
+
+    void IndiceBuffer::Bind() const
+    {
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Id);
+    }
+
+    void IndiceBuffer::Unbind() const
+    {
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    }
+
+    size_t IndiceBuffer::GetCount() const
+    {
+        return m_Count;
+    }
+
+    template class VertexBuffer<float>;
+    template class VertexBuffer<uint32_t>;
 }

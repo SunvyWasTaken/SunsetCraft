@@ -80,7 +80,7 @@ namespace SunsetEngine
         std::string name;
         ShaderType::Type type;
         uint32_t size;
-        uint32_t offset;
+        int offset;
         bool normalized;
 
         int Count() const;
@@ -108,6 +108,40 @@ namespace SunsetEngine
         std::vector<BufferElement> m_Elements;
 
         uint32_t m_Stride;
+    };
+
+    template <typename T>
+    class VertexBuffer
+    {
+    public:
+        explicit VertexBuffer(const std::vector<T>& vertices);
+        virtual ~VertexBuffer();
+
+        void Bind() const;
+        void Unbind() const;
+
+        void SetLayout(const std::initializer_list<BufferElement>& elements);
+        BufferLayout GetLayout() const;
+
+        size_t GetSize() const;
+
+    private:
+        uint32_t m_Id;
+        BufferLayout m_Layout;
+        size_t m_Size;
+    };
+
+    class IndiceBuffer
+    {
+    public:
+        explicit IndiceBuffer(const std::vector<uint32_t>& indices);
+        virtual ~IndiceBuffer();
+        void Bind() const;
+        void Unbind() const;
+        size_t GetCount() const;
+    private:
+        uint32_t m_Id;
+        size_t m_Count;
     };
 }
 

@@ -12,7 +12,6 @@ namespace SunsetEngine
         : vao(0)
         , vbo(0)
         , vertexCount(vertices.size())
-        , layout({})
     {
         Create(vertices);
     }
@@ -32,12 +31,6 @@ namespace SunsetEngine
     {
         vertexCount = vertices.size();
 
-        if (layout.empty())
-        {
-            HUD("generation failed misarably cuz layout isn't set.");
-            return;
-        }
-
         glGenVertexArrays(1, &vao);
         glGenBuffers(1, &vbo);
 
@@ -46,13 +39,9 @@ namespace SunsetEngine
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glBufferData(GL_ARRAY_BUFFER, sizeof(std::uint32_t) * vertices.size(), vertices.data(), GL_STATIC_DRAW);
 
-        uint32_t index = 0;
-        for (const auto& element : layout)
-        {
-            glVertexAttribIPointer(index, element.Count(), element(), layout.GetStride(), (const void*)element.offset);
-            glEnableVertexAttribArray(index);
-            ++index;
-        }
+        glVertexAttribIPointer(0, 1, GL_UNSIGNED_INT, sizeof(std::uint32_t), (void*)0);
+        glEnableVertexAttribArray(0);
+        glVertexAttribDivisor(0, 1);
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 

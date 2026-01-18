@@ -7,6 +7,7 @@
 #include "ApplicationSetting.h"
 #include "Layer.h"
 #include "Scene.h"
+#include "Render/RenderCommande.h"
 #include "Render/Renderer.h"
 
 namespace
@@ -52,12 +53,12 @@ namespace SunsetEngine
                 layer->OnUpdate(dt.count());
             }
 
-            m_Render->BeginFrame();
+            RenderCommande::BeginFrame();
             for (auto layer = m_LayerStack.end(); layer != m_LayerStack.begin(); )
             {
                 (*--layer)->OnDraw();
             }
-            m_Render->EndFrame();
+            RenderCommande::EndFrame();
         }
     }
 

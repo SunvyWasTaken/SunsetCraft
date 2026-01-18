@@ -47,30 +47,33 @@ namespace
             block.id = currentBlockId++;
             block.name = block_json["name"];
 
-            auto& tex = block_json["textures"];
-            if (tex.contains("all"))
+            if (block_json.contains("textures"))
             {
-                std::string all = tex.value("all", "");
-                for (auto& t : block.textures)
-                    t = all;
+                auto& tex = block_json["textures"];
+                if (tex.contains("all"))
+                {
+                    std::string all = tex.value("all", "");
+                    for (auto& t : block.textures)
+                        t = all;
+                }
+                if (tex.contains("top"))
+                    block.textures[static_cast<int>(BlockFace::Top)] = tex["top"];
+
+                if (tex.contains("bottom"))
+                    block.textures[static_cast<int>(BlockFace::Bottom)] = tex["bottom"];
+
+                if (tex.contains("north"))
+                    block.textures[static_cast<int>(BlockFace::North)] = tex["north"];
+
+                if (tex.contains("south"))
+                    block.textures[static_cast<int>(BlockFace::South)] = tex["south"];
+
+                if (tex.contains("west"))
+                    block.textures[static_cast<int>(BlockFace::West)] = tex["west"];
+
+                if (tex.contains("east"))
+                    block.textures[static_cast<int>(BlockFace::East)] = tex["east"];
             }
-            if (tex.contains("top"))
-                block.textures[static_cast<int>(BlockFace::Top)] = tex["top"];
-
-            if (tex.contains("bottom"))
-                block.textures[static_cast<int>(BlockFace::Bottom)] = tex["bottom"];
-
-            if (tex.contains("north"))
-                block.textures[static_cast<int>(BlockFace::North)] = tex["north"];
-
-            if (tex.contains("south"))
-                block.textures[static_cast<int>(BlockFace::South)] = tex["south"];
-
-            if (tex.contains("west"))
-                block.textures[static_cast<int>(BlockFace::West)] = tex["west"];
-
-            if (tex.contains("east"))
-                block.textures[static_cast<int>(BlockFace::East)] = tex["east"];
 
             m_BlockRegistry[block.id] = block;
             m_BlockRegistryName[block.name] = block.id;
