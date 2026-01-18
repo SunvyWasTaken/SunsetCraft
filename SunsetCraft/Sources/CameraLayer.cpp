@@ -95,6 +95,8 @@ void CameraLayer::OnUpdate(float dt)
                     hit.chunk->SetBlockId(hit.blockPose + hit.hitNormal, BlockRegistry::STONE);
                 else if (scene->currentSelectTool == 2)
                     hit.chunk->SetBlockId(hit.blockPose + hit.hitNormal, BlockRegistry::Get("wood").id);
+                else if (scene->currentSelectTool == 3)
+                    hit.chunk->SetBlockId(hit.blockPose + hit.hitNormal, BlockRegistry::Get("diamond_ore").id);
 
             }
             else if (SunsetEngine::Input::IsMouseButtonClick(0))

@@ -33,5 +33,12 @@
       "top": "oak_log_top.png",
       "bottom": "oak_log_top.png"
     }
+  },
+  {
+    "name" : "diamond_ore",
+    "textures" :
+    {
+      "all" : "diamond_ore.png"
+    }
   }
 ]

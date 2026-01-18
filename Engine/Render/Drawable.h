@@ -5,6 +5,8 @@
 #ifndef SUNSETCRAFT_DRAWABLE_H
 #define SUNSETCRAFT_DRAWABLE_H
 
+#include "Buffer.h"
+
 namespace SunsetEngine
 {
     class Drawable final
@@ -22,6 +24,7 @@ namespace SunsetEngine
     private:
         std::uint32_t vao, vbo;
         std::size_t vertexCount;
+        BufferLayout layout;
     };
 }
 
