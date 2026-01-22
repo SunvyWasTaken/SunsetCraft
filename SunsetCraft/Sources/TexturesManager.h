@@ -20,7 +20,7 @@ public:
 
     void Use(const SunsetEngine::Shader* shader) const;
 
-    std::uint32_t Get(const std::string_view& name);
+    static std::uint32_t Get(const std::string_view& name);
 
     SunsetEngine::Textures& GetImage();
 
