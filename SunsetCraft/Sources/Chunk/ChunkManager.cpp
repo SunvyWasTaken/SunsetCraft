@@ -5,27 +5,19 @@
 #include "ChunkManager.h"
 
 #include "Chunk.h"
-#include "../World/CraftScene.h"
+#include "ChunkMeshBuilder.h"
+#include "ChunkUtility.h"
+#include "WorldGenerator.h"
+#include "Render/Shader.h"
+#include "World/CraftScene.h"
 
 namespace
 {
-    int m_RenderDistance = 6;
-    int verticalRadius = 2;
+    int m_RenderDistance = 12;
+    int verticalRadius = 16;
 
-    using ChunkKey = std::tuple<int,int,int>;
-
-    struct triplet_hash
-    {
-        std::size_t operator()(const ChunkKey& t) const
-        {
-            auto h1 = std::hash<int>{}(std::get<0>(t));
-            auto h2 = std::hash<int>{}(std::get<1>(t));
-            auto h3 = std::hash<int>{}(std::get<2>(t));
-            return h1 ^ (h2 << 1) ^ (h3 << 2);
-        }
-    };
-
-    std::unordered_map<ChunkKey, std::unique_ptr<Chunk>, triplet_hash> m_Chunks;
+    std::unordered_map<glm::ivec3, std::unique_ptr<Chunk>, triplet_hash> m_Chunks;
+    std::unique_ptr<SunsetEngine::Shader> m_ChunkShader = nullptr;
 
     template <typename T>
     int WorldToChunk(T value)
@@ -33,15 +25,16 @@ namespace
         return static_cast<int>(std::floor(value / m_chunkSize));
     }
 
-    void LoadChunk(const glm::ivec3& position, CraftScene* scene)
+    void LoadChunk(const glm::ivec3& position)
     {
         for (int x = position.x - m_RenderDistance; x <= position.x + m_RenderDistance; ++x) {
             for (int z = position.z - m_RenderDistance; z <= position.z + m_RenderDistance; ++z) {
                 for (int y = position.y - verticalRadius; y <= position.y + verticalRadius; ++y) {
-                    ChunkKey key = std::make_tuple(x, y, z);
+                    const glm::ivec3 key{x, y, z};
                     if (m_Chunks.find(key) == m_Chunks.end()) {
                         // Créer et générer le chunk
-                        m_Chunks[key] = std::make_unique<Chunk>(glm::vec3{x, y, z}, scene);
+                        m_Chunks[key] = std::make_unique<Chunk>(glm::vec3{x, y, z});
+                        WorldGenerator::Request(*(m_Chunks[key].get()));
                     }
                 }
             }
@@ -52,9 +45,9 @@ namespace
     {
         for (auto it = m_Chunks.begin(); it != m_Chunks.end(); )
         {
-            int dx = std::abs(std::get<0>(it->first) - position.x);
-            int dy = std::abs(std::get<1>(it->first) - position.y);
-            int dz = std::abs(std::get<2>(it->first) - position.z);
+            int dx = std::abs(it->first.x - position.x);
+            int dy = std::abs(it->first.y - position.y);
+            int dz = std::abs(it->first.z - position.z);
 
             if (dx > m_RenderDistance || dz > m_RenderDistance || dy > verticalRadius)
             {
@@ -69,15 +62,18 @@ namespace
     }
 }
 
-ChunkManager::ChunkManager()
+void ChunkManager::Init()
 {
     LOG("Chunk Manager Create")
+
     m_Chunks.clear();
+    m_ChunkShader = std::make_unique<SunsetEngine::Shader>("SunsetCraft/Shaders/ChunkVertShader.vert", "SunsetCraft/Shaders/ChunkFragShader.frag");
 }
 
-ChunkManager::~ChunkManager()
+void ChunkManager::Shutdown()
 {
     m_Chunks.clear();
+    m_ChunkShader.reset();
 }
 
 void ChunkManager::Update(const glm::vec3& position)
@@ -88,31 +84,29 @@ void ChunkManager::Update(const glm::vec3& position)
         WorldToChunk(position.z)};
 
     UnloadChunk(positionInChunk);
-    LoadChunk(positionInChunk, m_Scene);
+    LoadChunk(positionInChunk);
 }
 
-void ChunkManager::Draw() const
+void ChunkManager::SetBlock(const glm::vec3 &position, BlockType blockType)
 {
-    for (const auto& chunk : m_Chunks | std::views::values)
+}
+
+BlockType ChunkManager::GetBlock(const glm::vec3 &position)
+{
+    return BlockType{};
+}
+
+void ChunkManager::Draw(CraftScene* scene)
+{
+    m_ChunkShader->Use();
+    m_ChunkShader->SetMat4("projection", scene->m_Camera.GetProjection());
+    m_ChunkShader->SetMat4("view", scene->m_Camera.GetViewMatrix());
+
+    scene->m_TexturesManager.Use(m_ChunkShader.get());
+
+    for (const auto &chunk: m_Chunks | std::views::values)
     {
-        chunk->UseShader(m_Scene->m_Camera);
-        m_Scene->m_TexturesManager.Use(chunk->GetShader());
+        m_ChunkShader->SetVec3("chunkLocation", chunk->GetPosition());
         chunk->Draw();
     }
-}
-
-Chunk* ChunkManager::GetChunks(const glm::vec3& position)
-{
-    Chunk* result = nullptr;
-
-    // Position du joueur en coordonnées chunk
-    int chunkX = WorldToChunk(position.x);
-    int chunkY = WorldToChunk(position.y);
-    int chunkZ = WorldToChunk(position.z);
-
-    const ChunkKey key = std::make_tuple(chunkX, chunkY, chunkZ);
-
-    result = m_Chunks.at(key).get();
-
-    return result;
 }

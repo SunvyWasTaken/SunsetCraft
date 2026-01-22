@@ -5,24 +5,24 @@
 #ifndef SUNSETCRAFT_CHUNKMANAGER_H
 #define SUNSETCRAFT_CHUNKMANAGER_H
 
+struct BlockType;
+
 class Chunk;
 class CraftScene;
 
 class ChunkManager final
 {
 public:
-    ChunkManager();
-    ~ChunkManager();
+    static void Init();
+    static void Shutdown();
 
-    void Update(const glm::vec3& position);
+    static void Update(const glm::vec3& position);
 
-    void Draw() const;
+    static void SetBlock(const glm::vec3& position, BlockType blockType);
 
-    Chunk* GetChunks(const glm::vec3& position);
+    static BlockType GetBlock(const glm::vec3& position);
 
-private:
-    friend class CraftScene;
-    CraftScene* m_Scene = nullptr;
+    static void Draw(CraftScene* scene);
 };
 
 #endif //SUNSETCRAFT_CHUNKMANAGER_H

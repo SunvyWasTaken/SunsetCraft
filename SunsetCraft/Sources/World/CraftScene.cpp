@@ -11,8 +11,20 @@
 #include "Block.h"
 #include "Utility/BlockRegistry.h"
 
+CraftScene::CraftScene()
+{
+    ChunkManager::Init();
+}
+
+CraftScene::~CraftScene()
+{
+    ChunkManager::Shutdown();
+}
+
 void CraftScene::LineTrace(RaycastHit& hit, const glm::vec3& start, const glm::vec3& forward, const float distance)
 {
+    return;
+
     hit.Clear();
 
     // Direction du rayon
@@ -54,20 +66,20 @@ void CraftScene::LineTrace(RaycastHit& hit, const glm::vec3& start, const glm::v
     while (t <= distance)
     {
         // Récupération du chunk / bloc
-        Chunk* chunk = m_Chunks.GetChunks(voxelPos);
-        if (chunk)
-        {
-            BlockId blockId = chunk->GetBlockId(voxelPos);
-            if (blockId != BlockRegistry::AIR)
-            {
-                hit.Hit = true;
-                hit.blockPose = voxelPos;
-                hit.chunk = chunk;
-                hit.BlockType = blockId;
-                hit.hitNormal = hitNormal;
-                return;
-            }
-        }
+        // Chunk* chunk = m_Chunks.GetChunks(voxelPos);
+        // if (chunk)
+        // {
+        //     BlockId blockId = chunk->GetBlockId(voxelPos);
+        //     if (blockId != BlockRegistry::AIR)
+        //     {
+        //         hit.Hit = true;
+        //         hit.blockPose = voxelPos;
+        //         hit.chunk = chunk;
+        //         hit.BlockType = blockId;
+        //         hit.hitNormal = hitNormal;
+        //         return;
+        //     }
+        // }
 
         // Avancer vers la frontière la plus proche
         if (tMax.x < tMax.y)

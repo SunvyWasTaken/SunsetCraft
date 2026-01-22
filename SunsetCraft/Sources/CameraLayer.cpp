@@ -83,23 +83,23 @@ void CameraLayer::OnUpdate(float dt)
 
 
 
-        RaycastHit hit;
-        scene->LineTrace(hit , scene->m_Camera.GetPosition(), scene->m_Camera.GetForward(), 10.f);
-        if (hit)
-        {
-            if (SunsetEngine::Input::IsMouseButtonClick(1))
-            {
-                if (scene->currentSelectTool == 0)
-                    hit.chunk->SetBlockId(hit.blockPose + hit.hitNormal, BlockRegistry::DIRT);
-                else if (scene->currentSelectTool == 1)
-                    hit.chunk->SetBlockId(hit.blockPose + hit.hitNormal, BlockRegistry::STONE);
-                else if (scene->currentSelectTool == 2)
-                    hit.chunk->SetBlockId(hit.blockPose + hit.hitNormal, BlockRegistry::Get("wood").id);
-
-            }
-            else if (SunsetEngine::Input::IsMouseButtonClick(0))
-                hit.chunk->SetBlockId(hit.blockPose, BlockRegistry::AIR);
-        }
+        // RaycastHit hit;
+        // scene->LineTrace(hit , scene->m_Camera.GetPosition(), scene->m_Camera.GetForward(), 10.f);
+        // if (hit)
+        // {
+        //     if (SunsetEngine::Input::IsMouseButtonClick(1))
+        //     {
+        //         if (scene->currentSelectTool == 0)
+        //             hit.chunk->SetBlockId(hit.blockPose + hit.hitNormal, BlockRegistry::DIRT);
+        //         else if (scene->currentSelectTool == 1)
+        //             hit.chunk->SetBlockId(hit.blockPose + hit.hitNormal, BlockRegistry::STONE);
+        //         else if (scene->currentSelectTool == 2)
+        //             hit.chunk->SetBlockId(hit.blockPose + hit.hitNormal, BlockRegistry::Get("wood").id);
+        //
+        //     }
+        //     else if (SunsetEngine::Input::IsMouseButtonClick(0))
+        //         hit.chunk->SetBlockId(hit.blockPose, BlockRegistry::AIR);
+        // }
     }
 }
 

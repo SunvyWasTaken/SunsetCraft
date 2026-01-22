@@ -32,7 +32,7 @@ void CraftLayer::OnUpdate(float dt)
 {
     if (CraftScene* scene = static_cast<CraftScene*>(GetScene()))
     {
-        scene->m_Chunks.Update(scene->m_Camera.GetPosition());
+        ChunkManager::Update(scene->m_Camera.GetPosition());
     }
 }
 
@@ -41,7 +41,7 @@ void CraftLayer::OnDraw()
     HUD("CraftLayerDraw");
     if (CraftScene* scene = static_cast<CraftScene*>(GetScene()))
     {
-        scene->m_Chunks.Draw();
+        ChunkManager::Draw(scene);
     }
 }
 

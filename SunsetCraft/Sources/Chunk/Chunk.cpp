@@ -4,20 +4,11 @@
 
 #include "Chunk.h"
 
-#include "Math/AABB.h"
-#include "Render/Camera.h"
 #include "Render/Drawable.h"
-#include "Render/Shader.h"
-#include "World/CraftScene.h"
-#include "Utility/BlockRegistry.h"
 #include "World/Block.h"
-
-#include <glm/gtc/noise.hpp>
 
 namespace
 {
-    CraftScene* m_Scene = nullptr;
-
     constexpr std::uint32_t EncodeVoxel(
         const std::uint32_t x,
         const std::uint32_t y,
@@ -32,195 +23,56 @@ namespace
                 ((uvID & 0x1FF) << 23);
     }
 
-    std::size_t Index(const int x, const int y, const int z)
-    {
-        int N = Chunk::ChunkSize();
-        int ix = (x % N + N) % N;
-        int iy = (y % N + N) % N;
-        int iz = (z % N + N) % N;
-
-        return ix + iz * N + iy * N * N;
-    }
-
     glm::ivec3 WorldToChunk(const glm::ivec3& ChunkPos, const glm::ivec3& pos)
     {
-        glm::ivec3 localPos = pos - ChunkPos * Chunk::ChunkSize();
+        glm::ivec3 localPos = pos - ChunkPos * m_chunkSize;
 
         // s'assure que le résultat est toujours dans [0, ChunkSize-1]
-        localPos.x = (localPos.x % Chunk::ChunkSize() + Chunk::ChunkSize()) % Chunk::ChunkSize();
-        localPos.y = (localPos.y % Chunk::ChunkSize() + Chunk::ChunkSize()) % Chunk::ChunkSize();
-        localPos.z = (localPos.z % Chunk::ChunkSize() + Chunk::ChunkSize()) % Chunk::ChunkSize();
+        localPos.x = (localPos.x % m_chunkSize + m_chunkSize) % m_chunkSize;
+        localPos.y = (localPos.y % m_chunkSize + m_chunkSize) % m_chunkSize;
+        localPos.z = (localPos.z % m_chunkSize + m_chunkSize) % m_chunkSize;
 
         return localPos;
     }
 
-    bool IsSolid(const BlockList& data, int x, int y, int z)
+    bool IsInside(const glm::ivec3& chunkPos, const glm::ivec3& pos)
     {
-        if (x < 0 || x >= Chunk::ChunkSize() || y < 0 || y >= Chunk::ChunkSize() || z < 0 || z >= Chunk::ChunkSize())
-            return false;
-        return data[Index(x, y, z)] != BlockRegistry::AIR;
-    }
-
-    void CreateMesh(const BlockList& data, std::vector<std::uint32_t>& indices, CraftScene* scene)
-    {
-        indices.reserve(data.size());
-        for (int y = 0; y < Chunk::ChunkSize(); ++y)
-        {
-            for (int z = 0; z < Chunk::ChunkSize(); ++z)
-            {
-                for (int x = 0; x < Chunk::ChunkSize(); ++x)
-                {
-                    const BlockId voxel = data[Index(x, y, z)];
-                    if (voxel == BlockRegistry::AIR)
-                        continue;
-
-                    auto getUv = [&](BlockFace side)
-                    {
-                        const BlockType& block = BlockRegistry::Get(voxel);
-
-                        return scene->m_TexturesManager.Get(block.textures[static_cast<uint8_t>(side)]);
-                    };
-
-                    // +X
-                    if (!IsSolid(data, x + 1, y, z))
-                        indices.push_back(EncodeVoxel(x, y, z, static_cast<uint8_t>(BlockFace::East), getUv(BlockFace::East)));
-                    // -X
-                    if (!IsSolid(data, x - 1, y, z))
-                        indices.push_back(EncodeVoxel(x, y, z, static_cast<uint8_t>(BlockFace::West), getUv(BlockFace::West)));
-                    // +Y
-                    if (!IsSolid(data, x, y + 1, z))
-                        indices.push_back(EncodeVoxel(x, y, z, static_cast<uint8_t>(BlockFace::Top), getUv(BlockFace::Top)));
-                    // -Y
-                    if (!IsSolid(data, x, y - 1, z))
-                        indices.push_back(EncodeVoxel(x, y, z, static_cast<uint8_t>(BlockFace::Bottom), getUv(BlockFace::Bottom)));
-                    // +Z
-                    if (!IsSolid(data, x, y, z + 1))
-                        indices.push_back(EncodeVoxel(x, y, z, static_cast<uint8_t>(BlockFace::North), getUv(BlockFace::North)));
-                    // -Z
-                    if (!IsSolid(data, x, y, z - 1))
-                        indices.push_back(EncodeVoxel(x, y, z, static_cast<uint8_t>(BlockFace::South), getUv(BlockFace::South)));
-                }
-            }
-        }
-
-    }
-
-    float smoothNoise(int x, int z, int seed)
-    {
-        float nx = (std::sin(x * 0.1f) + 1.0f) * 0.5f;
-        float nz = (std::sin(z * 0.1f) + 1.0f) * 0.5f;
-        return nx + nz * 0.5f;
-    }
-
-    // Fonction pseudo-aléatoire basée sur x, z et seed
-    float hash(int x, int z, int seed) {
-        int n = x + z * 57 + seed * 131;
-        n = (n << 13) ^ n;
-        return (1.0f - ((n * (n * n * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824.0f);
-    }
-
-    // Fonction de lissage (smoothstep)
-    float smoothStep(float t) {
-        return t * t * (3 - 2 * t);
-    }
-
-    // Interpolation bilinéaire lissée
-    float lerp(float a, float b, float t) {
-        return a + (b - a) * smoothStep(t);
-    }
-
-    // Noise chaotique mais lisse
-    float smoothChaosNoise(float x, float z, int seed)
-    {
-        int x0 = (int)std::floor(x);
-        int x1 = x0 + 1;
-        int z0 = (int)std::floor(z);
-        int z1 = z0 + 1;
-
-        float sx = x - (float)x0;
-        float sz = z - (float)z0;
-
-        float n0 = hash(x0, z0, seed);
-        float n1 = hash(x1, z0, seed);
-        float ix0 = lerp(n0, n1, sx);
-
-        n0 = hash(x0, z1, seed);
-        n1 = hash(x1, z1, seed);
-        float ix1 = lerp(n0, n1, sx);
-
-        return lerp(ix0, ix1, sz);
+        constexpr int HalfChunkSize = m_chunkSize / 2;
+        return chunkPos.x - HalfChunkSize <= pos.x && chunkPos.x - HalfChunkSize >= pos.x &&
+            chunkPos.y - HalfChunkSize <= pos.y && chunkPos.y - HalfChunkSize >= pos.y &&
+            chunkPos.z - HalfChunkSize <= pos.z && chunkPos.z - HalfChunkSize >= pos.z;
     }
 }
 
-Chunk::Chunk(const glm::vec3& pos, CraftScene* scene)
-    : position(pos)
-    , data()
-    , m_Drawable(nullptr)
-    , m_Shader(nullptr)
+/****************************************/
+/* CHUNK                                */
+/****************************************/
+
+std::size_t Index(const int x, const int y, const int z)
 {
-    Generate();
+    int N = m_chunkSize;
+    int ix = (x % N + N) % N;
+    int iy = (y % N + N) % N;
+    int iz = (z % N + N) % N;
 
-    m_Scene = scene;
+    return ix + iz * N + iy * N * N;
+}
 
-    std::vector<std::uint32_t> vertices;
-    CreateMesh(data, vertices, m_Scene);
-
-    m_Drawable = std::make_unique<SunsetEngine::Drawable>(vertices);
-    m_Shader = std::make_unique<SunsetEngine::Shader>("SunsetCraft/Shaders/ChunkVertShader.vert", "SunsetCraft/Shaders/ChunkFragShader.frag");
+Chunk::Chunk(const glm::ivec3& pos)
+    : bIsDirty(true)
+    , position(pos)
+    , data()
+    , m_Drawable(std::unique_ptr<SunsetEngine::Drawable>(nullptr))
+{
 }
 
 Chunk::~Chunk()
 {
 }
 
-void Chunk::UseShader(const SunsetEngine::Camera& camera) const
-{
-    m_Shader->Use();
-    m_Shader->SetMat4("projection", camera.GetProjection());
-    m_Shader->SetMat4("view", camera.GetViewMatrix());
-    m_Shader->SetVec3("chunkLocation", position);
-}
-
 void Chunk::Draw() const
 {
     m_Drawable->Draw();
-}
-
-void Chunk::Generate()
-{
-    const float scale = 0.05f;
-    const int seed = 56;
-
-    for (int z = 0; z < m_chunkSize; ++z)
-    {
-        int WorldZ = z + static_cast<int>(position.z) * m_chunkSize;
-
-        for (int x = 0; x < m_chunkSize; ++x)
-        {
-            int WorldX = x + static_cast<int>(position.x) * m_chunkSize;
-            const float noise = smoothChaosNoise(WorldX * 0.05, WorldZ * 0.05, seed) * 20;
-            //const float noise = smoothNoise(WorldX, WorldZ, seed) * 20;
-            //const float noise = glm::perlin(glm::vec2{WorldX, WorldZ}) * 20;
-
-            for (int y = 0; y < Chunk::ChunkSize(); ++y)
-            {
-                int WorldY = y + static_cast<int>(position.y) * m_chunkSize;
-                if (WorldY > noise)
-                    data[Index(x, y, z)] = BlockRegistry::AIR;
-                else if (WorldY >= noise - 1)
-                    data[Index(x, y, z)] = BlockRegistry::GRASS;
-                else if (WorldY > noise - 3)
-                    data[Index(x, y, z)] = BlockRegistry::DIRT;
-                else
-                    data[Index(x, y, z)] = BlockRegistry::STONE;
-            }
-        }
-    }
-}
-
-SunsetEngine::Shader* Chunk::GetShader()
-{
-    return m_Shader.get();
 }
 
 BlockId Chunk::GetBlockId(const glm::ivec3& pos) const
@@ -234,9 +86,38 @@ void Chunk::SetBlockId(const glm::ivec3& pos, BlockId blockId)
 {
     const glm::ivec3 i = WorldToChunk(position, pos);
     data[Index(i.x, i.y, i.z)] = blockId;
-    std::vector<std::uint32_t> vertices;
-    CreateMesh(data, vertices, m_Scene);
+}
+
+glm::ivec3 Chunk::GetPosition() const
+{
+    return position;
+}
+
+const BlockList & Chunk::GetBlocks() const
+{
+    return data;
+}
+
+void Chunk::UpdateDrawable(const std::vector<std::uint32_t>& vertices)
+{
+    bIsDirty = false;
+
+    if (!m_Drawable)
+    {
+        m_Drawable = std::make_unique<SunsetEngine::Drawable>(vertices);
+        return;
+    }
 
     m_Drawable->Clear();
     m_Drawable->Create(vertices);
+}
+
+const BiomeType::Type& Chunk::GetBiomeType() const
+{
+    return m_BiomeType;
+}
+
+void Chunk::SetBiomeType(const BiomeType::Type &biomeType)
+{
+    m_BiomeType = biomeType;
 }
