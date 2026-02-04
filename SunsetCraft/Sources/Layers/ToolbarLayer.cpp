@@ -67,7 +67,7 @@ namespace
     // Inventory
     bool bIsInventoryVisible = false;
 
-    void HandleChangeInventory(CraftScene* craft_scene)
+    void HandleChangeInventory()
     {
         static bool isKeyPress = false;
         if (SunsetEngine::Input::IsKeyPress('E'))
@@ -83,18 +83,15 @@ namespace
     }
 }
 
-ToolbarLayer::ToolbarLayer(SunsetEngine::Scene* scene)
-    : SunsetEngine::Layer(scene)
-{
-}
-
 ToolbarLayer::~ToolbarLayer()
 {
     ToolbarSlate.Clear();
 }
 
-void ToolbarLayer::OnAttach()
+void ToolbarLayer::OnAttach(SunsetEngine::Scene* scene)
 {
+    Layer::OnAttach(scene);
+
     ToolbarSlate.SetPosition({1280/2, 720});
     ToolbarSlate.SetPadding({5, 0});
     ToolbarSlate.Reserve(ToolbarSize);
@@ -134,8 +131,6 @@ void ToolbarLayer::OnUpdate(float dt)
     assert(craft_scene);
 
     HandleChangeToolbar(craft_scene);
-
-    HandleChangeInventory(craft_scene);
 }
 
 void ToolbarLayer::OnDraw()
@@ -171,6 +166,22 @@ void ToolbarLayer::OnDraw()
 
     SunsetEngine::Square Inventory{{WinSize.x / 2, WinSize.y / 2}, {500, 500}, color, radius};
     Inventory.Draw();
+}
+
+bool ToolbarLayer::OnEvent(SunsetEngine::Event::Type& event)
+{
+    return std::visit(overloads{[](SunsetEngine::Event::KeyEvent& event)
+    {
+        if (event.key != 'E')
+            return false;
+
+        HandleChangeInventory();
+        return true;
+    }, [](SunsetEngine::Event::MouseEvent& event)
+    {
+        return false;
+    }
+    }, event);
 }
 
 CraftScene* ToolbarLayer::GetCraftScene()

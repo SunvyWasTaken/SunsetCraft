@@ -5,6 +5,7 @@
 #ifndef SUNSETCRAFT_APPLICATION_H
 #define SUNSETCRAFT_APPLICATION_H
 
+#include "Input.h"
 #include "LayerStack.h"
 
 namespace SunsetEngine
@@ -19,6 +20,8 @@ namespace SunsetEngine
         virtual ~Application();
 
         void Run();
+
+        void OnEvent(Event::Type& event);
 
         template <typename T>
         requires std::is_base_of_v<SunsetEngine::Layer, T>
@@ -35,6 +38,7 @@ namespace SunsetEngine
         }
 
         static const ApplicationSetting& GetSetting();
+        static const Application& GetApplication();
         static void ResizeWindow(const glm::ivec2& setting);
 
     private:

@@ -61,18 +61,9 @@ namespace
     }
 }
 
-
-CameraLayer::CameraLayer(SunsetEngine::Scene* scene)
-    : SunsetEngine::Layer(scene)
+void CameraLayer::OnAttach(SunsetEngine::Scene* scene)
 {
-}
-
-CameraLayer::~CameraLayer()
-{
-}
-
-void CameraLayer::OnAttach()
-{
+    SunsetEngine::Layer::OnAttach(scene);
 }
 
 void CameraLayer::OnUpdate(float dt)
@@ -106,4 +97,19 @@ void CameraLayer::OnUpdate(float dt)
 void CameraLayer::OnDraw()
 {
     HUD("CameraLayer Draw");
+}
+
+bool CameraLayer::OnEvent(SunsetEngine::Event::Type& event)
+{
+    std::visit(overloads{
+    [](SunsetEngine::Event::KeyEvent& event)
+    {
+        LOG("{}", static_cast<char>(event.key))
+    },
+    [](SunsetEngine::Event::MouseEvent& event)
+    {
+
+    }
+    }, event);
+    return false;
 }

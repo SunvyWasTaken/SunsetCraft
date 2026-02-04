@@ -4,6 +4,7 @@
 
 #ifndef SUNSETCRAFT_RENDERER_H
 #define SUNSETCRAFT_RENDERER_H
+#include "Core/Input.h"
 
 namespace SunsetEngine
 {
@@ -12,6 +13,8 @@ namespace SunsetEngine
     public:
         Renderer();
         ~Renderer();
+
+        void BindEvent(std::function<void(Event::Type&)> func);
 
         bool Valid() const;
 

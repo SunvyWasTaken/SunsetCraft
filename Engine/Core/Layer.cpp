@@ -6,9 +6,14 @@
 
 namespace SunsetEngine
 {
-    Layer::Layer(Scene* scene)
-        : m_Scene(scene)
+    void Layer::OnAttach(Scene* scene)
     {
+        m_Scene = scene;
+    }
+
+    bool Layer::OnEvent(Event::Type& event)
+    {
+        return false;
     }
 
     Scene* Layer::GetScene() const

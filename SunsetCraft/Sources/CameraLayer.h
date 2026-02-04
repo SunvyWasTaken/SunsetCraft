@@ -15,11 +15,10 @@ namespace SunsetEngine
 class CameraLayer : public SunsetEngine::Layer
 {
 public:
-    explicit CameraLayer(SunsetEngine::Scene* scene);
-    ~CameraLayer();
-    void OnAttach() override;
+    void OnAttach(SunsetEngine::Scene* scene) override;
     void OnUpdate(float dt) override;
     void OnDraw() override;
+    bool OnEvent(SunsetEngine::Event::Type& event) override;
 };
 
 #endif //SUNSETCRAFT_CAMERALAYER_H

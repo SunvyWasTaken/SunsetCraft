@@ -16,6 +16,8 @@ namespace
     bool IsAppRunning = true;
 
     SunsetEngine::ApplicationSetting AppSetting;
+
+    SunsetEngine::Application* app = nullptr;
 }
 
 namespace SunsetEngine
@@ -25,8 +27,10 @@ namespace SunsetEngine
         , m_Scene(nullptr)
     {
         LOG("App Create")
+        app = this;
         AppSetting = setting;
         m_Render = new Renderer();
+        m_Render->BindEvent([this](Event::Type& event){ OnEvent(event); });
     }
 
     Application::~Application()
@@ -35,6 +39,8 @@ namespace SunsetEngine
 
         delete m_Render;
         m_Render = nullptr;
+
+        app = nullptr;
     }
 
     void Application::Run()
@@ -61,9 +67,23 @@ namespace SunsetEngine
         }
     }
 
+    void Application::OnEvent(Event::Type& event)
+    {
+        for (const auto& layer : m_LayerStack)
+        {
+            if (layer->OnEvent(event))
+                return;
+        }
+    }
+
     const ApplicationSetting& Application::GetSetting()
     {
         return AppSetting;
+    }
+
+    const Application& Application::GetApplication()
+    {
+        return *app;
     }
 
     void Application::ResizeWindow(const glm::ivec2& setting)

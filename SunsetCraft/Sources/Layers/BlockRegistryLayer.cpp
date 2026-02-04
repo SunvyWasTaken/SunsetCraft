@@ -6,17 +6,9 @@
 
 #include "Utility/BlockRegistry.h"
 
-BlockRegistryLayer::BlockRegistryLayer(SunsetEngine::Scene *scene)
-    : SunsetEngine::Layer(scene)
+void BlockRegistryLayer::OnAttach(SunsetEngine::Scene* scene)
 {
-}
-
-BlockRegistryLayer::~BlockRegistryLayer()
-{
-}
-
-void BlockRegistryLayer::OnAttach()
-{
+    Layer::OnAttach(scene);
     BlockRegistry::Init("SunsetCraft/Sources/BlockReg.json");
 }
 

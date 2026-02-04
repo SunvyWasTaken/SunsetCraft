@@ -16,10 +16,8 @@ namespace SunsetEngine
 class CraftLayer : public SunsetEngine::Layer
 {
 public:
-    explicit CraftLayer(SunsetEngine::Scene* scene);
-    ~CraftLayer() override;
 
-    void OnAttach() override;
+    void OnAttach(SunsetEngine::Scene* scene) override;
 
     void OnUpdate(float dt) override;
     void OnDraw() override;

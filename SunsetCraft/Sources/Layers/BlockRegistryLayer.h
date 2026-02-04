@@ -10,13 +10,10 @@
 class BlockRegistryLayer : public SunsetEngine::Layer
 {
 public:
-    explicit BlockRegistryLayer(class SunsetEngine::Scene* scene);
-    ~BlockRegistryLayer();
+    virtual void OnAttach(SunsetEngine::Scene* scene) override;
 
-    virtual void OnAttach();
-
-    virtual void OnUpdate(float dt);
-    virtual void OnDraw();
+    virtual void OnUpdate(float dt) override;
+    virtual void OnDraw() override;
 };
 
 #endif //SUNSETCRAFT_BLOCKREGISTRYLAYER_H

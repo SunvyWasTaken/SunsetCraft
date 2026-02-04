@@ -33,4 +33,7 @@ auto format(const glm::vec<2, T, glm::defaultp>& v, FormatContext& ctx) const
     }
 };
 
+template<class... Ts>
+struct overloads : Ts... { using Ts::operator()...; };
+
 #endif //SUNSETCRAFT_DEBUGGLM_H

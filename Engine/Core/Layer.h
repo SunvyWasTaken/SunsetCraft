@@ -4,6 +4,7 @@
 
 #ifndef SUNSETCRAFT_LAYER_H
 #define SUNSETCRAFT_LAYER_H
+#include "Input.h"
 
 namespace SunsetEngine
 {
@@ -12,13 +13,15 @@ namespace SunsetEngine
     class Layer
     {
     public:
-        explicit Layer(Scene* scene);
+        Layer() = default;
         virtual ~Layer() = default;
 
-        virtual void OnAttach() = 0;
+        virtual void OnAttach(Scene* scene);
 
         virtual void OnUpdate(float dt) = 0;
         virtual void OnDraw() = 0;
+
+        virtual bool OnEvent(Event::Type& event);
 
     protected:
         Scene* GetScene() const;

@@ -11,14 +11,14 @@ class CraftScene;
 
 class ToolbarLayer : public SunsetEngine::Layer
 {
-    public:
-    ToolbarLayer(class SunsetEngine::Scene* scene);
+public:
+
     ~ToolbarLayer() override;
 
-    virtual void OnAttach();
-
-    virtual void OnUpdate(float dt);
-    virtual void OnDraw();
+    void OnAttach(SunsetEngine::Scene* scene) override;
+    void OnUpdate(float dt) override;
+    void OnDraw() override;
+    bool OnEvent(SunsetEngine::Event::Type& event) override;
 
     private:
 

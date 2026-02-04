@@ -20,7 +20,7 @@ int main()
     app.PushLayer<ToolbarLayer>();
     app.PushLayer<CraftLayer>();
     app.PushLayer<CameraLayer>();
-    app.PushLayer<DebugLayer>();
+    //app.PushLayer<DebugLayer>();
 
     app.Run();
     return 0;

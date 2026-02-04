@@ -15,17 +15,7 @@ namespace
 {
 }
 
-DebugLayer::DebugLayer(SunsetEngine::Scene* scene)
-    : SunsetEngine::Layer(scene)
-{
-}
-
-DebugLayer::~DebugLayer()
-{
-
-}
-
-void DebugLayer::OnAttach()
+void DebugLayer::OnAttach(SunsetEngine::Scene* scene)
 {
 }
 

@@ -13,6 +13,21 @@ namespace SunsetEngine
         static bool IsMouseButtonClick(unsigned int button);
         static glm::vec2 GetMousePosition();
     };
+
+    struct Event
+    {
+        struct KeyEvent
+        {
+            unsigned int key;
+        };
+
+        struct MouseEvent
+        {
+            float x, y;
+        };
+
+        using Type = std::variant<KeyEvent, MouseEvent>;
+    };
 }
 
 #endif //SUNSETCRAFT_INPUT_H

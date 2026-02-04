@@ -13,19 +13,9 @@ namespace
 
 }
 
-CraftLayer::CraftLayer(SunsetEngine::Scene* scene)
-    : SunsetEngine::Layer(scene)
+void CraftLayer::OnAttach(SunsetEngine::Scene* scene)
 {
-
-}
-
-CraftLayer::~CraftLayer()
-{
-
-}
-
-void CraftLayer::OnAttach()
-{
+    Layer::OnAttach(scene);
 }
 
 void CraftLayer::OnUpdate(float dt)

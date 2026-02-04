@@ -14,9 +14,13 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include "Core/Input.h"
+
 namespace
 {
     GLFWwindow* m_Window = nullptr;
+
+    std::function<void(SunsetEngine::Event::Type&)> EventCallback;
 
     GLFWwindow* CreateWindow(const SunsetEngine::ApplicationSetting& setting)
     {
@@ -26,6 +30,12 @@ namespace
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
         return glfwCreateWindow(setting.WindowSize.x, setting.WindowSize.y, setting.WindowTitle.data(), NULL, NULL);
+    }
+
+    void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+    {
+        SunsetEngine::Event::Type event = SunsetEngine::Event::KeyEvent{static_cast<unsigned int>(key)};
+        EventCallback(event);
     }
 
     void framebuffer_size_callback(GLFWwindow* window, int width, int height)
@@ -51,6 +61,8 @@ namespace SunsetEngine
         glfwMakeContextCurrent(m_Window);
 
         glfwSetFramebufferSizeCallback(m_Window, framebuffer_size_callback);
+
+        glfwSetKeyCallback(m_Window, KeyCallback);
 
     #ifdef NDEBUG
         glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -84,6 +96,11 @@ namespace SunsetEngine
 
         glfwDestroyWindow(m_Window);
         glfwTerminate();
+    }
+
+    void Renderer::BindEvent(std::function<void(Event::Type&)> func)
+    {
+        EventCallback = func;
     }
 
     bool Renderer::Valid() const
