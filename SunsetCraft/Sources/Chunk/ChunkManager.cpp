@@ -13,8 +13,8 @@
 
 namespace
 {
-    int m_RenderDistance = 12;
-    int verticalRadius = 16;
+    int m_RenderDistance = 6;
+    int verticalRadius = 2;
 
     std::unordered_map<glm::ivec3, std::unique_ptr<Chunk>, triplet_hash> m_Chunks;
     std::unique_ptr<SunsetEngine::Shader> m_ChunkShader = nullptr;

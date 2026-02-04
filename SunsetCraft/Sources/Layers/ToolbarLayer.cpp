@@ -4,9 +4,6 @@
 
 #include "ToolbarLayer.h"
 
-#include <GLFW/glfw3.h>
-#include <glm/ext/quaternion_common.hpp>
-
 #include "Core/Application.h"
 #include "Core/ApplicationSetting.h"
 #include "Core/Input.h"
@@ -15,10 +12,75 @@
 #include "Slate/Square.h"
 #include "World/CraftScene.h"
 
+#include <GLFW/glfw3.h>
+#include <glm/ext/quaternion_common.hpp>
+
 namespace
 {
     constexpr std::uint8_t ToolbarSize = 9;
     SunsetEngine::HorizontalBox ToolbarSlate;
+
+    // Toolbar
+    void HandleChangeToolbar(CraftScene* craft_scene)
+    {
+        static bool isKeyPress = false;
+        if (SunsetEngine::Input::IsMouseButtonClick(4) || SunsetEngine::Input::IsKeyPress(GLFW_KEY_LEFT))
+        {
+            if (isKeyPress)
+                return;
+
+            craft_scene->currentSelectTool -= 1;
+            if (0 > craft_scene->currentSelectTool)
+                craft_scene->currentSelectTool = ToolbarSize - 1;
+
+            isKeyPress = true;
+        }
+        else if (SunsetEngine::Input::IsMouseButtonClick(3) || SunsetEngine::Input::IsKeyPress(GLFW_KEY_RIGHT))
+        {
+            if (isKeyPress)
+                return;
+
+            craft_scene->currentSelectTool += 1;
+            if (ToolbarSize - 1 < craft_scene->currentSelectTool)
+                craft_scene->currentSelectTool = 0;
+
+            isKeyPress = true;
+        }
+        else
+        {
+            isKeyPress = false;
+        }
+
+        const int8_t currTool = craft_scene->currentSelectTool;
+
+        if (ToolbarSize <= currTool)
+            return;
+
+        for (const auto& tool : ToolbarSlate)
+        {
+            tool->SetSize({75, 75});
+        }
+
+        ToolbarSlate[currTool]->SetSize({90, 90});
+    }
+
+    // Inventory
+    bool bIsInventoryVisible = false;
+
+    void HandleChangeInventory(CraftScene* craft_scene)
+    {
+        static bool isKeyPress = false;
+        if (SunsetEngine::Input::IsKeyPress('E'))
+        {
+            if (isKeyPress)
+                return;
+
+            isKeyPress = true;
+            bIsInventoryVisible = !bIsInventoryVisible;
+        }
+        else
+            isKeyPress = false;
+    }
 }
 
 ToolbarLayer::ToolbarLayer(SunsetEngine::Scene* scene)
@@ -65,51 +127,15 @@ void ToolbarLayer::OnAttach()
     }
 }
 
-static bool isKeyPress = false;
-
 void ToolbarLayer::OnUpdate(float dt)
 {
-    if (CraftScene* craft_scene = GetCraftScene())
-    {
-        if (SunsetEngine::Input::IsMouseButtonClick(4) || SunsetEngine::Input::IsKeyPress(GLFW_KEY_LEFT))
-        {
-            if (isKeyPress)
-                return;
+    CraftScene* craft_scene = GetCraftScene();
 
-            craft_scene->currentSelectTool -= 1;
-            if (0 > craft_scene->currentSelectTool)
-                craft_scene->currentSelectTool = ToolbarSize - 1;
+    assert(craft_scene);
 
-            isKeyPress = true;
-        }
-        else if (SunsetEngine::Input::IsMouseButtonClick(3) || SunsetEngine::Input::IsKeyPress(GLFW_KEY_RIGHT))
-        {
-            if (isKeyPress)
-                return;
+    HandleChangeToolbar(craft_scene);
 
-            craft_scene->currentSelectTool += 1;
-            if (ToolbarSize - 1 < craft_scene->currentSelectTool)
-                craft_scene->currentSelectTool = 0;
-
-            isKeyPress = true;
-        }
-        else
-        {
-            isKeyPress = false;
-        }
-
-        const int8_t currTool = craft_scene->currentSelectTool;
-
-        if (ToolbarSize <= currTool)
-            return;
-
-        for (auto& tool : ToolbarSlate)
-        {
-            tool->SetSize({75, 75});
-        }
-
-        ToolbarSlate[currTool]->SetSize({90, 90});
-    }
+    HandleChangeInventory(craft_scene);
 }
 
 void ToolbarLayer::OnDraw()
@@ -139,6 +165,12 @@ void ToolbarLayer::OnDraw()
     crossDown.Draw();
     crossLeft.Draw();
     crossRight.Draw();
+
+    if (!bIsInventoryVisible)
+        return;
+
+    SunsetEngine::Square Inventory{{WinSize.x / 2, WinSize.y / 2}, {500, 500}, color, radius};
+    Inventory.Draw();
 }
 
 CraftScene* ToolbarLayer::GetCraftScene()

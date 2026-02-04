@@ -13,7 +13,7 @@ class ToolbarLayer : public SunsetEngine::Layer
 {
     public:
     ToolbarLayer(class SunsetEngine::Scene* scene);
-    virtual ~ToolbarLayer();
+    ~ToolbarLayer() override;
 
     virtual void OnAttach();
 

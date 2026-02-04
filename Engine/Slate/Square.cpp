@@ -59,7 +59,6 @@ namespace SunsetEngine
 
         if (m_Child)
             m_Child->Draw();
-
     }
 
     void Square::SetAnchor(const glm::vec2 &val)
