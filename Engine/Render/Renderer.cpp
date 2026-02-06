@@ -38,6 +38,12 @@ namespace
         EventCallback(event);
     }
 
+    void CursorPositionCallback(GLFWwindow* window, double x, double y)
+    {
+        SunsetEngine::Event::Type event = SunsetEngine::Event::MouseEvent{x, y};
+        EventCallback(event);
+    }
+
     void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     {
         glViewport(0, 0, width, height);
@@ -63,6 +69,8 @@ namespace SunsetEngine
         glfwSetFramebufferSizeCallback(m_Window, framebuffer_size_callback);
 
         glfwSetKeyCallback(m_Window, KeyCallback);
+
+        glfwSetCursorPosCallback(m_Window, CursorPositionCallback);
 
     #ifdef NDEBUG
         glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);

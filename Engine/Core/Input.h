@@ -23,10 +23,17 @@ namespace SunsetEngine
 
         struct MouseEvent
         {
-            float x, y;
+            double x, y;
         };
 
         using Type = std::variant<KeyEvent, MouseEvent>;
+    };
+
+    struct InputManager
+    {
+        // Take a path to a .json with the key in it.
+        static void Init(const std::string_view& Path);
+        static bool IsKeyPress(const std::string_view& name, Event::Type& event);
     };
 }
 

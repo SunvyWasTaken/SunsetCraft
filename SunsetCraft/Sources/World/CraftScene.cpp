@@ -4,8 +4,6 @@
 
 #include "CraftScene.h"
 
-#include <filesystem>
-
 #include "RaycastHit.h"
 #include "Chunk/Chunk.h"
 #include "Block.h"

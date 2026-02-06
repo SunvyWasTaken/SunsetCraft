@@ -64,6 +64,8 @@ namespace
 void CameraLayer::OnAttach(SunsetEngine::Scene* scene)
 {
     SunsetEngine::Layer::OnAttach(scene);
+
+    SunsetEngine::InputManager::AddKey("Forward", 'W');
 }
 
 void CameraLayer::OnUpdate(float dt)
@@ -96,20 +98,14 @@ void CameraLayer::OnUpdate(float dt)
 
 void CameraLayer::OnDraw()
 {
-    HUD("CameraLayer Draw");
 }
 
 bool CameraLayer::OnEvent(SunsetEngine::Event::Type& event)
 {
-    std::visit(overloads{
-    [](SunsetEngine::Event::KeyEvent& event)
+    if (SunsetEngine::InputManager::IsKeyPress("Forward", event))
     {
-        LOG("{}", static_cast<char>(event.key))
-    },
-    [](SunsetEngine::Event::MouseEvent& event)
-    {
-
+        HUD("Forward press")
     }
-    }, event);
+
     return false;
 }

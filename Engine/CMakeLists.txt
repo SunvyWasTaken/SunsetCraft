@@ -7,6 +7,7 @@ find_package(glm CONFIG REQUIRED)
 find_package(glfw3 CONFIG REQUIRED)
 find_package(glad CONFIG REQUIRED)
 find_package(Stb REQUIRED)
+find_package(nlohmann_json CONFIG REQUIRED)
 
 add_library(${PROJECT_NAME} STATIC
         ${SOURCES}
@@ -29,6 +30,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 target_link_libraries(${PROJECT_NAME} PUBLIC
         MiniMotor_compiler_flags
         glm::glm
+        nlohmann_json::nlohmann_json
 )
 
 target_precompile_headers(${PROJECT_NAME} PUBLIC

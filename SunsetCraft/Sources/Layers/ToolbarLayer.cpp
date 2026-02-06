@@ -135,8 +135,6 @@ void ToolbarLayer::OnUpdate(float dt)
 
 void ToolbarLayer::OnDraw()
 {
-    HUD("ToolbarLayer::Draw");
-
     ToolbarSlate.Draw();
 
     int length = 15;

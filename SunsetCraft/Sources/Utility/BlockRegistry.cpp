@@ -8,31 +8,12 @@
 
 #include <nlohmann/json.hpp>
 
-#include <fstream>
-
 namespace
 {
     std::unordered_map<BlockId, BlockType> m_BlockRegistry;
     std::unordered_map<std::string, BlockId> m_BlockRegistryName;
 
     bool bIsInitialized = false;
-
-    nlohmann::json LoadJsonFile(const std::string_view& Path)
-    {
-        std::ifstream file;
-        file.open(Path.data());
-
-        nlohmann::json json;
-
-        if (!file.is_open())
-        {
-            LOG("Json file couldn't be open")
-            return json;
-        }
-
-        file >> json;
-        return json;
-    }
 
     void FillRegistry(const nlohmann::json& blockJson)
     {
@@ -90,7 +71,7 @@ BlockId BlockRegistry::STONE = 0;
 
 void BlockRegistry::Init(const std::string_view &Path)
 {
-    const nlohmann::json blockJson = LoadJsonFile(Path);
+    const nlohmann::json blockJson = SunsetEngine::UtilityFunction::LoadJson(Path);
 
     FillRegistry(blockJson);
 
