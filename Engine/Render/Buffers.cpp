@@ -69,6 +69,7 @@ namespace
                     return {sizeof(bool), 1, GL_BOOL};
                 }
         }
+        return {};
     }
 
     size_t CalculateStride(std::vector<SunsetEngine::BufferElement>& type)
@@ -106,5 +107,108 @@ namespace SunsetEngine
     int BufferElement::Type() const
     {
         return GetInfo(type).type;
+    }
+
+    BufferLayout::BufferLayout(const std::initializer_list<BufferElement>& list)
+        : m_Elements(list)
+        , m_Stride(0)
+    {
+        m_Stride = CalculateStride(m_Elements);
+    }
+
+    const std::vector<BufferElement>& BufferLayout::operator()() const
+    {
+        return m_Elements;
+    }
+
+    std::vector<BufferElement>::const_iterator BufferLayout::begin() const
+    {
+        return m_Elements.begin();
+    }
+
+    std::vector<BufferElement>::const_iterator BufferLayout::end() const
+    {
+        return m_Elements.end();
+    }
+
+    bool BufferLayout::empty() const
+    {
+        return m_Elements.empty();
+    }
+
+    uint32_t BufferLayout::GetStride() const
+    {
+        return m_Stride;
+    }
+
+    VertexBuffer::VertexBuffer(const void* data, size_t size)
+        : m_Id(0)
+        , m_Layout({})
+        , m_Size(size)
+    {
+        glGenBuffers(1, &m_Id);
+        Bind();
+        glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
+        Unbind();
+    }
+    
+    VertexBuffer::~VertexBuffer()
+    {
+        glDeleteBuffers(1, &m_Id);
+    }
+    
+    void VertexBuffer::Bind() const
+    {
+        glBindBuffer(GL_ARRAY_BUFFER, m_Id);
+    }
+
+    void VertexBuffer::Unbind() const
+    {
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
+
+    void VertexBuffer::SetLayout(const std::initializer_list<BufferElement>& elements)
+    {
+        m_Layout = elements;
+    }
+
+    BufferLayout VertexBuffer::GetLayout() const
+    {
+        return m_Layout;
+    }
+    
+    size_t VertexBuffer::GetSize() const
+    {
+        return m_Size;
+    }
+
+    IndiceBuffer::IndiceBuffer(const std::vector<uint32_t>& indices)
+        : m_Id(0)
+        , m_Count(indices.size())
+    {
+        glGenBuffers(1, &m_Id);
+        Bind();
+        glBufferData(GL_ARRAY_BUFFER, sizeof(uint32_t) * indices.size(), indices.data(), GL_STATIC_DRAW);
+        Unbind();
+    }
+
+    IndiceBuffer::~IndiceBuffer()
+    {
+        glDeleteBuffers(1, &m_Id);
+    }
+
+    void IndiceBuffer::Bind() const
+    {
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Id);
+    }
+
+    void IndiceBuffer::Unbind() const
+    {
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    }
+
+    size_t IndiceBuffer::GetCount() const
+    {
+        return m_Count;
     }
 }
