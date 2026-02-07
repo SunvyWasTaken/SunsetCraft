@@ -104,6 +104,7 @@ namespace SunsetEngine
 
         glfwDestroyWindow(m_Window);
         glfwTerminate();
+        LOG("Engine", info, "Render Destroy")
     }
 
     void Renderer::BindEvent(std::function<void(Event::Type&)> func)

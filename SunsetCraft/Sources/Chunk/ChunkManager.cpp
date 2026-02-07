@@ -74,6 +74,8 @@ void ChunkManager::Shutdown()
 {
     m_Chunks.clear();
     m_ChunkShader.reset();
+
+    LOG("SunsetCraft", info, "Chunk Manager Destroy")
 }
 
 void ChunkManager::Update(const glm::vec3& position)

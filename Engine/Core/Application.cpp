@@ -10,6 +10,8 @@
 #include "Render/RenderCommande.h"
 #include "Render/Renderer.h"
 
+#include <chrono>
+
 namespace
 {
     SunsetEngine::Application* app = nullptr;
@@ -37,10 +39,15 @@ namespace SunsetEngine
     {
         m_LayerStack.Clear();
 
+        m_Scene.reset(nullptr);
+
         delete m_Render;
         m_Render = nullptr;
 
         app = nullptr;
+
+        LOG("Engine", info, "App Destroy");
+
         Log::Shutdown();
     }
 
