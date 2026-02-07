@@ -46,6 +46,7 @@ namespace SunsetEngine
         uint32_t m_Stride;
     };
 
+    // VBO
     class VertexBuffer
     {
     public:
@@ -64,6 +65,7 @@ namespace SunsetEngine
         size_t m_Size;
     };
 
+    // EBO
     class IndiceBuffer
     {
     public:
@@ -76,7 +78,6 @@ namespace SunsetEngine
         uint32_t m_Id;
         size_t m_Count;
     };
-
 }
 
 #endif //SUNSETCRAFT_BUFFERS_H
