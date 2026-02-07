@@ -4,53 +4,44 @@
 
 #include "Logger.h"
 
+#include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/sinks/basic_file_sink.h>
+
 namespace
 {
-    // Logger
-    std::vector<std::string> m_Logger;
-    // Hud
-    std::vector<std::string> m_Texts;
+    std::unordered_map<std::string_view, std::shared_ptr<spdlog::logger>> m_Loggers;
+    spdlog::sink_ptr m_Sink;
 }
 
 namespace SunsetEngine
 {
-    void Logger::Add(std::string txt)
+    void Log::Init()
     {
-        m_Logger.emplace_back(txt);
+        spdlog::set_pattern("%^[%T] %n: %v%$");
+        m_Sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
     }
 
-    std::vector<std::string>::iterator Logger::begin()
+    void Log::Shutdown()
     {
-        return m_Logger.begin();
+        m_Sink.reset();
+        m_Loggers.clear();
     }
 
-    std::vector<std::string>::iterator Logger::end()
+    std::shared_ptr<spdlog::logger> Log::InitLog(const std::string_view& name)
     {
-        return m_Logger.end();
+        if (m_Loggers.contains(name))
+            return m_Loggers[name];
+
+        auto logger = std::make_shared<spdlog::logger>(name.data(), m_Sink);
+        logger->set_level(spdlog::level::trace);
+        spdlog::register_logger(logger);
+        m_Loggers[name] = logger;
+        return logger;
     }
 
-    void Hud::Add(const std::string& msg)
+    std::shared_ptr<spdlog::logger> Log::GetLogger(std::string name)
     {
-        m_Texts.emplace_back(msg);
-    }
-
-    void Hud::Clear()
-    {
-        m_Texts.clear();
-    }
-
-    bool Hud::IsEmpty()
-    {
-        return m_Texts.empty();
-    }
-
-    std::vector<std::string>::iterator Hud::begin()
-    {
-        return m_Texts.begin();
-    }
-
-    std::vector<std::string>::iterator Hud::end()
-    {
-        return m_Texts.end();
+        const auto it = m_Loggers.find(name);
+        return it == m_Loggers.end() ? nullptr : it->second;
     }
 }

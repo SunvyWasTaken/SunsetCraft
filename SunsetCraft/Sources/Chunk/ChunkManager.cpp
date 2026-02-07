@@ -64,7 +64,7 @@ namespace
 
 void ChunkManager::Init()
 {
-    LOG("Chunk Manager Create")
+    LOG("SunsetCraft", info, "Chunk Manager Create")
 
     m_Chunks.clear();
     m_ChunkShader = std::make_unique<SunsetEngine::Shader>("SunsetCraft/Shaders/ChunkVertShader.vert", "SunsetCraft/Shaders/ChunkFragShader.frag");

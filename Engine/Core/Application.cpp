@@ -7,17 +7,15 @@
 #include "ApplicationSetting.h"
 #include "Layer.h"
 #include "Scene.h"
+#include "Render/RenderCommande.h"
 #include "Render/Renderer.h"
 
 namespace
 {
-    SunsetEngine::Renderer* m_Render = nullptr;
-
-    bool IsAppRunning = true;
-
-    SunsetEngine::ApplicationSetting AppSetting;
-
     SunsetEngine::Application* app = nullptr;
+    SunsetEngine::ApplicationSetting AppSetting;
+    bool IsAppRunning = true;
+    SunsetEngine::Renderer* m_Render = nullptr;
 }
 
 namespace SunsetEngine
@@ -26,7 +24,9 @@ namespace SunsetEngine
         : m_LayerStack()
         , m_Scene(nullptr)
     {
-        LOG("App Create")
+        Log::Init();
+        INITLOG("Engine");
+        LOG("Engine", info, "App Create");
         app = this;
         AppSetting = setting;
         m_Render = new Renderer();
@@ -41,6 +41,7 @@ namespace SunsetEngine
         m_Render = nullptr;
 
         app = nullptr;
+        Log::Shutdown();
     }
 
     void Application::Run()
@@ -58,12 +59,17 @@ namespace SunsetEngine
                 layer->OnUpdate(dt.count());
             }
 
-            m_Render->BeginFrame();
+            m_Scene->Update(dt.count());
+
+            RenderCommande::BeginFrame();
+
+            m_Scene->Render();
+
             for (auto layer = m_LayerStack.end(); layer != m_LayerStack.begin(); )
             {
                 (*--layer)->OnDraw();
             }
-            m_Render->EndFrame();
+            RenderCommande::EndFrame();
         }
     }
 
@@ -89,5 +95,10 @@ namespace SunsetEngine
     void Application::ResizeWindow(const glm::ivec2& setting)
     {
         AppSetting.WindowSize = setting;
+    }
+
+    void* Application::GetWindow()
+    {
+        return Renderer::Get();
     }
 }

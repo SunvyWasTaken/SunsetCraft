@@ -10,6 +10,8 @@ namespace SunsetEngine
     struct Scene
     {
         virtual ~Scene() = default;
+        virtual void Update(float deltaTime) = 0;
+        virtual void Render() = 0;
     };
 }
 

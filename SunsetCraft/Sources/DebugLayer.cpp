@@ -27,9 +27,18 @@ void DebugLayer::OnUpdate(float dt)
 
 void DebugLayer::OnDraw()
 {
-    if (CraftScene* tmp = static_cast<CraftScene*>(this->GetScene()))
-    {
-        glm::vec2 pos = tmp->m_Camera.GetPosition();
-        BiomeGenerator::RequestBiome(pos);
-    }
+}
+
+bool DebugLayer::OnEvent(SunsetEngine::Event::Type& event)
+{
+    return std::visit(overloads{
+        [](SunsetEngine::Event::KeyEvent& event)
+        {
+            return true;
+        },
+        [](SunsetEngine::Event::MouseEvent& event)
+        {
+            return true;
+        }
+    }, event);
 }

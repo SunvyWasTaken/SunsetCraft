@@ -11,12 +11,21 @@
 
 CraftScene::CraftScene()
 {
+    INITLOG("SunsetCraft");
     ChunkManager::Init();
 }
 
 CraftScene::~CraftScene()
 {
     ChunkManager::Shutdown();
+}
+
+void CraftScene::Update(float deltaTime)
+{
+}
+
+void CraftScene::Render()
+{
 }
 
 void CraftScene::LineTrace(RaycastHit& hit, const glm::vec3& start, const glm::vec3& forward, const float distance)

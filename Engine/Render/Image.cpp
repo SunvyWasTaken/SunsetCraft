@@ -33,7 +33,7 @@ namespace SunsetEngine
         m_Data = stbi_load(path.data(), &width, &height, &nbrChannels, 0);
         if (m_Data == nullptr)
         {
-            LOG("Load Image failed : ", path)
+            LOG("Engine", error, "Load Image failed : {}", path)
         }
     }
 

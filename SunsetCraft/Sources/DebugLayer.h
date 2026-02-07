@@ -14,6 +14,7 @@ public:
 
     void OnUpdate(float dt) override;
     void OnDraw() override;
+    bool OnEvent(SunsetEngine::Event::Type& event) override;
 };
 
 #endif //SUNSETCRAFT_DEBUGLAYER_H

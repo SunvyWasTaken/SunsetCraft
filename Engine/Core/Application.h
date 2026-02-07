@@ -40,6 +40,7 @@ namespace SunsetEngine
         static const ApplicationSetting& GetSetting();
         static const Application& GetApplication();
         static void ResizeWindow(const glm::ivec2& setting);
+        static void* GetWindow();
 
     private:
 

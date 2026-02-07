@@ -18,10 +18,6 @@ namespace SunsetEngine
 
         bool Valid() const;
 
-        void BeginFrame();
-
-        void EndFrame();
-
         static void* Get();
     };
 }

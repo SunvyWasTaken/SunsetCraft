@@ -16,7 +16,11 @@ struct CraftScene : public SunsetEngine::Scene
 {
     CraftScene();
 
-    ~CraftScene();
+    ~CraftScene() override;
+
+    void Update(float deltaTime) override;
+
+    void Render() override;
 
     void LineTrace(RaycastHit& hit, const glm::vec3& start, const glm::vec3& forward, const float distance);
 
