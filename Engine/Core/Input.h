@@ -16,9 +16,17 @@ namespace SunsetEngine
 
     struct Event
     {
+        enum class Action
+        {
+            Press,
+            Release,
+            Hold
+        };
+
         struct KeyEvent
         {
             unsigned int key;
+            Action action;
         };
 
         struct MouseEvent
@@ -33,7 +41,8 @@ namespace SunsetEngine
     {
         // Take a path to a .json with the key in it.
         static void Init(const std::string_view& Path);
-        static bool IsKeyPress(const std::string_view& name, Event::Type& event);
+        static bool IsKeyPress(const std::string_view& name, const Event::KeyEvent& event);
+        static bool HandleKey(const std::string_view& name, const Event::KeyEvent& event, const std::function<void(const Event::Action& action)>& func);
     };
 }
 

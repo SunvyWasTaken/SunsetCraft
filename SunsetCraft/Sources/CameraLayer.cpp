@@ -22,6 +22,8 @@ namespace
     float yaw = -90.f;
     float pitch = 0.f;
 
+    std::array<bool, 4> PressDirs = { false, false, false, false };
+
     void ProcessInput(SunsetEngine::Camera& camera, const float dt)
     {
         const float cameraSpeed = 10.f * dt;
@@ -64,8 +66,6 @@ namespace
 void CameraLayer::OnAttach(SunsetEngine::Scene* scene)
 {
     SunsetEngine::Layer::OnAttach(scene);
-
-    SunsetEngine::InputManager::AddKey("Forward", 'W');
 }
 
 void CameraLayer::OnUpdate(float dt)
@@ -73,8 +73,6 @@ void CameraLayer::OnUpdate(float dt)
     if (CraftScene* scene = static_cast<CraftScene*>(GetScene()))
     {
         ProcessInput(scene->m_Camera, dt);
-
-
 
         // RaycastHit hit;
         // scene->LineTrace(hit , scene->m_Camera.GetPosition(), scene->m_Camera.GetForward(), 10.f);
@@ -102,10 +100,34 @@ void CameraLayer::OnDraw()
 
 bool CameraLayer::OnEvent(SunsetEngine::Event::Type& event)
 {
-    if (SunsetEngine::InputManager::IsKeyPress("Forward", event))
+    std::visit(overloads{[](SunsetEngine::Event::KeyEvent& event)
     {
-        HUD("Forward press")
-    }
+        bool handle = false;
+
+        handle = SunsetEngine::InputManager::HandleKey("Forward", event, [](const SunsetEngine::Event::Action& action)
+        {
+            switch (action)
+            {
+            case SunsetEngine::Event::Action::Release:
+                {
+                    PressDirs[0] = false;
+                }
+                default:
+                {
+                    PressDirs[0] = true;
+                }
+            }
+        });
+        handle = handle || SunsetEngine::InputManager::HandleKey("Backward", event, [](const SunsetEngine::Event::Action& action){});
+        handle = handle || SunsetEngine::InputManager::HandleKey("Left", event, [](const SunsetEngine::Event::Action& action){});
+        handle = handle || SunsetEngine::InputManager::HandleKey("Right", event, [](const SunsetEngine::Event::Action& action){});
+
+        return handle;
+    },
+    [](SunsetEngine::Event::MouseEvent& event)
+    {
+        return false;
+    }}, event);
 
     return false;
 }

@@ -16,10 +16,15 @@ namespace
 
     std::unordered_map<std::string, unsigned int> keyMap;
 
-    // Todo : faire le parsing ici pour avoir les touches que je veux.
-    void ProcessInputs(const nlohmann::json& j)
+    void ProcessInputs(const nlohmann::json& inputs)
     {
+        if (inputs.empty())
+            return;
 
+        for (const auto& input : inputs)
+        {
+            keyMap.emplace(input["name"], input["key"]);
+        }
     }
 }
 
@@ -64,22 +69,23 @@ namespace SunsetEngine
         ProcessInputs(j);
     }
 
-    bool InputManager::IsKeyPress(const std::string_view& name, Event::Type& event)
+    bool InputManager::IsKeyPress(const std::string_view& name, const Event::KeyEvent& event)
     {
-        return std::visit(overloads
-            {
-                [name](Event::KeyEvent& event)
-                {
-                    if (keyMap.contains(name.data()))
-                    {
-                        return event.key == keyMap.at(name.data());
-                    }
-                    return false;
-                },
-                [](Event::MouseEvent& event)
-                {
-                    return false;
-                }
-            }, event);
+        if (keyMap.contains(name.data()))
+        {
+            return event.key == keyMap.at(name.data());
+        }
+        return false;
+    }
+
+    bool InputManager::HandleKey(const std::string_view& name, const Event::KeyEvent& event,
+        const std::function<void(const Event::Action& action)>& func)
+    {
+        if (keyMap.contains(name.data()))
+        {
+            func(event.action);
+            return true;
+        }
+        return false;
     }
 }
