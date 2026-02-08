@@ -25,10 +25,12 @@ namespace SunsetEngine
 
         [[nodiscard]] uint32_t GetVAO() const;
         [[nodiscard]] uint32_t GetCount() const;
+        [[nodiscard]] bool hasEbo() const;
 
     private:
         uint32_t m_Id;
         uint32_t count;
+        bool bHasEbo;
     };
 }
 
