@@ -60,6 +60,7 @@ namespace SunsetEngine
 
         void SetLayout(const std::initializer_list<BufferElement>& elements);
         BufferLayout GetLayout() const;
+        size_t GetSize() const;
     private:
         uint32_t m_Id;
         BufferLayout m_Layout;
