@@ -9,6 +9,7 @@ find_package(glad CONFIG REQUIRED)
 find_package(Stb REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
+find_package(imgui CONFIG REQUIRED)
 
 add_library(${PROJECT_NAME} STATIC
         ${SOURCES}
@@ -22,6 +23,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
         OpenGL::GL
         glfw
         glad::glad
+        imgui::imgui
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC

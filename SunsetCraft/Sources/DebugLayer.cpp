@@ -4,13 +4,6 @@
 
 #include "DebugLayer.h"
 
-#include "Chunk/BiomeGenerator.h"
-#include "Core/Application.h"
-#include "Core/ApplicationSetting.h"
-#include "Imgui/imgui.h"
-#include "Slate/SlateImage.h"
-#include "World/CraftScene.h"
-
 namespace
 {
 }
