@@ -104,7 +104,7 @@ bool CameraLayer::OnEvent(SunsetEngine::Event::Type& event)
     {
         bool handle = false;
 
-        handle = SunsetEngine::InputManager::HandleKey("Forward", event, [](const SunsetEngine::Event::Action& action)
+        handle = SunsetEngine::InputRegister::HandleKey("Forward", event, [](const SunsetEngine::Event::Action& action)
         {
             switch (action)
             {
@@ -118,9 +118,9 @@ bool CameraLayer::OnEvent(SunsetEngine::Event::Type& event)
                 }
             }
         });
-        handle = handle || SunsetEngine::InputManager::HandleKey("Backward", event, [](const SunsetEngine::Event::Action& action){});
-        handle = handle || SunsetEngine::InputManager::HandleKey("Left", event, [](const SunsetEngine::Event::Action& action){});
-        handle = handle || SunsetEngine::InputManager::HandleKey("Right", event, [](const SunsetEngine::Event::Action& action){});
+        handle = handle || SunsetEngine::InputRegister::HandleKey("Backward", event, [](const SunsetEngine::Event::Action& action){});
+        handle = handle || SunsetEngine::InputRegister::HandleKey("Left", event, [](const SunsetEngine::Event::Action& action){});
+        handle = handle || SunsetEngine::InputRegister::HandleKey("Right", event, [](const SunsetEngine::Event::Action& action){});
 
         return handle;
     },

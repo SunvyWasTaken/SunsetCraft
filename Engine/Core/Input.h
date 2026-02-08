@@ -7,13 +7,6 @@
 
 namespace SunsetEngine
 {
-    struct Input
-    {
-        static bool IsKeyPress(unsigned int key);
-        static bool IsMouseButtonClick(unsigned int button);
-        static glm::vec2 GetMousePosition();
-    };
-
     struct Event
     {
         enum class Action
@@ -37,12 +30,14 @@ namespace SunsetEngine
         using Type = std::variant<KeyEvent, MouseEvent>;
     };
 
-    struct InputManager
+    struct InputRegister
     {
         // Take a path to a .json with the key in it.
         static void Init(const std::string_view& Path);
-        static bool IsKeyPress(const std::string_view& name, const Event::KeyEvent& event);
-        static bool HandleKey(const std::string_view& name, const Event::KeyEvent& event, const std::function<void(const Event::Action& action)>& func);
+        static void OnEvent(const Event::Type& event);
+        static glm::vec2 GetMouseDelta();
+        static bool IsKeyPress(const std::string_view& name);
+        static void RegisterAction(const std::string_view& name, const std::function<void(const Event::Action&)>& func);
     };
 }
 
