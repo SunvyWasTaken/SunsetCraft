@@ -156,14 +156,15 @@ namespace SunsetEngine
         return m_Stride;
     }
 
-    VertexBuffer::VertexBuffer(const void* data, size_t size)
+    VertexBuffer::VertexBuffer(const void* data, size_t size, size_t dataSize)
         : m_Id(0)
         , m_Layout({})
+, m_Size(size)
     {
         glGenBuffers(1, &m_Id);
         LOG("Engine", trace, "VertexBuffer {} create", m_Id);
         Bind();
-        glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, size * dataSize, data, GL_STATIC_DRAW);
         Unbind();
     }
     
@@ -194,6 +195,11 @@ namespace SunsetEngine
     {
         return m_Layout;
     }
+
+size_t VertexBuffer::GetSize() const
+{
+return m_Size;
+}
 
     IndiceBuffer::IndiceBuffer(const std::vector<uint32_t>& indices)
         : m_Id(0)

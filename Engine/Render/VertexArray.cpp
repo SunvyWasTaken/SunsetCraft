@@ -72,5 +72,10 @@ namespace SunsetEngine
     uint32_t VertexArray::GetCount() const
     {
         return count;
-    }   
+    }
+
+bool VertexArray::hasEbo() const
+{
+return bHasEbo;
+}
 }

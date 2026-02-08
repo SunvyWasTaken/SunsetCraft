@@ -52,7 +52,7 @@ namespace SunsetEngine
     class VertexBuffer
     {
     public:
-        VertexBuffer(const void* data, size_t size);
+        VertexBuffer(const void* data, size_t size, size_t dataSize);
         virtual ~VertexBuffer();
 
         void Bind() const;
@@ -60,9 +60,11 @@ namespace SunsetEngine
 
         void SetLayout(const std::initializer_list<BufferElement>& elements);
         BufferLayout GetLayout() const;
+        size_t GetSize() const;
     private:
         uint32_t m_Id;
         BufferLayout m_Layout;
+        size_t m_Size;
     };
 
     // EBO
