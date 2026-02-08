@@ -53,6 +53,7 @@ namespace SunsetEngine
                 glVertexAttribPointer(index, element.Count(), element.Type(), element.normalized, layout.GetStride(), (const void*)element.offset);
             index++;
         }
+        count = vertexBuffer.GetSize();
         Unbind();
     }
 
@@ -74,8 +75,8 @@ namespace SunsetEngine
         return count;
     }
 
-bool VertexArray::hasEbo() const
-{
-return bHasEbo;
-}
+    bool VertexArray::hasEbo() const
+    {
+        return bHasEbo;
+    }
 }

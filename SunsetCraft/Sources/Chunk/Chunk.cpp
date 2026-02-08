@@ -4,9 +4,6 @@
 
 #include "Chunk.h"
 
-#include "Render/Drawable.h"
-#include "World/Block.h"
-
 namespace
 {
     constexpr std::uint32_t EncodeVoxel(
@@ -62,17 +59,11 @@ Chunk::Chunk(const glm::ivec3& pos)
     : bIsDirty(true)
     , position(pos)
     , data()
-    , m_Drawable(std::unique_ptr<SunsetEngine::Drawable>(nullptr))
 {
 }
 
 Chunk::~Chunk()
 {
-}
-
-void Chunk::Draw() const
-{
-    // m_Drawable->Draw();
 }
 
 BlockId Chunk::GetBlockId(const glm::ivec3& pos) const
@@ -96,20 +87,6 @@ glm::ivec3 Chunk::GetPosition() const
 const BlockList & Chunk::GetBlocks() const
 {
     return data;
-}
-
-void Chunk::UpdateDrawable(const std::vector<std::uint32_t>& vertices)
-{
-    bIsDirty = false;
-
-    // if (!m_Drawable)
-    // {
-    //     m_Drawable = std::make_unique<SunsetEngine::Drawable>(vertices);
-    //     return;
-    // }
-    //
-    // m_Drawable->Clear();
-    // m_Drawable->Create(vertices);
 }
 
 const BiomeType::Type& Chunk::GetBiomeType() const

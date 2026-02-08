@@ -196,10 +196,10 @@ namespace SunsetEngine
         return m_Layout;
     }
 
-size_t VertexBuffer::GetSize() const
-{
-return m_Size;
-}
+    size_t VertexBuffer::GetSize() const
+    {
+        return m_Size;
+    }
 
     IndiceBuffer::IndiceBuffer(const std::vector<uint32_t>& indices)
         : m_Id(0)

@@ -8,26 +8,16 @@
 
 namespace SunsetEngine
 {
-    struct Scene;
-
     class Layer
     {
     public:
         Layer() = default;
         virtual ~Layer() = default;
 
-        virtual void OnAttach(Scene* scene);
-
         virtual void OnUpdate(float dt) = 0;
         virtual void OnDraw() = 0;
 
         virtual bool OnEvent(Event::Type& event);
-
-    protected:
-        Scene* GetScene() const;
-
-    private:
-        Scene* m_Scene;
     };
 }
 

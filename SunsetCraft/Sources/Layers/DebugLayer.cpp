@@ -4,14 +4,6 @@
 
 #include "DebugLayer.h"
 
-namespace
-{
-}
-
-void DebugLayer::OnAttach(SunsetEngine::Scene* scene)
-{
-}
-
 void DebugLayer::OnUpdate(float dt)
 {
     // HUD("Deltatime : {}", dt);

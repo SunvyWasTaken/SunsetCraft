@@ -23,9 +23,18 @@ namespace SunsetEngine
 
         static std::shared_ptr<spdlog::logger> GetLogger(std::string name);
     };
+
+    struct PrintScreen
+    {
+        static void Add(const std::string_view& string);
+        static void Clear();
+        static std::vector<std::string>& Get();
+    };
 }
 
 #define INITLOG(name) SunsetEngine::Log::InitLog(name);
 #define LOG(name, level, txt, ...) SunsetEngine::Log::GetLogger(name)->level(std::format(txt, ##__VA_ARGS__));
+
+#define PRINTSCREEN(txt, ...) SunsetEngine::PrintScreen::Add(std::format(txt, ##__VA_ARGS__));
 
 #endif //SUNSETCRAFT_LOGGER_H

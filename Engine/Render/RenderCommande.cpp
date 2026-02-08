@@ -27,11 +27,29 @@ namespace
         SunsetEngine::RenderState state;
     };
 
+    struct HeapTest
+    {
+        std::chrono::steady_clock::time_point start;
+        std::string name;
+        explicit HeapTest(const std::string_view& _name)
+            : name(_name)
+        {
+            start = std::chrono::steady_clock::now();
+        }
+        ~HeapTest()
+        {
+            auto end = std::chrono::steady_clock::now();
+            auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+            PRINTSCREEN("{} : {}ms", name.c_str(), duration.count());
+        }
+    };
+
     // to change from just a vector to a 2 vector.
     std::vector<DrawCommand> m_DrawCommands;
 
     void FlushDrawCommand()
     {
+        HeapTest t("FlushDrawCommand");
         // Sort cmd
 
         for (DrawCommand& cmd : m_DrawCommands)
@@ -63,15 +81,17 @@ namespace SunsetEngine
 
     void RenderCommande::EndFrame()
     {
-        // ImGui::SetNextWindowPos(ImVec2(Application::GetSetting().WindowSize.x - 200, 0), ImGuiCond_Always);
-        // ImGui::SetNextWindowSize(ImVec2(200, Application::GetSetting().WindowSize.y), ImGuiCond_Always);
-        // ImGui::Begin("Log", nullptr);
-        // for (std::vector<std::string>::iterator it = Log::begin(); it != Log::end(); ++it)
-        // {
-        //     ImGui::Text("%s", it->c_str());
-        // }
-        // ImGui::SetScrollHereY(1.0f);
-        // ImGui::End();
+        if (!PrintScreen::Get().empty())
+        {
+            ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
+            ImGui::Begin("Stats", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+            for (const auto& it : PrintScreen::Get())
+            {
+                ImGui::Text("%s", it.c_str());
+            }
+            ImGui::End();
+            PrintScreen::Clear();
+        }
 
         FlushDrawCommand();
 

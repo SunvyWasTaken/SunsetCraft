@@ -109,6 +109,5 @@ void ChunkManager::Draw(CraftScene* scene)
     for (const auto &chunk: m_Chunks | std::views::values)
     {
         m_ChunkShader->SetVec3("chunkLocation", chunk->GetPosition());
-        chunk->Draw();
     }
 }

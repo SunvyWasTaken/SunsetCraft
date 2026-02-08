@@ -6,7 +6,6 @@
 
 #include "ApplicationSetting.h"
 #include "Layer.h"
-#include "Scene.h"
 #include "Render/RenderCommande.h"
 #include "Render/Renderer.h"
 
@@ -24,7 +23,6 @@ namespace SunsetEngine
 {
     Application::Application(const ApplicationSetting& setting)
         : m_LayerStack()
-        , m_Scene(nullptr)
     {
         Log::Init();
         INITLOG("Engine");
@@ -38,8 +36,6 @@ namespace SunsetEngine
     Application::~Application()
     {
         m_LayerStack.Clear();
-
-        m_Scene.reset(nullptr);
 
         delete m_Render;
         m_Render = nullptr;
@@ -66,11 +62,7 @@ namespace SunsetEngine
                 layer->OnUpdate(dt.count());
             }
 
-            m_Scene->Update(dt.count());
-
             RenderCommande::BeginFrame();
-
-            m_Scene->Render();
 
             for (auto layer = m_LayerStack.end(); layer != m_LayerStack.begin(); )
             {

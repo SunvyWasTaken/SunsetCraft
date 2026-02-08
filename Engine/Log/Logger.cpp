@@ -11,6 +11,8 @@ namespace
 {
     std::unordered_map<std::string_view, std::shared_ptr<spdlog::logger>> m_Loggers;
     spdlog::sink_ptr m_Sink;
+
+    std::vector<std::string> m_PrintScreen;
 }
 
 namespace SunsetEngine
@@ -47,5 +49,20 @@ namespace SunsetEngine
     {
         const auto it = m_Loggers.find(name);
         return it == m_Loggers.end() ? nullptr : it->second;
+    }
+
+    void PrintScreen::Add(const std::string_view& string)
+    {
+        m_PrintScreen.emplace_back(string);
+    }
+
+    void PrintScreen::Clear()
+    {
+        m_PrintScreen.clear();
+    }
+
+    std::vector<std::string>& PrintScreen::Get()
+    {
+        return m_PrintScreen;
     }
 }

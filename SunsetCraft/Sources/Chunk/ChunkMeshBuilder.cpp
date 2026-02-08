@@ -33,9 +33,9 @@ namespace
         return data[Index(x, y, z)] != BlockRegistry::AIR;
     }
     
-    void CreateMesh(const BlockList& data, std::vector<std::uint32_t>& indices)
+    void CreateMesh(const BlockList& data, std::vector<std::uint32_t>& vertices)
     {
-        indices.reserve(data.size());
+        vertices.reserve(data.size());
         for (int z = 0; z < m_chunkSize; ++z)
         {
             for (int x = 0; x < m_chunkSize; ++x)
@@ -54,34 +54,30 @@ namespace
 
                     // +X
                     if (!IsSolid(data, x + 1, y, z))
-                        indices.push_back(EncodeVoxel(x, y, z, static_cast<uint8_t>(BlockFace::East), getUv(BlockFace::East)));
+                        vertices.push_back(EncodeVoxel(x, y, z, static_cast<uint8_t>(BlockFace::East), getUv(BlockFace::East)));
                     // -X
                     if (!IsSolid(data, x - 1, y, z))
-                        indices.push_back(EncodeVoxel(x, y, z, static_cast<uint8_t>(BlockFace::West), getUv(BlockFace::West)));
+                        vertices.push_back(EncodeVoxel(x, y, z, static_cast<uint8_t>(BlockFace::West), getUv(BlockFace::West)));
                     // +Y
                     if (!IsSolid(data, x, y + 1, z))
-                        indices.push_back(EncodeVoxel(x, y, z, static_cast<uint8_t>(BlockFace::Top), getUv(BlockFace::Top)));
+                        vertices.push_back(EncodeVoxel(x, y, z, static_cast<uint8_t>(BlockFace::Top), getUv(BlockFace::Top)));
                     // -Y
                     if (!IsSolid(data, x, y - 1, z))
-                        indices.push_back(EncodeVoxel(x, y, z, static_cast<uint8_t>(BlockFace::Bottom), getUv(BlockFace::Bottom)));
+                        vertices.push_back(EncodeVoxel(x, y, z, static_cast<uint8_t>(BlockFace::Bottom), getUv(BlockFace::Bottom)));
                     // +Z
                     if (!IsSolid(data, x, y, z + 1))
-                        indices.push_back(EncodeVoxel(x, y, z, static_cast<uint8_t>(BlockFace::North), getUv(BlockFace::North)));
+                        vertices.push_back(EncodeVoxel(x, y, z, static_cast<uint8_t>(BlockFace::North), getUv(BlockFace::North)));
                     // -Z
                     if (!IsSolid(data, x, y, z - 1))
-                        indices.push_back(EncodeVoxel(x, y, z, static_cast<uint8_t>(BlockFace::South), getUv(BlockFace::South)));
+                        vertices.push_back(EncodeVoxel(x, y, z, static_cast<uint8_t>(BlockFace::South), getUv(BlockFace::South)));
                 }
             }
         }
     }    
 }
 
-void ChunkMeshBuilder::Build(Chunk &chunk)
+void ChunkMeshBuilder::Build(Chunk &chunk, std::vector<std::uint32_t>& vertices)
 {
-    std::vector<std::uint32_t> vertices;
-
     CreateMesh(chunk.GetBlocks(), vertices);
-
-    chunk.UpdateDrawable(vertices);
 }
 
