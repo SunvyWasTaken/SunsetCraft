@@ -99,6 +99,21 @@ namespace SunsetEngine
     {
     }
 
+    bool BufferElement::IsInt() const
+    {
+        switch (type)
+        {
+        case ShaderDataType::Int:
+        case ShaderDataType::Int2:
+        case ShaderDataType::Int3:
+        case ShaderDataType::Int4:
+        case ShaderDataType::UInt:
+            return true;
+        default:
+            return false;
+        }
+    }
+
     int BufferElement::Count() const
     {
         return GetInfo(type).count;

@@ -14,12 +14,20 @@ namespace SunsetEngine
     class VertexArray
     {
     public:
-        explicit VertexArray(std::unique_ptr<VertexBuffer> vb, std::unique_ptr<IndiceBuffer> ib = nullptr);
+        VertexArray();
         ~VertexArray();
+
+        void Bind();
+        void Unbind();
+
+        void AddVertexBuffer(const VertexBuffer& vertexBuffer);
+        void AddIndexBuffer(const IndiceBuffer& indexBuffer);
+
+        [[nodiscard]] uint32_t GetCount() const;
+
     private:
         uint32_t m_Id;
-        std::unique_ptr<VertexBuffer> vertexBuffer;
-        std::unique_ptr<IndiceBuffer> indiceBuffer;
+        uint32_t count;
     };
 }
 

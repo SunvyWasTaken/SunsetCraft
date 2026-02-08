@@ -18,8 +18,9 @@ namespace SunsetEngine
     {
         BufferElement(ShaderDataType type, const std::string_view& name, bool normalized = false);
 
-        int Count() const;
-        int Type() const;
+        [[nodiscard]] bool IsInt() const;
+        [[nodiscard]] int Count() const;
+        [[nodiscard]] int Type() const;
 
         std::string name;
         ShaderDataType type;
@@ -35,12 +36,13 @@ namespace SunsetEngine
 
         const std::vector<BufferElement>& operator()() const;
 
-        std::vector<BufferElement>::const_iterator begin() const;
-        std::vector<BufferElement>::const_iterator end() const;
+        [[nodiscard]] std::vector<BufferElement>::const_iterator begin() const;
+        [[nodiscard]] std::vector<BufferElement>::const_iterator end() const;
 
-        bool empty() const;
+        [[nodiscard]] bool empty() const;
 
-        uint32_t GetStride() const;
+        [[nodiscard]] uint32_t GetStride() const;
+
     private:
         std::vector<BufferElement> m_Elements;
         uint32_t m_Stride;
