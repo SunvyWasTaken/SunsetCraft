@@ -36,7 +36,7 @@ CraftScene::CraftScene()
     INITLOG("SunsetCraft");
     ChunkManager::Init();
 
-    std::shared_ptr<SunsetEngine::VertexBuffer> vbo = std::make_shared<SunsetEngine::VertexBuffer>(vertices, sizeof(vertices));
+    std::shared_ptr<SunsetEngine::VertexBuffer> vbo = std::make_shared<SunsetEngine::VertexBuffer>(vertices, sizeof(vertices) * sizeof(float));
     std::shared_ptr<SunsetEngine::IndiceBuffer> ebo = std::make_shared<SunsetEngine::IndiceBuffer>(indices);
 
     vbo->SetLayout({SunsetEngine::BufferElement{SunsetEngine::ShaderDataType::Float3, "pos", false}});

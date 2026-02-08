@@ -7,6 +7,8 @@
 #include "Core/Application.h"
 #include "Core/ApplicationSetting.h"
 #include "Drawable.h"
+#include "Mesh.h"
+#include "Shader.h"
 
 #include "Imgui/imgui.h"
 #include "Imgui/imgui_impl_glfw.h"
@@ -14,9 +16,6 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-
-#include "Mesh.h"
-#include "Shader.h"
 
 namespace
 {
@@ -42,7 +41,6 @@ namespace
             glBindVertexArray(cmd.vao);
             // Todo : change the draw command cuz actually it's not compatible with my instance block.
             //glDrawArrays(GL_TRIANGLES, 0, cmd.indexCount);
-            LOG("Engine", trace, "vertex count {}", cmd.indexCount);
             glDrawElements(GL_TRIANGLES, cmd.indexCount, GL_UNSIGNED_INT, nullptr);
         }
 
@@ -89,7 +87,6 @@ namespace SunsetEngine
         DrawCommand cmd;
         cmd.vao = drawable.m_Mesh->GetVAO();
         cmd.indexCount = drawable.m_Mesh->GetVertexCount();
-        LOG("Engine", trace, "index count {}", cmd.indexCount);
         cmd.shader = drawable.m_Shader->GetId();
         cmd.state = drawable.m_RenderState;
         m_DrawCommands.emplace_back(cmd);
