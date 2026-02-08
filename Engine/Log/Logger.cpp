@@ -33,7 +33,11 @@ namespace SunsetEngine
             return m_Loggers[name];
 
         auto logger = std::make_shared<spdlog::logger>(name.data(), m_Sink);
+#ifdef NDEBUG
+        logger->set_level(spdlog::level::info);
+#else
         logger->set_level(spdlog::level::trace);
+#endif
         spdlog::register_logger(logger);
         m_Loggers[name] = logger;
         return logger;

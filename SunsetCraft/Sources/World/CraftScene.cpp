@@ -7,16 +7,55 @@
 #include "RaycastHit.h"
 #include "Chunk/Chunk.h"
 #include "Block.h"
+#include "Render/Buffers.h"
+#include "Render/Drawable.h"
+#include "Render/Mesh.h"
+#include "Render/RenderCommande.h"
+#include "Render/Shader.h"
+#include "Render/VertexArray.h"
 #include "Utility/BlockRegistry.h"
+
+namespace
+{
+    std::unique_ptr<SunsetEngine::Drawable> d = nullptr;
+
+    float vertices[] = {
+        0.5f,  0.5f, 0.0f,  // top right
+        0.5f, -0.5f, 0.0f,  // bottom right
+       -0.5f, -0.5f, 0.0f,  // bottom left
+       -0.5f,  0.5f, 0.0f   // top left
+   };
+    std::vector<uint32_t> indices = {  // note that we start from 0!
+        0, 1, 3,   // first triangle
+        1, 2, 3    // second triangle
+    };
+}
 
 CraftScene::CraftScene()
 {
     INITLOG("SunsetCraft");
     ChunkManager::Init();
+
+    std::shared_ptr<SunsetEngine::VertexBuffer> vbo = std::make_shared<SunsetEngine::VertexBuffer>(vertices, sizeof(vertices));
+    std::shared_ptr<SunsetEngine::IndiceBuffer> ebo = std::make_shared<SunsetEngine::IndiceBuffer>(indices);
+
+    vbo->SetLayout({SunsetEngine::BufferElement{SunsetEngine::ShaderDataType::Float3, "pos", false}});
+
+    std::unique_ptr<SunsetEngine::VertexArray> vao = std::make_unique<SunsetEngine::VertexArray>();
+    vao->AddVertexBuffer(*vbo);
+    vao->AddIndexBuffer(*ebo);
+
+    d = std::make_unique<SunsetEngine::Drawable>();
+    d->m_Mesh = std::make_shared<SunsetEngine::Mesh>(vao);
+    d->m_Mesh->m_VertexBuffer = vbo;
+
+    std::shared_ptr<SunsetEngine::Shader> s = std::make_shared<SunsetEngine::Shader>("SunsetCraft/Shaders/CubeOutline.vert", "SunsetCraft/Shaders/CubeOutline.frag");
+    d->m_Shader = s;
 }
 
 CraftScene::~CraftScene()
 {
+    d.reset();
     ChunkManager::Shutdown();
 }
 
@@ -26,6 +65,7 @@ void CraftScene::Update(float deltaTime)
 
 void CraftScene::Render()
 {
+    SunsetEngine::RenderCommande::Submit(*d);
 }
 
 void CraftScene::LineTrace(RaycastHit& hit, const glm::vec3& start, const glm::vec3& forward, const float distance)

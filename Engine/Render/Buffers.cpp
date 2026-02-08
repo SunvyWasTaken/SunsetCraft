@@ -74,7 +74,7 @@ namespace
 
     size_t CalculateStride(std::vector<SunsetEngine::BufferElement>& type)
     {
-        uint32_t offset = 0;
+        size_t offset = 0;
         size_t stride = 0;
 
         for (auto& element : type)
@@ -151,7 +151,7 @@ namespace SunsetEngine
         return m_Elements.empty();
     }
 
-    uint32_t BufferLayout::GetStride() const
+    size_t BufferLayout::GetStride() const
     {
         return m_Stride;
     }
@@ -162,6 +162,7 @@ namespace SunsetEngine
         , m_Size(size)
     {
         glGenBuffers(1, &m_Id);
+        LOG("Engine", trace, "VertexBuffer {} create", m_Id);
         Bind();
         glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
         Unbind();
@@ -169,16 +170,19 @@ namespace SunsetEngine
     
     VertexBuffer::~VertexBuffer()
     {
+        LOG("Engine", trace, "VertexBuffer {} destroy", m_Id);
         glDeleteBuffers(1, &m_Id);
     }
     
     void VertexBuffer::Bind() const
     {
+        LOG("Engine", trace, "VertexBuffer {} Bind", m_Id);
         glBindBuffer(GL_ARRAY_BUFFER, m_Id);
     }
 
     void VertexBuffer::Unbind() const
     {
+        LOG("Engine", trace, "VertexBuffer {} Unbind", m_Id);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
@@ -203,7 +207,7 @@ namespace SunsetEngine
     {
         glGenBuffers(1, &m_Id);
         Bind();
-        glBufferData(GL_ARRAY_BUFFER, sizeof(uint32_t) * indices.size(), indices.data(), GL_STATIC_DRAW);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size(), indices.data(), GL_STATIC_DRAW);
         Unbind();
     }
 

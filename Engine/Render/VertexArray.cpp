@@ -8,57 +8,71 @@
 
 #include <glad/glad.h>
 
-SunsetEngine::VertexArray::VertexArray()
-    : m_Id(0)
-    , count(0)
+namespace SunsetEngine
 {
-    glGenVertexArrays(1, &m_Id);
-}
-
-SunsetEngine::VertexArray::~VertexArray()
-{
-    glDeleteVertexArrays(1, &m_Id);
-}
-
-void SunsetEngine::VertexArray::Bind()
-{
-    glBindVertexArray(m_Id);
-}
-
-void SunsetEngine::VertexArray::Unbind()
-{
-    glBindVertexArray(0);
-}
-
-void SunsetEngine::VertexArray::AddVertexBuffer(const VertexBuffer& vertexBuffer)
-{
-    Bind();
-    vertexBuffer.Bind();
-
-    const auto& layout = vertexBuffer.GetLayout();
-    uint32_t index = 0;
-
-    for (auto& element : layout)
+    VertexArray::VertexArray()
+       : m_Id(0)
+       , count(0)
     {
-        glEnableVertexAttribArray(index);
-        if (element.IsInt())
-            glVertexAttribIPointer(index, element.Count(), element.Type(), layout.GetStride(), (const void*)element.offset);
-        else
-            glVertexAttribPointer(index, element.Count(), element.Type(), element.normalized, layout.GetStride(), (const void*)element.offset);
-        index++;
+        glGenVertexArrays(1, &m_Id);
+        LOG("Engine", trace, "VertexArray {} create", m_Id)
     }
 
-    count = vertexBuffer.GetSize();
-}
+    VertexArray::~VertexArray()
+    {
+        LOG("Engine", trace, "VertexArray {} destroy", m_Id)
+        glDeleteVertexArrays(1, &m_Id);
+    }
 
-void SunsetEngine::VertexArray::AddIndexBuffer(const IndiceBuffer& indexBuffer)
-{
-    Bind();
-    indexBuffer.Bind();
-    count = indexBuffer.GetCount();
-}
+    void VertexArray::Bind() const
+    {
+        LOG("Engine", trace, "VertexArray {} bind", m_Id)
+        glBindVertexArray(m_Id);
+    }
 
-uint32_t SunsetEngine::VertexArray::GetCount() const
-{
-    return count;
+    void VertexArray::Unbind() const
+    {
+        LOG("Engine", trace, "VertexArray {} unbind", m_Id)
+        glBindVertexArray(0);
+    }
+
+    void VertexArray::AddVertexBuffer(const VertexBuffer& vertexBuffer)
+    {
+        Bind();
+        vertexBuffer.Bind();
+
+        const auto& layout = vertexBuffer.GetLayout();
+        uint32_t index = 0;
+
+        for (auto& element : layout)
+        {
+            glEnableVertexAttribArray(index);
+            if (element.IsInt())
+                glVertexAttribIPointer(index, element.Count(), element.Type(), layout.GetStride(), (const void*)element.offset);
+            else
+                glVertexAttribPointer(index, element.Count(), element.Type(), element.normalized, layout.GetStride(), (const void*)element.offset);
+            index++;
+        }
+
+        count = vertexBuffer.GetSize();
+        Unbind();
+    }
+
+    void VertexArray::AddIndexBuffer(const IndiceBuffer& indexBuffer)
+    {
+        Bind();
+        indexBuffer.Bind();
+        count = indexBuffer.GetCount();
+        Unbind();
+    }
+
+    uint32_t VertexArray::GetVAO() const
+    {
+        return m_Id;
+    }
+
+    uint32_t VertexArray::GetCount() const
+    {
+        return count;
+    }   
 }

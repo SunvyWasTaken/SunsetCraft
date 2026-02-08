@@ -24,8 +24,8 @@ namespace SunsetEngine
 
         std::string name;
         ShaderDataType type;
-        uint32_t size;
-        uint32_t offset;
+        size_t size;
+        size_t offset;
         bool normalized;
     };
 
@@ -41,11 +41,11 @@ namespace SunsetEngine
 
         [[nodiscard]] bool empty() const;
 
-        [[nodiscard]] uint32_t GetStride() const;
+        [[nodiscard]] size_t GetStride() const;
 
     private:
         std::vector<BufferElement> m_Elements;
-        uint32_t m_Stride;
+        size_t m_Stride;
     };
 
     // VBO

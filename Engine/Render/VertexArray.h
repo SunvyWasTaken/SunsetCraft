@@ -17,12 +17,13 @@ namespace SunsetEngine
         VertexArray();
         ~VertexArray();
 
-        void Bind();
-        void Unbind();
+        void Bind() const;
+        void Unbind() const;
 
         void AddVertexBuffer(const VertexBuffer& vertexBuffer);
         void AddIndexBuffer(const IndiceBuffer& indexBuffer);
 
+        [[nodiscard]] uint32_t GetVAO() const;
         [[nodiscard]] uint32_t GetCount() const;
 
     private:

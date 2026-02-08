@@ -7,13 +7,23 @@
 
 namespace SunsetEngine
 {
+    class IndiceBuffer;
+    class VertexBuffer;
+    class VertexArray;
+
     class Mesh final
     {
     public:
-        Mesh();
+        explicit Mesh(std::unique_ptr<VertexArray>& vao);
         ~Mesh();
+        [[nodiscard]] uint32_t GetVAO() const;
+        [[nodiscard]] uint32_t GetVertexCount() const;
     private:
-        
+        std::unique_ptr<VertexArray> m_VertexArray;
+
+    public:
+        std::shared_ptr<VertexBuffer> m_VertexBuffer;
+        std::shared_ptr<IndiceBuffer> m_IndiceBuffer;
     };
 }
 

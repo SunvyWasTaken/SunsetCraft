@@ -7,21 +7,52 @@
 
 namespace SunsetEngine
 {
+    class Shader;
+    class Mesh;
+
+    enum class BlendFactor
+    {
+        Zero,
+        One,
+        SrcAlpha,
+        OneMinusSrcAlpha,
+        DstAlpha,
+        OneMinusDstAlpha,
+        SrcColor,
+        OneMinusSrcColor,
+        DstColor,
+        OneMinusDstColor
+    };
+
+    enum class CullMode
+    {
+        None,
+        Back,
+        Front
+    };
+
+    struct RenderState
+    {
+        bool depthTest = true;
+        bool depthWrite = true;
+
+        bool blending = true;
+        BlendFactor src = BlendFactor::One;
+        BlendFactor dest = BlendFactor::Zero;
+
+        CullMode cullMode = CullMode::Back;
+        bool wireframe = false;
+    };
+
     class Drawable final
     {
     public:
-        explicit Drawable(const std::vector<std::uint32_t>& vertices);
+        Drawable();
         ~Drawable();
 
-        void Clear() const;
-
-        void Create(const std::vector<std::uint32_t>& vertices);
-
-        void Draw() const;
-
-    private:
-        std::uint32_t vao, vbo;
-        std::size_t vertexCount;
+        std::shared_ptr<Mesh> m_Mesh;
+        std::shared_ptr<Shader> m_Shader;
+        RenderState m_RenderState;
     };
 }
 

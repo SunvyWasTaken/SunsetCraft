@@ -72,7 +72,7 @@ Chunk::~Chunk()
 
 void Chunk::Draw() const
 {
-    m_Drawable->Draw();
+    // m_Drawable->Draw();
 }
 
 BlockId Chunk::GetBlockId(const glm::ivec3& pos) const
@@ -102,14 +102,14 @@ void Chunk::UpdateDrawable(const std::vector<std::uint32_t>& vertices)
 {
     bIsDirty = false;
 
-    if (!m_Drawable)
-    {
-        m_Drawable = std::make_unique<SunsetEngine::Drawable>(vertices);
-        return;
-    }
-
-    m_Drawable->Clear();
-    m_Drawable->Create(vertices);
+    // if (!m_Drawable)
+    // {
+    //     m_Drawable = std::make_unique<SunsetEngine::Drawable>(vertices);
+    //     return;
+    // }
+    //
+    // m_Drawable->Clear();
+    // m_Drawable->Create(vertices);
 }
 
 const BiomeType::Type& Chunk::GetBiomeType() const

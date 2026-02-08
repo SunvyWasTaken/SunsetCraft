@@ -7,13 +7,14 @@
 
 namespace SunsetEngine
 {
+    class Drawable;
+
     struct RenderCommande
     {
         static void BeginFrame();
         static void EndFrame();
 
-        static void SetWireframe(bool DrawWireframe);
-        static void DrawCube();
+        static void Submit(const SunsetEngine::Drawable& drawable);
     };
 }
 
