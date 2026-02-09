@@ -15,24 +15,20 @@ namespace SunsetEngine
        , count(0)
     {
         glGenVertexArrays(1, &m_Id);
-        LOG("Engine", trace, "VertexArray {} create", m_Id)
     }
 
     VertexArray::~VertexArray()
     {
-        LOG("Engine", trace, "VertexArray {} destroy", m_Id)
         glDeleteVertexArrays(1, &m_Id);
     }
 
     void VertexArray::Bind() const
     {
-        LOG("Engine", trace, "VertexArray {} bind", m_Id)
         glBindVertexArray(m_Id);
     }
 
     void VertexArray::Unbind() const
     {
-        LOG("Engine", trace, "VertexArray {} unbind", m_Id)
         glBindVertexArray(0);
     }
 

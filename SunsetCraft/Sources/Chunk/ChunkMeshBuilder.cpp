@@ -6,7 +6,10 @@
 
 #include "Chunk.h"
 #include "ChunkUtility.h"
+#include "Render/Buffers.h"
 #include "Render/Drawable.h"
+#include "Render/Mesh.h"
+#include "Render/VertexArray.h"
 #include "Utility/BlockRegistry.h"
 #include "World/CraftScene.h"
 
@@ -76,8 +79,24 @@ namespace
     }    
 }
 
-void ChunkMeshBuilder::Build(Chunk &chunk, std::vector<std::uint32_t>& vertices)
+void ChunkMeshBuilder::Build(Chunk &chunk)
 {
+    std::vector<std::uint32_t> vertices;
     CreateMesh(chunk.GetBlocks(), vertices);
+
+    std::shared_ptr<SunsetEngine::VertexBuffer> vbo = std::make_shared<SunsetEngine::VertexBuffer>(vertices.data(), vertices.size(), sizeof(uint32_t));
+
+    vbo->SetLayout({SunsetEngine::BufferElement{SunsetEngine::ShaderDataType::UInt, "data"}});
+
+    std::unique_ptr<SunsetEngine::VertexArray> vao = std::make_unique<SunsetEngine::VertexArray>();
+
+    vao->AddVertexBuffer(*vbo);
+
+    std::shared_ptr<SunsetEngine::Mesh> m_Mesh = std::make_shared<SunsetEngine::Mesh>(vao);
+    m_Mesh->m_VertexBuffer = vbo;
+
+    std::unique_ptr<SunsetEngine::Drawable> drawable = std::make_unique<SunsetEngine::Drawable>();
+    drawable->m_Mesh = m_Mesh;
+    chunk.m_Drawable = std::move(drawable);
 }
 

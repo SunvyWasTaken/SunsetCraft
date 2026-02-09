@@ -162,7 +162,6 @@ namespace SunsetEngine
 , m_Size(size)
     {
         glGenBuffers(1, &m_Id);
-        LOG("Engine", trace, "VertexBuffer {} create", m_Id);
         Bind();
         glBufferData(GL_ARRAY_BUFFER, size * dataSize, data, GL_STATIC_DRAW);
         Unbind();
@@ -170,19 +169,16 @@ namespace SunsetEngine
     
     VertexBuffer::~VertexBuffer()
     {
-        LOG("Engine", trace, "VertexBuffer {} destroy", m_Id);
         glDeleteBuffers(1, &m_Id);
     }
     
     void VertexBuffer::Bind() const
     {
-        LOG("Engine", trace, "VertexBuffer {} Bind", m_Id);
         glBindBuffer(GL_ARRAY_BUFFER, m_Id);
     }
 
     void VertexBuffer::Unbind() const
     {
-        LOG("Engine", trace, "VertexBuffer {} Unbind", m_Id);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 

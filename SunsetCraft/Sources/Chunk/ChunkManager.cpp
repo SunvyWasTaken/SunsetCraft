@@ -8,6 +8,7 @@
 #include "ChunkMeshBuilder.h"
 #include "ChunkUtility.h"
 #include "WorldGenerator.h"
+#include "Render/RenderCommande.h"
 #include "Render/Shader.h"
 #include "World/CraftScene.h"
 
@@ -17,7 +18,7 @@ namespace
     int verticalRadius = 2;
 
     std::unordered_map<glm::ivec3, std::unique_ptr<Chunk>, triplet_hash> m_Chunks;
-    std::unique_ptr<SunsetEngine::Shader> m_ChunkShader = nullptr;
+    std::shared_ptr<SunsetEngine::Shader> m_ChunkShader = nullptr;
 
     template <typename T>
     int WorldToChunk(T value)
@@ -34,6 +35,7 @@ namespace
                     if (m_Chunks.find(key) == m_Chunks.end()) {
                         // Créer et générer le chunk
                         m_Chunks[key] = std::make_unique<Chunk>(glm::vec3{x, y, z});
+                        m_Chunks[key]->SetShader(m_ChunkShader);
                         WorldGenerator::Request(*(m_Chunks[key].get()));
                     }
                 }
@@ -98,16 +100,10 @@ BlockType ChunkManager::GetBlock(const glm::vec3 &position)
     return BlockType{};
 }
 
-void ChunkManager::Draw(CraftScene* scene)
+void ChunkManager::Render()
 {
-    m_ChunkShader->Use();
-    m_ChunkShader->SetMat4("projection", scene->m_Camera.GetProjection());
-    m_ChunkShader->SetMat4("view", scene->m_Camera.GetViewMatrix());
-
-    scene->m_TexturesManager.Use(m_ChunkShader.get());
-
-    for (const auto &chunk: m_Chunks | std::views::values)
+    for (const std::unique_ptr<Chunk>& chunk: m_Chunks | std::views::values)
     {
-        m_ChunkShader->SetVec3("chunkLocation", chunk->GetPosition());
+        SunsetEngine::RenderCommande::Submit(*chunk);
     }
 }

@@ -16,43 +16,26 @@
 
 namespace
 {
-    std::unique_ptr<SunsetEngine::Drawable> d = nullptr;
 }
 
 CraftScene::CraftScene()
 {
     ChunkManager::Init();
-
-    Chunk chunk{};
-
-    std::shared_ptr<SunsetEngine::VertexBuffer> vbo = std::make_shared<SunsetEngine::VertexBuffer>(vertices, sizeof(vertices), sizeof(float));
-
-    vbo->SetLayout({SunsetEngine::BufferElement{SunsetEngine::ShaderDataType::Float3, "pos", false}});
-
-    std::unique_ptr<SunsetEngine::VertexArray> vao = std::make_unique<SunsetEngine::VertexArray>();
-    vao->AddVertexBuffer(*vbo);
-
-    d = std::make_unique<SunsetEngine::Drawable>();
-    d->m_Mesh = std::make_shared<SunsetEngine::Mesh>(vao);
-    d->m_Mesh->m_VertexBuffer = vbo;
-
-    std::shared_ptr<SunsetEngine::Shader> s = std::make_shared<SunsetEngine::Shader>("SunsetCraft/Shaders/CubeOutline.vert", "SunsetCraft/Shaders/CubeOutline.frag");
-    d->m_Shader = s;
 }
 
 CraftScene::~CraftScene()
 {
-    d.reset();
     ChunkManager::Shutdown();
 }
 
 void CraftScene::Update(float deltaTime)
 {
+    ChunkManager::Update({0, 10, 0});
 }
 
 void CraftScene::Render()
 {
-    SunsetEngine::RenderCommande::Submit(*d);
+    ChunkManager::Render();
 }
 
 void CraftScene::LineTrace(RaycastHit& hit, const glm::vec3& start, const glm::vec3& forward, const float distance)

@@ -8,6 +8,12 @@
 #include "BiomeType.h"
 #include "World/Block.h"
 
+namespace SunsetEngine
+{
+    class Shader;
+    class Drawable;
+}
+
 class CraftScene;
 
 constexpr static int m_chunkSize = 16;
@@ -20,6 +26,7 @@ using BlockList = std::array<BlockId, m_CubeChunkSize>;
 class Chunk final
 {
     friend class HeightGenerator;
+    friend class ChunkMeshBuilder;
 public:
     Chunk(const glm::ivec3& pos);
     ~Chunk();
@@ -36,12 +43,17 @@ public:
 
     void SetBiomeType(const BiomeType::Type& biomeType);
 
+    void SetShader(const std::shared_ptr<SunsetEngine::Shader>& shader);
+
+    operator const SunsetEngine::Drawable&() const;
+
     bool bIsDirty;
 
 private:
     glm::ivec3 position;
     BlockList data;
     BiomeType::Type m_BiomeType;
+    std::unique_ptr<SunsetEngine::Drawable> m_Drawable;
 };
 
 #endif //SUNSETCRAFT_CHUNK_H

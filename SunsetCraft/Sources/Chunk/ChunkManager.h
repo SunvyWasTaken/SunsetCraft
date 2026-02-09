@@ -22,7 +22,7 @@ public:
 
     static BlockType GetBlock(const glm::vec3& position);
 
-    static void Draw(CraftScene* scene);
+    static void Render();
 };
 
 #endif //SUNSETCRAFT_CHUNKMANAGER_H

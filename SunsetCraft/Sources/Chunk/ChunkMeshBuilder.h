@@ -10,7 +10,7 @@ class Chunk;
 
 struct ChunkMeshBuilder
 {
-    static void Build(Chunk& chunk, std::vector<std::uint32_t>& vertices);
+    static void Build(Chunk& chunk);
 };
 
 #endif //SUNSETCRAFT_CHUNKMESHBUILDER_H

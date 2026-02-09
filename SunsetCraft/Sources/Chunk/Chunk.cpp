@@ -4,6 +4,9 @@
 
 #include "Chunk.h"
 
+#include "Render/Drawable.h"
+#include "Render/Shader.h"
+
 namespace
 {
     constexpr std::uint32_t EncodeVoxel(
@@ -59,11 +62,13 @@ Chunk::Chunk(const glm::ivec3& pos)
     : bIsDirty(true)
     , position(pos)
     , data()
+    , m_Drawable(std::make_unique<SunsetEngine::Drawable>())
 {
 }
-
+static int nbrShaderCopy = 0;
 Chunk::~Chunk()
 {
+    --nbrShaderCopy;
 }
 
 BlockId Chunk::GetBlockId(const glm::ivec3& pos) const
@@ -97,4 +102,15 @@ const BiomeType::Type& Chunk::GetBiomeType() const
 void Chunk::SetBiomeType(const BiomeType::Type &biomeType)
 {
     m_BiomeType = biomeType;
+}
+
+void Chunk::SetShader(const std::shared_ptr<SunsetEngine::Shader>& shader)
+{
+    LOG("SunsetCraft", trace, "nbr copy {}", ++nbrShaderCopy);
+    m_Drawable->m_Shader = shader;
+}
+
+Chunk::operator const SunsetEngine::Drawable&() const
+{
+    return *m_Drawable;
 }
