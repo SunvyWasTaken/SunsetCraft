@@ -79,10 +79,12 @@ namespace SunsetEngine
         const std::string vertShader = OpenFile(vertPath);
         const std::string fragShader = OpenFile(fragPath);
         CreateShader(vertShader.c_str(), fragShader.c_str(), id);
+        LOG("Engine", trace, "Shader {} create succefully", id)
     }
 
     Shader::~Shader()
     {
+        LOG("Engine", trace, "Shader {} delete", id)
         glDeleteProgram(id);
     }
 

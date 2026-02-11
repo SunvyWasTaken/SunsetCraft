@@ -7,44 +7,76 @@
 #include "Render/Renderer.h"
 
 #include <GLFW/glfw3.h>
+#include <nlohmann/json.hpp>
 
 namespace
 {
     glm::vec2 lastMousePosition = glm::vec2(0.0f, 0.0f);
     std::map<unsigned int, bool> bIsMouseButtonClick;
+
+    std::unordered_map<std::string, unsigned int> keyMap;
+
+    void ProcessInputs(const nlohmann::json& inputs)
+    {
+        if (inputs.empty())
+            return;
+
+        for (const auto& input : inputs)
+        {
+            if (!input.contains("name") || !input.contains("key"))
+                continue;
+
+            const auto& keyJson = input["key"];
+            if (!keyJson.is_string() || keyJson.get_ref<const std::string&>().size() != 1)
+                continue;
+
+            keyMap.emplace(
+                input["name"].get<std::string>(),
+                static_cast<unsigned int>(keyJson.get_ref<const std::string&>()[0])
+            );
+        }
+    }
 }
 
 namespace SunsetEngine
 {
-    bool Input::IsKeyPress(const unsigned int key)
+    void InputRegister::Init(const std::string_view& Path)
     {
-        return glfwGetKey(static_cast<GLFWwindow*>(Renderer::Get()), key) == GLFW_PRESS;
+        const nlohmann::json j = UtilityFunction::LoadJson(Path);
+
+        ProcessInputs(j);
     }
 
-    bool Input::IsMouseButtonClick(const unsigned int button)
+    void InputRegister::OnEvent(const Event::Type& event)
     {
-        if (glfwGetMouseButton(static_cast<GLFWwindow*>(Renderer::Get()), button) == GLFW_PRESS)
+        std::visit(overloads{
+        [](const Event::KeyEvent& event)
         {
-            if (bIsMouseButtonClick.find(button) != bIsMouseButtonClick.end())
-            {
-                if (!bIsMouseButtonClick[button])
-                {
-                    bIsMouseButtonClick[button] = true;
-                    return true;
-                }
-                return false;
-            }
-        }
-        bIsMouseButtonClick[button] = false;
-        return false;
+
+        }, [](const Event::MouseEvent& event)
+        {
+
+        }}, event);
     }
 
-    glm::vec2 Input::GetMousePosition()
+    glm::vec2 InputRegister::GetMouseDelta()
     {
         double x, y;
         glfwGetCursorPos(static_cast<GLFWwindow*>(Renderer::Get()), &x, &y);
         glm::vec2 delta = glm::vec2(x, y) - lastMousePosition;
         lastMousePosition = glm::vec2(x, y);
         return delta;
+    }
+
+    bool InputRegister::IsKeyPress(const std::string_view& name)
+    {
+        if (!keyMap.contains(name.data()))
+            return false;
+        return glfwGetKey(static_cast<GLFWwindow*>(Renderer::Get()), keyMap[name.data()]);
+    }
+
+    void InputRegister::RegisterAction(const std::string_view& name,
+        const std::function<void(const Event::Action&)>& func)
+    {
     }
 }

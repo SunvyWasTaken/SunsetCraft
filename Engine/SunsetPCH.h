@@ -6,7 +6,6 @@
 #define SUNSETCRAFT_SUNSETPCH_H
 
 #include <array>
-#include <chrono>
 #include <cmath>
 #include <cstdint>
 #include <cstring>
@@ -24,5 +23,6 @@
 
 #include "Log/Logger.h"
 #include "Utility/DebugGLM.h"
+#include "Utility/UtilityFunction.h"
 
 #endif //SUNSETCRAFT_SUNSETPCH_H

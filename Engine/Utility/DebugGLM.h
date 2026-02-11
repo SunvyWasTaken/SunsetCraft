@@ -36,4 +36,13 @@ auto format(const glm::vec<2, T, glm::defaultp>& v, FormatContext& ctx) const
 template<class... Ts>
 struct overloads : Ts... { using Ts::operator()...; };
 
+#if defined(_MSC_VER)
+#define DEBUG_BREAK() __debugbreak()
+#elif defined(__GNUC__) || defined(__clang__)
+#define DEBUG_BREAK() __builtin_trap()
+#else
+#include <csignal>
+#define DEBUG_BREAK() raise(SIGTRAP)
+#endif
+
 #endif //SUNSETCRAFT_DEBUGGLM_H

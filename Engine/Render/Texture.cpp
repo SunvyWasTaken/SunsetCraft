@@ -29,13 +29,16 @@ namespace SunsetEngine
 {
     /// Texture
 
-    Textures::Textures(std::vector<Image>& images, const int width, const int height)
+    Textures::Textures(const std::string_view& name, std::vector<Image>& images, const int width, const int height)
         : m_Width(width)
         , m_Height(height)
+        , m_Name(name)
         , m_Id(0)
         , m_Nbr(images.size())
     {
         SendTextureToGpu(m_Id, m_Width, m_Height);
+
+        LOG("Engine", trace, "Texture {} created at {}", m_Name, m_Id)
 
         int currentY = 0;
 
@@ -48,15 +51,18 @@ namespace SunsetEngine
 
     Textures::~Textures()
     {
+        LOG("Engine", trace, "Texture {} destroy", m_Id)
         glDeleteTextures(1, &m_Id);
     }
 
-    void Textures::Use(const Shader* shader, const std::string_view& name) const
+    void Textures::Use() const
     {
-        glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D,m_Id);
-        const GLint loc = glGetUniformLocation(shader->GetId(), name.data());
-        glUniform1i(loc, 0);
+    }
+
+    const char* Textures::GetName() const
+    {
+        return m_Name.c_str();
     }
 
     size_t Textures::Nbr() const

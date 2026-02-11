@@ -5,6 +5,7 @@
 #ifndef SUNSETCRAFT_APPLICATION_H
 #define SUNSETCRAFT_APPLICATION_H
 
+#include "Input.h"
 #include "LayerStack.h"
 
 namespace SunsetEngine
@@ -20,28 +21,28 @@ namespace SunsetEngine
 
         void Run();
 
-        template <typename T>
+        void OnEvent(Event::Type& event);
+
+        template <typename T, typename ...Args>
         requires std::is_base_of_v<SunsetEngine::Layer, T>
-        void PushLayer()
+        void PushLayer(Args&&... args)
         {
-            m_LayerStack.PushLayer<T>(m_Scene.get());
+            m_LayerStack.PushLayer<T>(std::forward<Args>(args)...);
         }
 
-        template <typename T>
-        requires std::is_base_of_v<SunsetEngine::Scene, T>
-        void SetScene()
+        void AddLayer(Layer* layer)
         {
-            m_Scene = std::make_unique<T>();
+            m_LayerStack.AddLayer(layer);
         }
 
         static const ApplicationSetting& GetSetting();
+        static const Application& GetApplication();
         static void ResizeWindow(const glm::ivec2& setting);
+        static void* GetWindow();
 
     private:
 
         SunsetEngine::LayerStack m_LayerStack;
-
-        std::unique_ptr<Scene> m_Scene;
     };
 }
 

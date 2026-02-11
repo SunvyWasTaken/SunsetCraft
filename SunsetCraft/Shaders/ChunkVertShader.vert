@@ -2,14 +2,12 @@
 
 layout(location = 0) in uint vData;
 
-uniform vec3 chunkLocation;
+uniform vec3 location;
 uniform mat4 projection;
 uniform mat4 view;
-uniform uint NbrTile;
 
 out vec3 Normal;
 out vec2 TexCoord;
-flat out uint fNbrTile;
 flat out uint UvId;
 
 // Decoder la position du bloc
@@ -122,12 +120,11 @@ void main()
 
     vec3 localPos = cubeVerts[vertId];
 
-    vec3 worldPos = blockPos + localPos + chunkLocation * 16.0;
+    vec3 worldPos = blockPos + localPos + location * 16.0;
 
     gl_Position = projection * view * vec4(worldPos, 1.0);
 
     Normal = cubeNormals[vertId];
     TexCoord = cubeUV[vertId];
     UvId = DecodeUV(vData);
-    fNbrTile = NbrTile;
 }

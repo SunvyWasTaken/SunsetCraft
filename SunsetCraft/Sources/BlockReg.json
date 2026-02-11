@@ -3,6 +3,13 @@
     "name": "air"
   },
   {
+    "name": "water",
+    "textures":
+    {
+
+    }
+  },
+  {
   "name": "grass",
   "textures":
     {

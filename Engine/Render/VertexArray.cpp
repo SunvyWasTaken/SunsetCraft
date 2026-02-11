@@ -1,96 +1,81 @@
 //
-// Created by sunvy on 18/01/2026.
+// Created by sunvy on 07/02/2026.
 //
 
 #include "VertexArray.h"
+
+#include "Buffers.h"
 
 #include <glad/glad.h>
 
 namespace SunsetEngine
 {
-    template<typename T>
-    VertexArray<T>::VertexArray()
+    VertexArray::VertexArray()
+       : m_Id(0)
+       , count(0)
     {
         glGenVertexArrays(1, &m_Id);
     }
 
-    template<typename T>
-    VertexArray<T>::~VertexArray()
+    VertexArray::~VertexArray()
     {
         glDeleteVertexArrays(1, &m_Id);
     }
 
-    template<typename T>
-    void VertexArray<T>::Bind() const
+    void VertexArray::Bind() const
     {
         glBindVertexArray(m_Id);
     }
 
-    template<typename T>
-    void VertexArray<T>::Unbind() const
+    void VertexArray::Unbind() const
     {
         glBindVertexArray(0);
     }
 
-    template<typename T>
-    void VertexArray<T>::AddBuffers(const std::shared_ptr<VertexBuffer<T>> &vertexBuffer,
-        const std::shared_ptr<IndiceBuffer> &indexBuffer)
+    void VertexArray::AddVertexBuffer(const VertexBuffer& vertexBuffer)
     {
-        if (!vertexBuffer)
-            return;
-
-        if (vertexBuffer->GetLayout().empty())
-        {
-            LOG("Layout hasn't been set!");
-            return;
-        }
-
-        m_Buffers.emplace_back(vertexBuffer, indexBuffer);
-
         Bind();
-        vertexBuffer->Bind();
+        vertexBuffer.Bind();
 
+        const auto& layout = vertexBuffer.GetLayout();
         uint32_t index = 0;
-        for (const auto& element : vertexBuffer->GetLayout())
+
+        for (auto& element : layout)
         {
             glEnableVertexAttribArray(index);
-            if (element() == GL_UNSIGNED_INT)
-            {
-                glVertexAttribIPointer(index,
-                    element.Count(),
-                    element(),
-                    vertexBuffer->GetLayout().GetStride(),
-                    static_cast<const void *>(&element.offset));
-                glVertexAttribDivisor(index, 1);
-            }
+            if (element.IsInt())
+                glVertexAttribIPointer(index, element.Count(), element.Type(), layout.GetStride(), (const void*)element.offset);
             else
-                glVertexAttribPointer(index,
-                    element.Count(),
-                    element(),
-                    element.normalized ? GL_TRUE : GL_FALSE,
-                    vertexBuffer->GetLayout().GetStride(),
-                    static_cast<const void *>(&element.offset));
-            ++index;
+                glVertexAttribPointer(index, element.Count(), element.Type(), element.normalized, layout.GetStride(), (const void*)element.offset);
+            if (element.divisor > 0)
+                glVertexAttribDivisor(index, element.divisor);
+
+            index++;
         }
-
-        if (indexBuffer)
-            indexBuffer->Bind();
-
+        count = vertexBuffer.GetSize();
         Unbind();
     }
 
-    template<typename T>
-    std::vector<typename VertexArray<T>::Buffers>::const_iterator VertexArray<T>::begin() const
+    void VertexArray::AddIndexBuffer(const IndiceBuffer& indexBuffer)
     {
-        return m_Buffers.begin();
+        Bind();
+        indexBuffer.Bind();
+        count = indexBuffer.GetCount();
+        Unbind();
     }
 
-    template<typename T>
-    std::vector<typename VertexArray<T>::Buffers>::const_iterator VertexArray<T>::end() const
+    uint32_t VertexArray::GetVAO() const
     {
-        return m_Buffers.end();
+        return m_Id;
     }
 
-    template class VertexArray<float>;
-    template class VertexArray<uint32_t>;
+    uint32_t VertexArray::GetCount() const
+    {
+        return count;
+    }
+
+    bool VertexArray::hasEbo() const
+    {
+        return bHasEbo;
+    }
 }

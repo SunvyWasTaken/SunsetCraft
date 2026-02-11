@@ -14,11 +14,13 @@ namespace SunsetEngine
     class Textures
     {
     public:
-        Textures(std::vector<Image>& images, int width, int height);
+        Textures(const std::string_view& name, std::vector<Image>& images, int width, int height);
 
         virtual ~Textures();
 
-        void Use(const Shader* shader, const std::string_view& name) const;
+        void Use() const;
+
+        const char* GetName() const;
 
         size_t Nbr() const;
 
@@ -27,6 +29,7 @@ namespace SunsetEngine
         int m_Width, m_Height;
 
     private:
+        std::string m_Name;
         std::uint32_t m_Id;
         size_t m_Nbr;
     };

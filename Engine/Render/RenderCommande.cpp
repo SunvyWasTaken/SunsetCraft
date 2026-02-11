@@ -6,21 +6,122 @@
 
 #include "Core/Application.h"
 #include "Core/ApplicationSetting.h"
-#include "Buffer.h"
+#include "Drawable.h"
+#include "Mesh.h"
+#include "Shader.h"
+
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include "Renderer.h"
-#include "Imgui/imgui.h"
-#include "Imgui/imgui_impl_glfw.h"
-#include "Imgui/imgui_impl_opengl3.h"
+#include "Camera.h"
+#include "Material.h"
+
+namespace
+{
+    struct FrameState
+    {
+        uint32_t drawCalls = 0;
+        uint64_t triangleCount = 0;
+    };
+
+    FrameState m_FrameState;
+
+    struct FrameData
+    {
+        glm::mat4 view;
+        glm::mat4 projection;
+    };
+
+    struct DrawCommand
+    {
+        uint32_t vao;
+        uint32_t indexCount;
+        std::shared_ptr<SunsetEngine::Material> material;
+        glm::vec3 position;
+        SunsetEngine::RenderState state;
+    };
+
+    struct HeapTest
+    {
+        std::chrono::steady_clock::time_point start;
+        const std::string name;
+        explicit HeapTest(const std::string_view& _name)
+            : name(_name)
+        {
+            start = std::chrono::steady_clock::now();
+        }
+
+        ~HeapTest()
+        {
+            const auto end = std::chrono::steady_clock::now();
+            const auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+            PRINTSCREEN("{} : {}ms", name, duration.count());
+        }
+    };
+
+    // to change from just a vector to a 2 vector.
+    std::vector<DrawCommand> m_DrawCommands;
+
+    FrameData m_FrameData;
+
+    void FlushDrawCommand()
+    {
+        HeapTest t(std::format("FlushDrawCommand {}", m_DrawCommands.size()));
+
+        // Sort cmd
+        std::shared_ptr<SunsetEngine::Shader> currentShader = nullptr;
+        std::shared_ptr<SunsetEngine::Material> currentMaterial = nullptr;
+        GLuint currentVAO = 0;
+
+        for (DrawCommand& cmd : m_DrawCommands)
+        {
+            // ApplyState
+            if (currentShader != cmd.material->m_Shader)
+            {
+                currentShader = cmd.material->m_Shader;
+                currentShader->Use();
+                currentShader->SetMat4("view", m_FrameData.view);
+                currentShader->SetMat4("projection", m_FrameData.projection);
+            }
+
+            if (currentMaterial != cmd.material)
+            {
+                currentMaterial = cmd.material;
+                currentMaterial->Bind();
+            }
+
+            if (currentVAO != cmd.vao)
+            {
+                currentVAO = cmd.vao;
+                glBindVertexArray(currentVAO);
+            }
+
+            cmd.material->m_Shader->SetVec3("location", cmd.position);
+
+            // Todo : change the draw command cuz actually it's not compatible with my instance block.
+            if (cmd.state.DrawInstance)
+                glDrawArraysInstanced(GL_TRIANGLES, 0, 6, cmd.indexCount);
+            else
+                glDrawElements(GL_TRIANGLES, cmd.indexCount, GL_UNSIGNED_INT, nullptr);
+        }
+
+        m_DrawCommands.clear();
+    }
+}
 
 namespace SunsetEngine
 {
     void RenderCommande::BeginFrame()
     {
+        m_FrameState = {};
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        glfwPollEvents();
 
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
@@ -29,76 +130,44 @@ namespace SunsetEngine
 
     void RenderCommande::EndFrame()
     {
-        if (!Hud::IsEmpty())
+        if (!PrintScreen::Get().empty())
         {
             ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
             ImGui::Begin("Stats", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
-            for (std::vector<std::string>::iterator it = Hud::begin(); it != Hud::end(); ++it)
+            for (const auto& it : PrintScreen::Get())
             {
-                ImGui::Text("%s", it->c_str());
+                ImGui::Text("%s", it.c_str());
             }
             ImGui::End();
-            Hud::Clear();
+            PrintScreen::Clear();
         }
 
-        ImGui::SetNextWindowPos(ImVec2(Application::GetSetting().WindowSize.x - 200, 0), ImGuiCond_Always);
-        ImGui::SetNextWindowSize(ImVec2(200, Application::GetSetting().WindowSize.y), ImGuiCond_Always);
-        ImGui::Begin("Log", nullptr);
-        for (std::vector<std::string>::iterator it = Logger::begin(); it != Logger::end(); ++it)
-        {
-            ImGui::Text("%s", it->c_str());
-        }
-        ImGui::SetScrollHereY(1.0f);
-        ImGui::End();
+        FlushDrawCommand();
+
+        PRINTSCREEN("Nbr vertice count {}", m_FrameState.triangleCount);
 
         ImGui::Render();
 
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-        glfwSwapBuffers(static_cast<GLFWwindow *>(Renderer::Get()));
-        glfwPollEvents();
+        glfwSwapBuffers(static_cast<GLFWwindow*>(Application::GetWindow()));
     }
 
-    template <typename T>
-    void RenderCommande::FunctorHelper<T>::Submit(const std::shared_ptr<VertexArray<T>>& obj)
+    void RenderCommande::Submit(const SunsetEngine::Drawable& drawable)
     {
-        for (const auto& [vertexBuffer, IndexBuffer] : *obj)
-        {
-            if (IndexBuffer)
-                glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(IndexBuffer->GetCount()), GL_UNSIGNED_INT, nullptr);
-            else
-                glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(vertexBuffer->GetSize()));
-        }
+        DrawCommand cmd;
+        cmd.vao = drawable.m_Mesh->GetVAO();
+        cmd.indexCount = drawable.m_Mesh->GetVertexCount();
+        m_FrameState.triangleCount += cmd.indexCount * 6;
+        cmd.material = drawable.m_Material;
+        cmd.position = drawable.m_Position;
+        cmd.state = drawable.m_RenderState;
+        m_DrawCommands.emplace_back(cmd);
     }
 
-    template <typename T>
-    void RenderCommande::FunctorHelper<T>::SubmitInstance(const std::shared_ptr<VertexArray<T>>& obj, size_t nbrInstance)
+    void RenderCommande::UseCamera(const SunsetEngine::Camera& camera)
     {
-        glEnable(GL_CULL_FACE);
-        glEnable(GL_DEPTH_TEST);
-
-        obj->Bind();
-
-        for (const auto& [vertexBuffer, IndexBuffer] : *obj)
-        {
-            HUD("Chunk size {}", vertexBuffer->GetSize())
-            glDrawArraysInstanced(GL_TRIANGLES, 0, static_cast<GLsizei>(nbrInstance), static_cast<GLsizei>(vertexBuffer->GetSize()));
-        }
-    };
-
-    template struct RenderCommande::FunctorHelper<float>;
-    template struct RenderCommande::FunctorHelper<uint32_t>;
-
-    void RenderCommande::SetWireframe(bool DrawWireframe)
-    {
-        if (DrawWireframe)
-            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        else
-            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    }
-
-    void RenderCommande::DrawCube()
-    {
-        glDrawArraysInstanced(GL_TRIANGLES, 0, 36, 1);
+        m_FrameData.view = camera.GetViewMatrix();
+        m_FrameData.projection = camera.GetProjection();
     }
 }

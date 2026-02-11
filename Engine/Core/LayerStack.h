@@ -20,7 +20,11 @@ namespace SunsetEngine
         void PushLayer(Args&& ...args)
         {
             m_Layers.emplace_back(std::make_unique<T>(std::forward<Args>(args)...));
-            m_Layers.back()->OnAttach();
+        }
+
+        void AddLayer(Layer* layer)
+        {
+            m_Layers.emplace_back(layer);
         }
 
         decltype(auto) begin()

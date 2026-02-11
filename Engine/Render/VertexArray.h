@@ -1,35 +1,36 @@
 //
-// Created by sunvy on 18/01/2026.
+// Created by sunvy on 07/02/2026.
 //
 
 #ifndef SUNSETCRAFT_VERTEXARRAY_H
 #define SUNSETCRAFT_VERTEXARRAY_H
 
-#include "Buffer.h"
-
 namespace SunsetEngine
 {
-    template <typename T>
+    class VertexBuffer;
+    class IndiceBuffer;
+
+    // VAO
     class VertexArray
     {
     public:
-
-        using Buffers = std::tuple<std::shared_ptr<VertexBuffer<T>>, std::shared_ptr<IndiceBuffer>>;
-
         VertexArray();
-        virtual ~VertexArray();
+        ~VertexArray();
 
         void Bind() const;
         void Unbind() const;
 
-        void AddBuffers(const std::shared_ptr<VertexBuffer<T>>& vertexBuffer, const std::shared_ptr<IndiceBuffer>& indexBuffer = nullptr);
+        void AddVertexBuffer(const VertexBuffer& vertexBuffer);
+        void AddIndexBuffer(const IndiceBuffer& indexBuffer);
 
-        std::vector<Buffers>::const_iterator begin() const;
-        std::vector<Buffers>::const_iterator end() const;
+        [[nodiscard]] uint32_t GetVAO() const;
+        [[nodiscard]] uint32_t GetCount() const;
+        [[nodiscard]] bool hasEbo() const;
 
     private:
         uint32_t m_Id;
-        std::vector<Buffers> m_Buffers;
+        uint32_t count;
+        bool bHasEbo;
     };
 }
 

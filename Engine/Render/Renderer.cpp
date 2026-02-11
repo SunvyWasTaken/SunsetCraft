@@ -7,16 +7,42 @@
 #include "Core/Application.h"
 #include "Core/ApplicationSetting.h"
 
-#include "Imgui/imgui.h"
-#include "Imgui/imgui_impl_glfw.h"
-#include "Imgui/imgui_impl_opengl3.h"
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include "Core/Input.h"
+
 namespace
 {
     GLFWwindow* m_Window = nullptr;
+
+    std::function<void(SunsetEngine::Event::Type&)> EventCallback;
+
+    void GLAPIENTRY OpenGLDebugCallback(
+        GLenum source,
+        GLenum type,
+        GLuint id,
+        GLenum severity,
+        GLsizei length,
+        const GLchar* message,
+        const void* userParam)
+    {
+        // Ignore les messages non critiques si tu veux
+        if (severity == GL_DEBUG_SEVERITY_NOTIFICATION)
+            return;
+
+        const char* severityStr =
+            severity == GL_DEBUG_SEVERITY_HIGH ? "HIGH" :
+            severity == GL_DEBUG_SEVERITY_MEDIUM ? "MEDIUM" :
+            severity == GL_DEBUG_SEVERITY_LOW ? "LOW" :
+            "NOTIFICATION";
+
+        LOG("OpenGL", error, "[{}] {}", severityStr, message);
+    }
 
     GLFWwindow* CreateWindow(const SunsetEngine::ApplicationSetting& setting)
     {
@@ -25,7 +51,23 @@ namespace
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
+    #ifndef NDEBUG
+        glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
+    #endif
+
         return glfwCreateWindow(setting.WindowSize.x, setting.WindowSize.y, setting.WindowTitle.data(), NULL, NULL);
+    }
+
+    void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+    {
+        SunsetEngine::Event::Type event = SunsetEngine::Event::KeyEvent{static_cast<unsigned int>(key)};
+        EventCallback(event);
+    }
+
+    void CursorPositionCallback(GLFWwindow* window, double x, double y)
+    {
+        SunsetEngine::Event::Type event = SunsetEngine::Event::MouseEvent{x, y};
+        EventCallback(event);
     }
 
     void framebuffer_size_callback(GLFWwindow* window, int width, int height)
@@ -39,7 +81,7 @@ namespace SunsetEngine
 {
     Renderer::Renderer()
     {
-        LOG("Render Create")
+        LOG("Engine", info, "Render Create")
         const ApplicationSetting& setting = Application::GetSetting();
         m_Window = CreateWindow(setting);
         if (m_Window == NULL)
@@ -52,6 +94,10 @@ namespace SunsetEngine
 
         glfwSetFramebufferSizeCallback(m_Window, framebuffer_size_callback);
 
+        glfwSetKeyCallback(m_Window, KeyCallback);
+
+        glfwSetCursorPosCallback(m_Window, CursorPositionCallback);
+
     #ifdef NDEBUG
         glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     #endif
@@ -60,6 +106,26 @@ namespace SunsetEngine
         {
             throw std::runtime_error("Failed to initialize GLAD");
         }
+
+#ifndef NDEBUG
+        int flags;
+        glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
+        if (flags & GL_CONTEXT_FLAG_DEBUG_BIT)
+        {
+            glEnable(GL_DEBUG_OUTPUT);
+            glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+            glDebugMessageCallback(OpenGLDebugCallback, nullptr);
+
+            // Optionnel : filtrage
+            glDebugMessageControl(
+                GL_DONT_CARE,
+                GL_DONT_CARE,
+                GL_DONT_CARE,
+                0, nullptr,
+                GL_TRUE
+            );
+        }
+#endif
 
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_CULL_FACE);
@@ -84,6 +150,12 @@ namespace SunsetEngine
 
         glfwDestroyWindow(m_Window);
         glfwTerminate();
+        LOG("Engine", info, "Render Destroy")
+    }
+
+    void Renderer::BindEvent(std::function<void(Event::Type&)> func)
+    {
+        EventCallback = func;
     }
 
     bool Renderer::Valid() const

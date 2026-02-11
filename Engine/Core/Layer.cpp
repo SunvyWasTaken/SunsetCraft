@@ -6,13 +6,8 @@
 
 namespace SunsetEngine
 {
-    Layer::Layer(Scene* scene)
-        : m_Scene(scene)
+    bool Layer::OnEvent(Event::Type& event)
     {
-    }
-
-    Scene* Layer::GetScene() const
-    {
-        return m_Scene;
+        return false;
     }
 }

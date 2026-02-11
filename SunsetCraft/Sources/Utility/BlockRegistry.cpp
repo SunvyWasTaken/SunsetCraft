@@ -8,31 +8,12 @@
 
 #include <nlohmann/json.hpp>
 
-#include <fstream>
-
 namespace
 {
     std::unordered_map<BlockId, BlockType> m_BlockRegistry;
     std::unordered_map<std::string, BlockId> m_BlockRegistryName;
 
     bool bIsInitialized = false;
-
-    nlohmann::json LoadJsonFile(const std::string_view& Path)
-    {
-        std::ifstream file;
-        file.open(Path.data());
-
-        nlohmann::json json;
-
-        if (!file.is_open())
-        {
-            LOG("Json file couldn't be open")
-            return json;
-        }
-
-        file >> json;
-        return json;
-    }
 
     void FillRegistry(const nlohmann::json& blockJson)
     {
@@ -90,7 +71,7 @@ BlockId BlockRegistry::STONE = 0;
 
 void BlockRegistry::Init(const std::string_view &Path)
 {
-    const nlohmann::json blockJson = LoadJsonFile(Path);
+    const nlohmann::json blockJson = SunsetEngine::UtilityFunction::LoadJson(Path);
 
     FillRegistry(blockJson);
 
@@ -98,20 +79,25 @@ void BlockRegistry::Init(const std::string_view &Path)
     GRASS = Get("grass").id;
     DIRT = Get("dirt").id;
     STONE = Get("stone").id;
+    LOG("SunsetCraft", info, "Block registry Init")
 }
 
 const BlockType BlockRegistry::Get(const BlockId id)
 {
     if (!bIsInitialized || !m_BlockRegistry.contains(id))
+    {
+        LOG("SunsetEngine", warn, "The registry might not be init or the block doesn't exist")
         return BlockType{};
-
+    }
     return m_BlockRegistry[id];
 }
 
 const BlockType BlockRegistry::Get(const std::string_view &name)
 {
     if (!bIsInitialized || !m_BlockRegistryName.contains(name.data()))
+    {
+        LOG("SunsetEngine", warn, "The registry might not be init or the block doesn't exist")
         return BlockType{};
-
+    }
     return m_BlockRegistry[m_BlockRegistryName[name.data()]];
 }
