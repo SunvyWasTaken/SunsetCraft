@@ -4,10 +4,13 @@
 
 #include "CraftScene.h"
 
+#include <imgui.h>
+
 #include "RaycastHit.h"
 #include "Chunk/ChunkManager.h"
 #include "Core/Input.h"
 #include "Render/RenderCommande.h"
+#include "Render/Texture.h"
 #include "Utility/BlockRegistry.h"
 
 namespace
@@ -87,6 +90,10 @@ void CraftScene::Render()
 {
     SunsetEngine::RenderCommande::UseCamera(m_Camera);
     ChunkManager::Render();
+
+    ImGui::Begin("image");
+    ImGui::Image((ImTextureID)(intptr_t)(TexturesManager::GetImage().get()->operator()()), ImVec2(TexturesManager::GetImage()->m_Width, TexturesManager::GetImage()->m_Height));
+    ImGui::End();
 }
 
 void CraftScene::LineTrace(RaycastHit& hit, const glm::vec3& start, const glm::vec3& forward, const float distance)

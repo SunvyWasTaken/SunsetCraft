@@ -32,12 +32,8 @@ namespace
         }
     }
 
-    SunsetEngine::Textures LoadTextures(const std::string_view& path)
+    void LoadTextures(const std::string_view& path, std::vector<SunsetEngine::Image>& images, int& atlasWidth, int& atlasHeight)
     {
-        int atlasWidth = 0;
-        int atlasHeight = 0;
-        std::vector<SunsetEngine::Image> images;
-
         std::vector<std::string> files;
         GetTextureFiles(path, files);
         images.reserve(files.size());
@@ -58,14 +54,16 @@ namespace
         }
 
         atlasWidth = images.back().width;
-        return {"atlasTexture", images, atlasWidth, atlasHeight};
     }
 }
 
 void TexturesManager::Init(const std::string_view& path)
 {
     LOG("SunsetCraft", info, "TextureManager Init");
-    m_Texture = std::make_shared<SunsetEngine::Textures>(LoadTextures(path));
+    std::vector<SunsetEngine::Image> images;
+    int atlasWidth = 0, atlasHeight = 0;
+    LoadTextures(path, images, atlasWidth, atlasHeight);
+    m_Texture = std::make_shared<SunsetEngine::Textures>("atlasTexture", images, atlasWidth, atlasHeight);
 }
 
 void TexturesManager::Shutdown()

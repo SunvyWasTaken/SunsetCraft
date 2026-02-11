@@ -38,6 +38,8 @@ namespace SunsetEngine
     {
         SendTextureToGpu(m_Id, m_Width, m_Height);
 
+        LOG("Engine", trace, "Texture {} created at {}", m_Name, m_Id)
+
         int currentY = 0;
 
         for (const auto& image : images)
@@ -49,6 +51,7 @@ namespace SunsetEngine
 
     Textures::~Textures()
     {
+        LOG("Engine", trace, "Texture {} destroy", m_Id)
         glDeleteTextures(1, &m_Id);
     }
 
