@@ -7,6 +7,15 @@
 
 namespace SunsetEngine
 {
+    struct AABB;
+
+    struct Frustum
+    {
+        glm::vec4 planes[6]; // left, right, bottom, top, near, far
+
+        bool IsVisible(const AABB& box);
+    };
+
     class Camera
     {
     public:
@@ -27,6 +36,8 @@ namespace SunsetEngine
         void AddPitch(float pitch);
 
         void AddYaw(float yaw);
+
+        Frustum GetFrustum() const;
 
     private:
         glm::vec3 m_Position;

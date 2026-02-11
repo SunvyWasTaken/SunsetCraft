@@ -89,7 +89,7 @@ void CraftScene::Update(float deltaTime)
 void CraftScene::Render()
 {
     SunsetEngine::RenderCommande::UseCamera(m_Camera);
-    ChunkManager::Render();
+    ChunkManager::Render(m_Camera);
 
     ImGui::Begin("image");
     ImGui::Image((ImTextureID)(intptr_t)(TexturesManager::GetImage().get()->operator()()), ImVec2(TexturesManager::GetImage()->m_Width, TexturesManager::GetImage()->m_Height));

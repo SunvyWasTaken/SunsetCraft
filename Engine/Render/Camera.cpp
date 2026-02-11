@@ -6,6 +6,7 @@
 
 #include "Core/Application.h"
 #include "Core/ApplicationSetting.h"
+#include "Math/AABB.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -23,6 +24,27 @@ namespace
 
 namespace SunsetEngine
 {
+    bool Frustum::IsVisible(const AABB& box)
+    {
+        for (auto plane : planes)
+        {
+            glm::vec3 normal = glm::vec3(plane);
+            float distance = plane.w;
+
+            // point le plus loin dans la direction du plan
+            glm::vec3 positiveVertex = box.min;
+
+            if (normal.x >= 0) positiveVertex.x = box.max.x;
+            if (normal.y >= 0) positiveVertex.y = box.max.y;
+            if (normal.z >= 0) positiveVertex.z = box.max.z;
+
+            if (glm::dot(normal, positiveVertex) + distance < 0)
+                return false;
+        }
+
+        return true;
+    }
+
     Camera::Camera()
         : m_Position(0.f, 0.f, 0.f)
         , m_Forward(0.0f, 0.0f, -1.0f)
@@ -86,5 +108,27 @@ namespace SunsetEngine
         m_Yaw += yaw;
 
         UpdateForward(m_Forward, m_Yaw, m_Pitch);
+    }
+
+    Frustum Camera::GetFrustum() const
+    {
+        glm::mat4 vp = GetProjection() * GetViewMatrix();
+
+        Frustum f{};
+
+        f.planes[0] = vp[3] + vp[0]; // left
+        f.planes[1] = vp[3] - vp[0]; // right
+        f.planes[2] = vp[3] + vp[1]; // bottom
+        f.planes[3] = vp[3] - vp[1]; // top
+        f.planes[4] = vp[3] + vp[2]; // near
+        f.planes[5] = vp[3] - vp[2]; // far
+
+        for (auto & plane : f.planes)
+        {
+            const float length = glm::length(glm::vec3(plane));
+            plane /= length;
+        }
+
+        return f;
     }
 }

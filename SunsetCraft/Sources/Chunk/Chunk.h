@@ -6,6 +6,7 @@
 #define SUNSETCRAFT_CHUNK_H
 
 #include "BiomeType.h"
+#include "Math/AABB.h"
 #include "World/Block.h"
 
 namespace SunsetEngine
@@ -47,6 +48,8 @@ public:
 
     operator const SunsetEngine::Drawable&() const;
 
+    SunsetEngine::AABB GetAABB() const;
+
     bool bIsDirty;
 
 private:
@@ -54,6 +57,7 @@ private:
     BlockList data;
     BiomeType::Type m_BiomeType;
     std::unique_ptr<SunsetEngine::Drawable> m_Drawable;
+    SunsetEngine::AABB m_AABB;
 };
 
 #endif //SUNSETCRAFT_CHUNK_H

@@ -17,6 +17,24 @@ namespace
     SunsetEngine::ApplicationSetting AppSetting;
     bool IsAppRunning = true;
     SunsetEngine::Renderer* m_Render = nullptr;
+
+    struct HeapTest
+    {
+        std::chrono::steady_clock::time_point start;
+        const std::string name;
+        explicit HeapTest(const std::string_view& _name)
+            : name(_name)
+        {
+            start = std::chrono::steady_clock::now();
+        }
+
+        ~HeapTest()
+        {
+            const auto end = std::chrono::steady_clock::now();
+            const auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+            PRINTSCREEN("{} : {}ms", name, duration.count());
+        }
+    };
 }
 
 namespace SunsetEngine
@@ -58,18 +76,23 @@ namespace SunsetEngine
             prev = now;
 
             PRINTSCREEN("fps : {}", 1.0 / dt.count())
-
-            for (const auto& layer : m_LayerStack)
             {
-                layer->OnUpdate(dt.count());
+                HeapTest logic("Logic part");
+                for (const auto& layer : m_LayerStack)
+                {
+                    layer->OnUpdate(dt.count());
+                }
             }
 
-            RenderCommande::BeginFrame();
-            for (auto layer = m_LayerStack.end(); layer != m_LayerStack.begin(); )
             {
-                (*--layer)->OnDraw();
+                HeapTest Render("Render part");
+                RenderCommande::BeginFrame();
+                for (auto layer = m_LayerStack.end(); layer != m_LayerStack.begin(); )
+                {
+                    (*--layer)->OnDraw();
+                }
+                RenderCommande::EndFrame();
             }
-            RenderCommande::EndFrame();
         }
     }
 

@@ -4,6 +4,8 @@
 
 #include "WorldGenerator.h"
 
+#include <queue>
+
 #include "BiomeGenerator.h"
 #include "Chunk.h"
 #include "ChunkMeshBuilder.h"
@@ -11,11 +13,28 @@
 
 namespace
 {
+    std::vector<std::thread> workerThreads;
 
+    struct ChunkBuildData
+    {
+        glm::ivec3 position;
+        BlockList data;
+        BiomeType biomeType;
+    };
+
+    std::mutex queueMutex;
+    std::queue<ChunkBuildData> ChunkBuildQueue;
+
+    void SendToWorker(Chunk& chunk)
+    {
+        std::thread workerThread;
+    }
 }
 
 void WorldGenerator::Init()
 {
+    unsigned int threadCount = std::thread::hardware_concurrency();
+    LOG("SunsetCraft", info, "thread count {}", threadCount)
 }
 
 void WorldGenerator::Shutdown()

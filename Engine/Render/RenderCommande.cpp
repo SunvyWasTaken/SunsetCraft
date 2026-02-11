@@ -22,6 +22,14 @@
 
 namespace
 {
+    struct FrameState
+    {
+        uint32_t drawCalls = 0;
+        uint64_t triangleCount = 0;
+    };
+
+    FrameState m_FrameState;
+
     struct FrameData
     {
         glm::mat4 view;
@@ -63,17 +71,37 @@ namespace
     void FlushDrawCommand()
     {
         HeapTest t(std::format("FlushDrawCommand {}", m_DrawCommands.size()));
+
         // Sort cmd
+        std::shared_ptr<SunsetEngine::Shader> currentShader = nullptr;
+        std::shared_ptr<SunsetEngine::Material> currentMaterial = nullptr;
+        GLuint currentVAO = 0;
 
         for (DrawCommand& cmd : m_DrawCommands)
         {
             // ApplyState
-            cmd.material->Bind();
-            cmd.material->m_Shader->SetMat4("view", m_FrameData.view);
-            cmd.material->m_Shader->SetMat4("projection", m_FrameData.projection);
+            if (currentShader != cmd.material->m_Shader)
+            {
+                currentShader = cmd.material->m_Shader;
+                currentShader->Use();
+                currentShader->SetMat4("view", m_FrameData.view);
+                currentShader->SetMat4("projection", m_FrameData.projection);
+            }
+
+            if (currentMaterial != cmd.material)
+            {
+                currentMaterial = cmd.material;
+                currentMaterial->Bind();
+            }
+
+            if (currentVAO != cmd.vao)
+            {
+                currentVAO = cmd.vao;
+                glBindVertexArray(currentVAO);
+            }
+
             cmd.material->m_Shader->SetVec3("location", cmd.position);
 
-            glBindVertexArray(cmd.vao);
             // Todo : change the draw command cuz actually it's not compatible with my instance block.
             if (cmd.state.DrawInstance)
                 glDrawArraysInstanced(GL_TRIANGLES, 0, 6, cmd.indexCount);
@@ -89,6 +117,8 @@ namespace SunsetEngine
 {
     void RenderCommande::BeginFrame()
     {
+        m_FrameState = {};
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glfwPollEvents();
@@ -114,6 +144,8 @@ namespace SunsetEngine
 
         FlushDrawCommand();
 
+        PRINTSCREEN("Nbr vertice count {}", m_FrameState.triangleCount);
+
         ImGui::Render();
 
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -126,6 +158,7 @@ namespace SunsetEngine
         DrawCommand cmd;
         cmd.vao = drawable.m_Mesh->GetVAO();
         cmd.indexCount = drawable.m_Mesh->GetVertexCount();
+        m_FrameState.triangleCount += cmd.indexCount * 6;
         cmd.material = drawable.m_Material;
         cmd.position = drawable.m_Position;
         cmd.state = drawable.m_RenderState;

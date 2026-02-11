@@ -117,3 +117,10 @@ Chunk::operator const SunsetEngine::Drawable&() const
 {
     return *m_Drawable;
 }
+
+SunsetEngine::AABB Chunk::GetAABB() const
+{
+    glm::vec3 min = position;
+    glm::vec3 max = min + glm::vec3(m_chunkSize, m_chunkSize, m_chunkSize);
+    return { min, max };
+}
