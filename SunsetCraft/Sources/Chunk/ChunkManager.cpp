@@ -14,8 +14,8 @@
 
 namespace
 {
-    int m_RenderDistance = 12;
-    int verticalRadius = 4;
+    int m_RenderDistance = 16;
+    int verticalRadius = 6;
 
     std::unordered_map<glm::ivec3, std::unique_ptr<Chunk>, triplet_hash> m_Chunks;
     std::shared_ptr<SunsetEngine::Shader> m_ChunkShader = nullptr;
@@ -113,6 +113,9 @@ void ChunkManager::Render(const SunsetEngine::Camera& camera)
 
     for (const std::unique_ptr<Chunk>& chunk: m_Chunks | std::views::values)
     {
+        if (chunk->IsEmpty())
+            continue;
+
         if (f.IsVisible(chunk->GetAABB()))
             SunsetEngine::RenderCommande::Submit(*chunk);
     }

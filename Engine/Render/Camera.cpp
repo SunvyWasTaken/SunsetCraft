@@ -114,14 +114,19 @@ namespace SunsetEngine
     {
         glm::mat4 vp = GetProjection() * GetViewMatrix();
 
+        const glm::vec4 row0(vp[0][0], vp[1][0], vp[2][0], vp[3][0]);
+        const glm::vec4 row1(vp[0][1], vp[1][1], vp[2][1], vp[3][1]);
+        const glm::vec4 row2(vp[0][2], vp[1][2], vp[2][2], vp[3][2]);
+        const glm::vec4 row3(vp[0][3], vp[1][3], vp[2][3], vp[3][3]);
+
         Frustum f{};
 
-        f.planes[0] = vp[3] + vp[0]; // left
-        f.planes[1] = vp[3] - vp[0]; // right
-        f.planes[2] = vp[3] + vp[1]; // bottom
-        f.planes[3] = vp[3] - vp[1]; // top
-        f.planes[4] = vp[3] + vp[2]; // near
-        f.planes[5] = vp[3] - vp[2]; // far
+        f.planes[0] = row3 + row0; // left
+        f.planes[1] = row3 - row0; // right
+        f.planes[2] = row3 + row1; // bottom
+        f.planes[3] = row3 - row1; // top
+        f.planes[4] = row3 + row2; // near
+        f.planes[5] = row3 - row2; // far
 
         for (auto & plane : f.planes)
         {

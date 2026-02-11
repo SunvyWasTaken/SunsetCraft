@@ -84,6 +84,9 @@ void ChunkMeshBuilder::Build(Chunk &chunk)
     std::vector<std::uint32_t> vertices;
     CreateMesh(chunk.GetBlocks(), vertices);
 
+    if (vertices.empty())
+        return;
+
     std::shared_ptr<SunsetEngine::VertexBuffer> vbo = std::make_shared<SunsetEngine::VertexBuffer>(vertices.data(), vertices.size(), sizeof(uint32_t));
 
     SunsetEngine::BufferElement buffer{SunsetEngine::ShaderDataType::UInt, "data"};
