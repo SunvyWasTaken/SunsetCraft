@@ -50,6 +50,8 @@ public:
 
     SunsetEngine::AABB GetAABB() const;
 
+    bool IsEmpty() const;
+
     bool bIsDirty;
 
 private:

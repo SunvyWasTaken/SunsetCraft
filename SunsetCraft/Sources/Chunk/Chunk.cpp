@@ -120,7 +120,12 @@ Chunk::operator const SunsetEngine::Drawable&() const
 
 SunsetEngine::AABB Chunk::GetAABB() const
 {
-    glm::vec3 min = position;
+    glm::vec3 min = position * m_chunkSize;
     glm::vec3 max = min + glm::vec3(m_chunkSize, m_chunkSize, m_chunkSize);
     return { min, max };
+}
+
+bool Chunk::IsEmpty() const
+{
+    return m_Drawable->m_Mesh == nullptr;
 }
