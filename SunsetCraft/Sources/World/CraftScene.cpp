@@ -11,7 +11,6 @@
 #include "Render/Drawable.h"
 #include "Render/Mesh.h"
 #include "Render/RenderCommande.h"
-#include "Render/Shader.h"
 #include "Render/VertexArray.h"
 #include "Utility/BlockRegistry.h"
 
@@ -37,6 +36,7 @@ void CraftScene::Update(float deltaTime)
 
 void CraftScene::Render()
 {
+    SunsetEngine::RenderCommande::UseCamera(m_Camera);
     ChunkManager::Render();
 }
 

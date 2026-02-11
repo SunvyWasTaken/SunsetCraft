@@ -12,7 +12,7 @@
 namespace SunsetEngine
 {
     Camera::Camera()
-        : m_Position(0.f, 10.f, 0.f)
+        : m_Position(0.f, 0.f, 0.f)
         , m_Forward(0.0f, 0.0f, -1.0f)
         , m_Up(0.0f, 1.0f, 0.0f)
         , fov(45.f)

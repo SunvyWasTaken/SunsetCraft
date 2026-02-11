@@ -79,6 +79,7 @@ void BlockRegistry::Init(const std::string_view &Path)
     GRASS = Get("grass").id;
     DIRT = Get("dirt").id;
     STONE = Get("stone").id;
+    LOG("SunsetCraft", info, "Block registry Init")
 }
 
 const BlockType BlockRegistry::Get(const BlockId id)

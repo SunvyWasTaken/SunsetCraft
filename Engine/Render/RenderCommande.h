@@ -7,6 +7,7 @@
 
 namespace SunsetEngine
 {
+    class Camera;
     class Drawable;
 
     struct RenderCommande
@@ -15,6 +16,7 @@ namespace SunsetEngine
         static void EndFrame();
 
         static void Submit(const SunsetEngine::Drawable& drawable);
+        static void UseCamera(const SunsetEngine::Camera& camera);
     };
 }
 

@@ -63,7 +63,6 @@ namespace SunsetEngine
             }
 
             RenderCommande::BeginFrame();
-
             for (auto layer = m_LayerStack.end(); layer != m_LayerStack.begin(); )
             {
                 (*--layer)->OnDraw();

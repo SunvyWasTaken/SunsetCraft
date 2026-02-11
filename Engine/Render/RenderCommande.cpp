@@ -17,35 +17,46 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include "Camera.h"
+
 namespace
 {
+    struct FrameData
+    {
+        glm::mat4 view;
+        glm::mat4 projection;
+    };
+
     struct DrawCommand
     {
         uint32_t vao;
         uint32_t indexCount;
-        uint32_t shader;
+        std::shared_ptr<SunsetEngine::Shader> shader;
         SunsetEngine::RenderState state;
     };
 
     struct HeapTest
     {
         std::chrono::steady_clock::time_point start;
-        std::string name;
+        const std::string name;
         explicit HeapTest(const std::string_view& _name)
             : name(_name)
         {
             start = std::chrono::steady_clock::now();
         }
+
         ~HeapTest()
         {
-            auto end = std::chrono::steady_clock::now();
-            auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-            PRINTSCREEN("{} : {}ms", name.c_str(), duration.count());
+            const auto end = std::chrono::steady_clock::now();
+            const auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+            PRINTSCREEN("{} : {}ms", name, duration.count());
         }
     };
 
     // to change from just a vector to a 2 vector.
     std::vector<DrawCommand> m_DrawCommands;
+
+    FrameData m_FrameData;
 
     void FlushDrawCommand()
     {
@@ -55,7 +66,10 @@ namespace
         for (DrawCommand& cmd : m_DrawCommands)
         {
             // ApplyState
-            glUseProgram(cmd.shader);
+            cmd.shader->Use();
+            cmd.shader->SetMat4("view", m_FrameData.view);
+            cmd.shader->SetMat4("projection", m_FrameData.projection);
+
             glBindVertexArray(cmd.vao);
             // Todo : change the draw command cuz actually it's not compatible with my instance block.
             if (cmd.state.DrawInstance)
@@ -109,8 +123,14 @@ namespace SunsetEngine
         DrawCommand cmd;
         cmd.vao = drawable.m_Mesh->GetVAO();
         cmd.indexCount = drawable.m_Mesh->GetVertexCount();
-        cmd.shader = drawable.m_Shader->GetId();
+        cmd.shader = drawable.m_Shader;
         cmd.state = drawable.m_RenderState;
         m_DrawCommands.emplace_back(cmd);
+    }
+
+    void RenderCommande::UseCamera(const SunsetEngine::Camera& camera)
+    {
+        m_FrameData.view = camera.GetViewMatrix();
+        m_FrameData.projection = camera.GetProjection();
     }
 }
