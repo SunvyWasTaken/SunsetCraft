@@ -84,15 +84,19 @@ void BlockRegistry::Init(const std::string_view &Path)
 const BlockType BlockRegistry::Get(const BlockId id)
 {
     if (!bIsInitialized || !m_BlockRegistry.contains(id))
+    {
+        LOG("SunsetEngine", warn, "The registry might not be init or the block doesn't exist")
         return BlockType{};
-
+    }
     return m_BlockRegistry[id];
 }
 
 const BlockType BlockRegistry::Get(const std::string_view &name)
 {
     if (!bIsInitialized || !m_BlockRegistryName.contains(name.data()))
+    {
+        LOG("SunsetEngine", warn, "The registry might not be init or the block doesn't exist")
         return BlockType{};
-
+    }
     return m_BlockRegistry[m_BlockRegistryName[name.data()]];
 }

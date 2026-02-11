@@ -64,11 +64,11 @@ Chunk::Chunk(const glm::ivec3& pos)
     , data()
     , m_Drawable(std::make_unique<SunsetEngine::Drawable>())
 {
+    m_Drawable->m_RenderState.DrawInstance = true;
 }
-static int nbrShaderCopy = 0;
+
 Chunk::~Chunk()
 {
-    --nbrShaderCopy;
 }
 
 BlockId Chunk::GetBlockId(const glm::ivec3& pos) const
@@ -106,7 +106,6 @@ void Chunk::SetBiomeType(const BiomeType::Type &biomeType)
 
 void Chunk::SetShader(const std::shared_ptr<SunsetEngine::Shader>& shader)
 {
-    LOG("SunsetCraft", trace, "nbr copy {}", ++nbrShaderCopy);
     m_Drawable->m_Shader = shader;
 }
 

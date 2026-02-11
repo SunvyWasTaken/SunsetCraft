@@ -33,4 +33,6 @@ void main()
     vec3 color = texColor.rgb * (0.2 + 0.8 * diff);
 
     FragColor = vec4(color, 1.0);
+
+    FragColor = vec4(1.0);
 }

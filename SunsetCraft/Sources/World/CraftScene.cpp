@@ -13,6 +13,7 @@
 #include "Render/RenderCommande.h"
 #include "Render/Shader.h"
 #include "Render/VertexArray.h"
+#include "Utility/BlockRegistry.h"
 
 namespace
 {
@@ -20,6 +21,7 @@ namespace
 
 CraftScene::CraftScene()
 {
+    BlockRegistry::Init("SunsetCraft/Sources/BlockReg.json");
     ChunkManager::Init();
 }
 

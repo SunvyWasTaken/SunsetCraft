@@ -42,6 +42,7 @@ namespace SunsetEngine
 
         CullMode cullMode = CullMode::Back;
         bool wireframe = false;
+        bool DrawInstance = false;
     };
 
     class Drawable final

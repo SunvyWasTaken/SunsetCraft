@@ -159,7 +159,7 @@ namespace SunsetEngine
     VertexBuffer::VertexBuffer(const void* data, size_t size, size_t dataSize)
         : m_Id(0)
         , m_Layout({})
-, m_Size(size)
+        , m_Size(size)
     {
         glGenBuffers(1, &m_Id);
         Bind();

@@ -49,7 +49,7 @@ namespace
 
     void FlushDrawCommand()
     {
-        HeapTest t("FlushDrawCommand");
+        HeapTest t(std::format("FlushDrawCommand {}", m_DrawCommands.size()));
         // Sort cmd
 
         for (DrawCommand& cmd : m_DrawCommands)
@@ -58,8 +58,10 @@ namespace
             glUseProgram(cmd.shader);
             glBindVertexArray(cmd.vao);
             // Todo : change the draw command cuz actually it's not compatible with my instance block.
-            //glDrawArrays(GL_TRIANGLES, 0, cmd.indexCount);
-            glDrawElements(GL_TRIANGLES, cmd.indexCount, GL_UNSIGNED_INT, nullptr);
+            if (cmd.state.DrawInstance)
+                glDrawArraysInstanced(GL_TRIANGLES, 0, 6, cmd.indexCount);
+            else
+                glDrawElements(GL_TRIANGLES, cmd.indexCount, GL_UNSIGNED_INT, nullptr);
         }
 
         m_DrawCommands.clear();

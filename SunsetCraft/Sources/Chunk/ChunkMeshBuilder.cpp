@@ -95,8 +95,6 @@ void ChunkMeshBuilder::Build(Chunk &chunk)
     std::shared_ptr<SunsetEngine::Mesh> m_Mesh = std::make_shared<SunsetEngine::Mesh>(vao);
     m_Mesh->m_VertexBuffer = vbo;
 
-    std::unique_ptr<SunsetEngine::Drawable> drawable = std::make_unique<SunsetEngine::Drawable>();
-    drawable->m_Mesh = m_Mesh;
-    chunk.m_Drawable = std::move(drawable);
+    chunk.m_Drawable->m_Mesh = m_Mesh;
 }
 
