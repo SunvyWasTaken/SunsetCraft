@@ -5,6 +5,11 @@
 #ifndef SUNSETCRAFT_CHUNKMANAGER_H
 #define SUNSETCRAFT_CHUNKMANAGER_H
 
+namespace SunsetEngine
+{
+    class Camera;
+}
+
 struct BlockType;
 
 class Chunk;
@@ -22,7 +27,7 @@ public:
 
     static BlockType GetBlock(const glm::vec3& position);
 
-    static void Draw(CraftScene* scene);
+    static void Render(const SunsetEngine::Camera& camera);
 };
 
 #endif //SUNSETCRAFT_CHUNKMANAGER_H

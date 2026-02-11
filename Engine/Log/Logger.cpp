@@ -4,53 +4,65 @@
 
 #include "Logger.h"
 
+#include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/sinks/basic_file_sink.h>
+
 namespace
 {
-    // Logger
-    std::vector<std::string> m_Logger;
-    // Hud
-    std::vector<std::string> m_Texts;
+    std::unordered_map<std::string_view, std::shared_ptr<spdlog::logger>> m_Loggers;
+    spdlog::sink_ptr m_Sink;
+
+    std::vector<std::string> m_PrintScreen;
 }
 
 namespace SunsetEngine
 {
-    void Logger::Add(std::string txt)
+    void Log::Init()
     {
-        m_Logger.emplace_back(txt);
+        spdlog::set_pattern("%^[%T] %n: %v%$");
+        m_Sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
     }
 
-    std::vector<std::string>::iterator Logger::begin()
+    void Log::Shutdown()
     {
-        return m_Logger.begin();
+        m_Sink.reset();
+        m_Loggers.clear();
     }
 
-    std::vector<std::string>::iterator Logger::end()
+    std::shared_ptr<spdlog::logger> Log::InitLog(const std::string_view& name)
     {
-        return m_Logger.end();
+        if (m_Loggers.contains(name))
+            return m_Loggers[name];
+
+        auto logger = std::make_shared<spdlog::logger>(name.data(), m_Sink);
+#ifdef NDEBUG
+        logger->set_level(spdlog::level::info);
+#else
+        logger->set_level(spdlog::level::trace);
+#endif
+        spdlog::register_logger(logger);
+        m_Loggers[name] = logger;
+        return logger;
     }
 
-    void Hud::Add(const std::string& msg)
+    std::shared_ptr<spdlog::logger> Log::GetLogger(std::string name)
     {
-        m_Texts.emplace_back(msg);
+        const auto it = m_Loggers.find(name);
+        return it == m_Loggers.end() ? nullptr : it->second;
     }
 
-    void Hud::Clear()
+    void PrintScreen::Add(const std::string_view& string)
     {
-        m_Texts.clear();
+        m_PrintScreen.emplace_back(string);
     }
 
-    bool Hud::IsEmpty()
+    void PrintScreen::Clear()
     {
-        return m_Texts.empty();
+        m_PrintScreen.clear();
     }
 
-    std::vector<std::string>::iterator Hud::begin()
+    std::vector<std::string>& PrintScreen::Get()
     {
-        return m_Texts.begin();
-    }
-
-    std::vector<std::string>::iterator Hud::end()
-    {
-        return m_Texts.end();
+        return m_PrintScreen;
     }
 }

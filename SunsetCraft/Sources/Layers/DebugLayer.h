@@ -10,10 +10,9 @@
 class DebugLayer : public SunsetEngine::Layer
 {
 public:
-    void OnAttach(SunsetEngine::Scene* scene) override;
-
     void OnUpdate(float dt) override;
     void OnDraw() override;
+    bool OnEvent(SunsetEngine::Event::Type& event) override;
 };
 
 #endif //SUNSETCRAFT_DEBUGLAYER_H

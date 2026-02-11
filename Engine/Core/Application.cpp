@@ -6,27 +6,45 @@
 
 #include "ApplicationSetting.h"
 #include "Layer.h"
-#include "Scene.h"
+#include "Render/RenderCommande.h"
 #include "Render/Renderer.h"
+
+#include <chrono>
 
 namespace
 {
+    SunsetEngine::Application* app = nullptr;
+    SunsetEngine::ApplicationSetting AppSetting;
+    bool IsAppRunning = true;
     SunsetEngine::Renderer* m_Render = nullptr;
 
-    bool IsAppRunning = true;
+    struct HeapTest
+    {
+        std::chrono::steady_clock::time_point start;
+        const std::string name;
+        explicit HeapTest(const std::string_view& _name)
+            : name(_name)
+        {
+            start = std::chrono::steady_clock::now();
+        }
 
-    SunsetEngine::ApplicationSetting AppSetting;
-
-    SunsetEngine::Application* app = nullptr;
+        ~HeapTest()
+        {
+            const auto end = std::chrono::steady_clock::now();
+            const auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+            PRINTSCREEN("{} : {}ms", name, duration.count());
+        }
+    };
 }
 
 namespace SunsetEngine
 {
     Application::Application(const ApplicationSetting& setting)
         : m_LayerStack()
-        , m_Scene(nullptr)
     {
-        LOG("App Create")
+        Log::Init();
+        INITLOG("Engine");
+        LOG("Engine", info, "App Create");
         app = this;
         AppSetting = setting;
         m_Render = new Renderer();
@@ -41,6 +59,10 @@ namespace SunsetEngine
         m_Render = nullptr;
 
         app = nullptr;
+
+        LOG("Engine", info, "App Destroy");
+
+        Log::Shutdown();
     }
 
     void Application::Run()
@@ -53,17 +75,24 @@ namespace SunsetEngine
             std::chrono::duration<float> dt = now - prev;
             prev = now;
 
-            for (const auto& layer : m_LayerStack)
+            PRINTSCREEN("fps : {}", 1.0 / dt.count())
             {
-                layer->OnUpdate(dt.count());
+                HeapTest logic("Logic part");
+                for (const auto& layer : m_LayerStack)
+                {
+                    layer->OnUpdate(dt.count());
+                }
             }
 
-            m_Render->BeginFrame();
-            for (auto layer = m_LayerStack.end(); layer != m_LayerStack.begin(); )
             {
-                (*--layer)->OnDraw();
+                HeapTest Render("Render part");
+                RenderCommande::BeginFrame();
+                for (auto layer = m_LayerStack.end(); layer != m_LayerStack.begin(); )
+                {
+                    (*--layer)->OnDraw();
+                }
+                RenderCommande::EndFrame();
             }
-            m_Render->EndFrame();
         }
     }
 
@@ -89,5 +118,10 @@ namespace SunsetEngine
     void Application::ResizeWindow(const glm::ivec2& setting)
     {
         AppSetting.WindowSize = setting;
+    }
+
+    void* Application::GetWindow()
+    {
+        return Renderer::Get();
     }
 }

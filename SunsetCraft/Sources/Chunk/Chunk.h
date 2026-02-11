@@ -6,11 +6,11 @@
 #define SUNSETCRAFT_CHUNK_H
 
 #include "BiomeType.h"
+#include "Math/AABB.h"
 #include "World/Block.h"
 
 namespace SunsetEngine
 {
-    class Camera;
     class Shader;
     class Drawable;
 }
@@ -27,11 +27,10 @@ using BlockList = std::array<BlockId, m_CubeChunkSize>;
 class Chunk final
 {
     friend class HeightGenerator;
+    friend class ChunkMeshBuilder;
 public:
     Chunk(const glm::ivec3& pos);
     ~Chunk();
-
-    void Draw() const;
 
     BlockId GetBlockId(const glm::ivec3& pos) const;
 
@@ -41,21 +40,24 @@ public:
 
     const BlockList& GetBlocks() const;
 
-    void UpdateDrawable(const std::vector<std::uint32_t>& vertices);
-
     const BiomeType::Type& GetBiomeType() const;
 
     void SetBiomeType(const BiomeType::Type& biomeType);
+
+    void SetShader(const std::shared_ptr<SunsetEngine::Shader>& shader);
+
+    operator const SunsetEngine::Drawable&() const;
+
+    SunsetEngine::AABB GetAABB() const;
 
     bool bIsDirty;
 
 private:
     glm::ivec3 position;
     BlockList data;
-
     BiomeType::Type m_BiomeType;
-
     std::unique_ptr<SunsetEngine::Drawable> m_Drawable;
+    SunsetEngine::AABB m_AABB;
 };
 
 #endif //SUNSETCRAFT_CHUNK_H

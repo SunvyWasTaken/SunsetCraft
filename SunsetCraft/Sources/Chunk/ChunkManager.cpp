@@ -8,16 +8,17 @@
 #include "ChunkMeshBuilder.h"
 #include "ChunkUtility.h"
 #include "WorldGenerator.h"
+#include "Render/RenderCommande.h"
 #include "Render/Shader.h"
 #include "World/CraftScene.h"
 
 namespace
 {
-    int m_RenderDistance = 6;
-    int verticalRadius = 2;
+    int m_RenderDistance = 12;
+    int verticalRadius = 4;
 
     std::unordered_map<glm::ivec3, std::unique_ptr<Chunk>, triplet_hash> m_Chunks;
-    std::unique_ptr<SunsetEngine::Shader> m_ChunkShader = nullptr;
+    std::shared_ptr<SunsetEngine::Shader> m_ChunkShader = nullptr;
 
     template <typename T>
     int WorldToChunk(T value)
@@ -27,6 +28,7 @@ namespace
 
     void LoadChunk(const glm::ivec3& position)
     {
+
         for (int x = position.x - m_RenderDistance; x <= position.x + m_RenderDistance; ++x) {
             for (int z = position.z - m_RenderDistance; z <= position.z + m_RenderDistance; ++z) {
                 for (int y = position.y - verticalRadius; y <= position.y + verticalRadius; ++y) {
@@ -34,6 +36,7 @@ namespace
                     if (m_Chunks.find(key) == m_Chunks.end()) {
                         // Créer et générer le chunk
                         m_Chunks[key] = std::make_unique<Chunk>(glm::vec3{x, y, z});
+                        m_Chunks[key]->SetShader(m_ChunkShader);
                         WorldGenerator::Request(*(m_Chunks[key].get()));
                     }
                 }
@@ -60,20 +63,28 @@ namespace
             }
         }
     }
+
+    /********************************************************/
+    /* Frustrum Culling                                     */
+    /********************************************************/
+
 }
 
 void ChunkManager::Init()
 {
-    LOG("Chunk Manager Create")
-
+    LOG("SunsetCraft", info, "Chunk Manager Create")
+    WorldGenerator::Init();
     m_Chunks.clear();
     m_ChunkShader = std::make_unique<SunsetEngine::Shader>("SunsetCraft/Shaders/ChunkVertShader.vert", "SunsetCraft/Shaders/ChunkFragShader.frag");
 }
 
 void ChunkManager::Shutdown()
 {
+    WorldGenerator::Shutdown();
     m_Chunks.clear();
     m_ChunkShader.reset();
+
+    LOG("SunsetCraft", info, "Chunk Manager Destroy")
 }
 
 void ChunkManager::Update(const glm::vec3& position)
@@ -96,17 +107,13 @@ BlockType ChunkManager::GetBlock(const glm::vec3 &position)
     return BlockType{};
 }
 
-void ChunkManager::Draw(CraftScene* scene)
+void ChunkManager::Render(const SunsetEngine::Camera& camera)
 {
-    m_ChunkShader->Use();
-    m_ChunkShader->SetMat4("projection", scene->m_Camera.GetProjection());
-    m_ChunkShader->SetMat4("view", scene->m_Camera.GetViewMatrix());
+    SunsetEngine::Frustum f = camera.GetFrustum();
 
-    scene->m_TexturesManager.Use(m_ChunkShader.get());
-
-    for (const auto &chunk: m_Chunks | std::views::values)
+    for (const std::unique_ptr<Chunk>& chunk: m_Chunks | std::views::values)
     {
-        m_ChunkShader->SetVec3("chunkLocation", chunk->GetPosition());
-        chunk->Draw();
+        if (f.IsVisible(chunk->GetAABB()))
+            SunsetEngine::RenderCommande::Submit(*chunk);
     }
 }

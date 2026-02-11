@@ -20,5 +20,14 @@
   }, {
     "name" : "nlohmann-json",
     "version>=" : "3.12.0#2"
+  }, {
+    "name" : "spdlog",
+    "version>=" : "1.17.0"
+  }, {
+    "name" : "imgui",
+    "version>=" : "1.91.9",
+    "features" : [
+      "glfw-binding", "opengl3-binding"
+    ]
   } ]
 }

@@ -16,7 +16,8 @@ nlohmann::json SunsetEngine::UtilityFunction::LoadJson(const std::string_view& p
 
     if (!file.is_open())
     {
-        LOG("Json file couldn't be open")
+        LOG("Engine", error, "Json file couldn't be open : {}", path);
+        DEBUG_BREAK();
         return json;
     }
 

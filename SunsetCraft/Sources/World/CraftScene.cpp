@@ -4,19 +4,96 @@
 
 #include "CraftScene.h"
 
+#include <imgui.h>
+
 #include "RaycastHit.h"
-#include "Chunk/Chunk.h"
-#include "Block.h"
+#include "Chunk/ChunkManager.h"
+#include "Core/Input.h"
+#include "Render/RenderCommande.h"
+#include "Render/Texture.h"
 #include "Utility/BlockRegistry.h"
+
+namespace
+{
+    float cameraSpeed = 100.f;
+    float MouseSpeed = 0.4f;
+
+    void MoveCamera(SunsetEngine::Camera& m_Camera, float dt)
+    {
+        const glm::vec3 forward = m_Camera.GetForward();
+        const glm::vec3 up = m_Camera.GetUp();
+        const glm::vec3 right = glm::cross(forward, up);
+
+        glm::vec3 Dir(0.0f, 0.0f, 0.0f);
+
+        if (SunsetEngine::InputRegister::IsKeyPress("forward"))
+        {
+            Dir += forward;
+        }
+        if (SunsetEngine::InputRegister::IsKeyPress("backward"))
+        {
+            Dir += -forward;
+        }
+        if (SunsetEngine::InputRegister::IsKeyPress("left"))
+        {
+            Dir += -right;
+        }
+        if (SunsetEngine::InputRegister::IsKeyPress("right"))
+        {
+            Dir += right;
+        }
+        if (SunsetEngine::InputRegister::IsKeyPress("up"))
+        {
+            Dir += up;
+        }
+        if (SunsetEngine::InputRegister::IsKeyPress("down"))
+        {
+            Dir += -up;
+        }
+
+        if (glm::length(Dir) > 0)
+        {
+            Dir = glm::normalize(Dir);
+            m_Camera.AddPosition(Dir * cameraSpeed * dt);
+        }
+
+        glm::vec2 delta = SunsetEngine::InputRegister::GetMouseDelta();
+        if (glm::length(delta) > 0)
+        {
+            m_Camera.AddYaw(delta.x * MouseSpeed);
+            m_Camera.AddPitch(-delta.y * MouseSpeed);
+        }
+    }
+}
 
 CraftScene::CraftScene()
 {
+    BlockRegistry::Init("SunsetCraft/Sources/BlockReg.json");
+    SunsetEngine::InputRegister::Init("SunsetCraft/Sources/Input.json");
+    TexturesManager::Init("Textures/");
     ChunkManager::Init();
 }
 
 CraftScene::~CraftScene()
 {
     ChunkManager::Shutdown();
+    TexturesManager::Shutdown();
+}
+
+void CraftScene::Update(float deltaTime)
+{
+    ChunkManager::Update(m_Camera.GetPosition());
+    MoveCamera(m_Camera, deltaTime);
+}
+
+void CraftScene::Render()
+{
+    SunsetEngine::RenderCommande::UseCamera(m_Camera);
+    ChunkManager::Render(m_Camera);
+
+    ImGui::Begin("image");
+    ImGui::Image((ImTextureID)(intptr_t)(TexturesManager::GetImage().get()->operator()()), ImVec2(TexturesManager::GetImage()->m_Width, TexturesManager::GetImage()->m_Height));
+    ImGui::End();
 }
 
 void CraftScene::LineTrace(RaycastHit& hit, const glm::vec3& start, const glm::vec3& forward, const float distance)

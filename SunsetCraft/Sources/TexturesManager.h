@@ -5,27 +5,21 @@
 #ifndef SUNSETCRAFT_TEXTURESMANAGER_H
 #define SUNSETCRAFT_TEXTURESMANAGER_H
 
-#include "Render/Texture.h"
-
 namespace SunsetEngine
 {
+    class Textures;
     class Shader;
 }
 
 class TexturesManager
 {
 public:
-    TexturesManager();
-    ~TexturesManager();
-
-    void Use(const SunsetEngine::Shader* shader) const;
+    static void Init(const std::string_view& path);
+    static void Shutdown();
 
     static std::uint32_t Get(const std::string_view& name);
 
-    SunsetEngine::Textures& GetImage();
-
-private:
-    SunsetEngine::Textures m_Texture;
+    static std::shared_ptr<SunsetEngine::Textures>& GetImage();
 };
 
 #endif //SUNSETCRAFT_TEXTURESMANAGER_H

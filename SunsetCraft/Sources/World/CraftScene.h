@@ -5,18 +5,20 @@
 #ifndef SUNSETCRAFT_CRAFTSCENE_H
 #define SUNSETCRAFT_CRAFTSCENE_H
 
-#include "../Chunk/ChunkManager.h"
 #include "../TexturesManager.h"
-#include "Core/Scene.h"
 #include "Render/Camera.h"
 
 struct RaycastHit;
 
-struct CraftScene : public SunsetEngine::Scene
+struct CraftScene
 {
     CraftScene();
 
     ~CraftScene();
+
+    void Update(float deltaTime);
+
+    void Render();
 
     void LineTrace(RaycastHit& hit, const glm::vec3& start, const glm::vec3& forward, const float distance);
 

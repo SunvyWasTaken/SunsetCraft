@@ -19,8 +19,12 @@ namespace SunsetEngine
         template<typename T, typename... Args>
         void PushLayer(Args&& ...args)
         {
-            m_Layers.emplace_back(std::make_unique<T>());
-            m_Layers.back()->OnAttach(std::forward<Args>(args)...);
+            m_Layers.emplace_back(std::make_unique<T>(std::forward<Args>(args)...));
+        }
+
+        void AddLayer(Layer* layer)
+        {
+            m_Layers.emplace_back(layer);
         }
 
         decltype(auto) begin()

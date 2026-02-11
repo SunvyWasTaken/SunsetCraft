@@ -5,31 +5,36 @@
 #ifndef SUNSETCRAFT_LOGGER_H
 #define SUNSETCRAFT_LOGGER_H
 
+#include <spdlog/spdlog.h>
+
 namespace SunsetEngine
 {
-    struct Logger
+    class Application;
+
+    struct Log
     {
-        static void Add(std::string txt);
+        friend Application;
+    private:
+        static void Init();
 
-        static std::vector<std::string>::iterator begin();
+        static void Shutdown();
+    public:
+        static std::shared_ptr<spdlog::logger> InitLog(const std::string_view& name);
 
-        static std::vector<std::string>::iterator end();
+        static std::shared_ptr<spdlog::logger> GetLogger(std::string name);
     };
 
-    struct Hud
+    struct PrintScreen
     {
-        static void Add(const std::string& msg);
-
+        static void Add(const std::string_view& string);
         static void Clear();
-
-        static bool IsEmpty();
-
-        static std::vector<std::string>::iterator begin();
-        static std::vector<std::string>::iterator end();
+        static std::vector<std::string>& Get();
     };
 }
 
-#define LOG(txt, ...) SunsetEngine::Logger::Add(std::format(txt, ##__VA_ARGS__));
-#define HUD(txt, ...) SunsetEngine::Hud::Add(std::format(txt, ##__VA_ARGS__));
+#define INITLOG(name) SunsetEngine::Log::InitLog(name);
+#define LOG(name, level, txt, ...) SunsetEngine::Log::GetLogger(name)->level(std::format(txt, ##__VA_ARGS__));
+
+#define PRINTSCREEN(txt, ...) SunsetEngine::PrintScreen::Add(std::format(txt, ##__VA_ARGS__));
 
 #endif //SUNSETCRAFT_LOGGER_H

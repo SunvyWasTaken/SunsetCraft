@@ -4,8 +4,10 @@
 
 #include "Chunk.h"
 
+#include "TexturesManager.h"
 #include "Render/Drawable.h"
-#include "World/Block.h"
+#include "Render/Material.h"
+#include "Render/Shader.h"
 
 namespace
 {
@@ -62,17 +64,15 @@ Chunk::Chunk(const glm::ivec3& pos)
     : bIsDirty(true)
     , position(pos)
     , data()
-    , m_Drawable(std::unique_ptr<SunsetEngine::Drawable>(nullptr))
+    , m_Drawable(std::make_unique<SunsetEngine::Drawable>())
 {
+    m_Drawable->m_Position = glm::vec3(pos);
+    m_Drawable->m_RenderState.DrawInstance = true;
+    m_Drawable->m_Material->m_Textures = {TexturesManager::GetImage()};
 }
 
 Chunk::~Chunk()
 {
-}
-
-void Chunk::Draw() const
-{
-    m_Drawable->Draw();
 }
 
 BlockId Chunk::GetBlockId(const glm::ivec3& pos) const
@@ -98,20 +98,6 @@ const BlockList & Chunk::GetBlocks() const
     return data;
 }
 
-void Chunk::UpdateDrawable(const std::vector<std::uint32_t>& vertices)
-{
-    bIsDirty = false;
-
-    if (!m_Drawable)
-    {
-        m_Drawable = std::make_unique<SunsetEngine::Drawable>(vertices);
-        return;
-    }
-
-    m_Drawable->Clear();
-    m_Drawable->Create(vertices);
-}
-
 const BiomeType::Type& Chunk::GetBiomeType() const
 {
     return m_BiomeType;
@@ -120,4 +106,21 @@ const BiomeType::Type& Chunk::GetBiomeType() const
 void Chunk::SetBiomeType(const BiomeType::Type &biomeType)
 {
     m_BiomeType = biomeType;
+}
+
+void Chunk::SetShader(const std::shared_ptr<SunsetEngine::Shader>& shader)
+{
+    m_Drawable->m_Material->m_Shader = shader;
+}
+
+Chunk::operator const SunsetEngine::Drawable&() const
+{
+    return *m_Drawable;
+}
+
+SunsetEngine::AABB Chunk::GetAABB() const
+{
+    glm::vec3 min = position;
+    glm::vec3 max = min + glm::vec3(m_chunkSize, m_chunkSize, m_chunkSize);
+    return { min, max };
 }

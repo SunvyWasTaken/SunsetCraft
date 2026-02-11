@@ -7,9 +7,9 @@
 #include "Core/Application.h"
 #include "Core/ApplicationSetting.h"
 
-#include "Imgui/imgui.h"
-#include "Imgui/imgui_impl_glfw.h"
-#include "Imgui/imgui_impl_opengl3.h"
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -22,12 +22,38 @@ namespace
 
     std::function<void(SunsetEngine::Event::Type&)> EventCallback;
 
+    void GLAPIENTRY OpenGLDebugCallback(
+        GLenum source,
+        GLenum type,
+        GLuint id,
+        GLenum severity,
+        GLsizei length,
+        const GLchar* message,
+        const void* userParam)
+    {
+        // Ignore les messages non critiques si tu veux
+        if (severity == GL_DEBUG_SEVERITY_NOTIFICATION)
+            return;
+
+        const char* severityStr =
+            severity == GL_DEBUG_SEVERITY_HIGH ? "HIGH" :
+            severity == GL_DEBUG_SEVERITY_MEDIUM ? "MEDIUM" :
+            severity == GL_DEBUG_SEVERITY_LOW ? "LOW" :
+            "NOTIFICATION";
+
+        LOG("OpenGL", error, "[{}] {}", severityStr, message);
+    }
+
     GLFWwindow* CreateWindow(const SunsetEngine::ApplicationSetting& setting)
     {
         glfwInit();
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+    #ifndef NDEBUG
+        glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
+    #endif
 
         return glfwCreateWindow(setting.WindowSize.x, setting.WindowSize.y, setting.WindowTitle.data(), NULL, NULL);
     }
@@ -55,7 +81,7 @@ namespace SunsetEngine
 {
     Renderer::Renderer()
     {
-        LOG("Render Create")
+        LOG("Engine", info, "Render Create")
         const ApplicationSetting& setting = Application::GetSetting();
         m_Window = CreateWindow(setting);
         if (m_Window == NULL)
@@ -81,6 +107,26 @@ namespace SunsetEngine
             throw std::runtime_error("Failed to initialize GLAD");
         }
 
+#ifndef NDEBUG
+        int flags;
+        glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
+        if (flags & GL_CONTEXT_FLAG_DEBUG_BIT)
+        {
+            glEnable(GL_DEBUG_OUTPUT);
+            glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+            glDebugMessageCallback(OpenGLDebugCallback, nullptr);
+
+            // Optionnel : filtrage
+            glDebugMessageControl(
+                GL_DONT_CARE,
+                GL_DONT_CARE,
+                GL_DONT_CARE,
+                0, nullptr,
+                GL_TRUE
+            );
+        }
+#endif
+
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_CULL_FACE);
         glCullFace(GL_FRONT);
@@ -104,6 +150,7 @@ namespace SunsetEngine
 
         glfwDestroyWindow(m_Window);
         glfwTerminate();
+        LOG("Engine", info, "Render Destroy")
     }
 
     void Renderer::BindEvent(std::function<void(Event::Type&)> func)
@@ -114,47 +161,6 @@ namespace SunsetEngine
     bool Renderer::Valid() const
     {
         return !glfwWindowShouldClose(m_Window);
-    }
-
-    void Renderer::BeginFrame()
-    {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-    }
-
-    void Renderer::EndFrame()
-    {
-        if (!Hud::IsEmpty())
-        {
-            ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
-            ImGui::Begin("Stats", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
-            for (std::vector<std::string>::iterator it = Hud::begin(); it != Hud::end(); ++it)
-            {
-                ImGui::Text("%s", it->c_str());
-            }
-            ImGui::End();
-            Hud::Clear();
-        }
-
-        ImGui::SetNextWindowPos(ImVec2(Application::GetSetting().WindowSize.x - 200, 0), ImGuiCond_Always);
-        ImGui::SetNextWindowSize(ImVec2(200, Application::GetSetting().WindowSize.y), ImGuiCond_Always);
-        ImGui::Begin("Log", nullptr);
-        for (std::vector<std::string>::iterator it = Logger::begin(); it != Logger::end(); ++it)
-        {
-             ImGui::Text("%s", it->c_str());
-        }
-        ImGui::SetScrollHereY(1.0f);
-        ImGui::End();
-
-        ImGui::Render();
-
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-        glfwSwapBuffers(m_Window);
-        glfwPollEvents();
     }
 
     void* Renderer::Get()

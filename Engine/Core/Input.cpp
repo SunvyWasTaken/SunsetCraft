@@ -23,37 +23,43 @@ namespace
 
         for (const auto& input : inputs)
         {
-            keyMap.emplace(input["name"], input["key"]);
+            if (!input.contains("name") || !input.contains("key"))
+                continue;
+
+            const auto& keyJson = input["key"];
+            if (!keyJson.is_string() || keyJson.get_ref<const std::string&>().size() != 1)
+                continue;
+
+            keyMap.emplace(
+                input["name"].get<std::string>(),
+                static_cast<unsigned int>(keyJson.get_ref<const std::string&>()[0])
+            );
         }
     }
 }
 
 namespace SunsetEngine
 {
-    bool Input::IsKeyPress(const unsigned int key)
+    void InputRegister::Init(const std::string_view& Path)
     {
-        return glfwGetKey(static_cast<GLFWwindow*>(Renderer::Get()), key) == GLFW_PRESS;
+        const nlohmann::json j = UtilityFunction::LoadJson(Path);
+
+        ProcessInputs(j);
     }
 
-    bool Input::IsMouseButtonClick(const unsigned int button)
+    void InputRegister::OnEvent(const Event::Type& event)
     {
-        if (glfwGetMouseButton(static_cast<GLFWwindow*>(Renderer::Get()), button) == GLFW_PRESS)
+        std::visit(overloads{
+        [](const Event::KeyEvent& event)
         {
-            if (bIsMouseButtonClick.find(button) != bIsMouseButtonClick.end())
-            {
-                if (!bIsMouseButtonClick[button])
-                {
-                    bIsMouseButtonClick[button] = true;
-                    return true;
-                }
-                return false;
-            }
-        }
-        bIsMouseButtonClick[button] = false;
-        return false;
+
+        }, [](const Event::MouseEvent& event)
+        {
+
+        }}, event);
     }
 
-    glm::vec2 Input::GetMousePosition()
+    glm::vec2 InputRegister::GetMouseDelta()
     {
         double x, y;
         glfwGetCursorPos(static_cast<GLFWwindow*>(Renderer::Get()), &x, &y);
@@ -62,30 +68,15 @@ namespace SunsetEngine
         return delta;
     }
 
-    void InputManager::Init(const std::string_view& Path)
+    bool InputRegister::IsKeyPress(const std::string_view& name)
     {
-        const nlohmann::json j = UtilityFunction::LoadJson(Path);
-
-        ProcessInputs(j);
+        if (!keyMap.contains(name.data()))
+            return false;
+        return glfwGetKey(static_cast<GLFWwindow*>(Renderer::Get()), keyMap[name.data()]);
     }
 
-    bool InputManager::IsKeyPress(const std::string_view& name, const Event::KeyEvent& event)
+    void InputRegister::RegisterAction(const std::string_view& name,
+        const std::function<void(const Event::Action&)>& func)
     {
-        if (keyMap.contains(name.data()))
-        {
-            return event.key == keyMap.at(name.data());
-        }
-        return false;
-    }
-
-    bool InputManager::HandleKey(const std::string_view& name, const Event::KeyEvent& event,
-        const std::function<void(const Event::Action& action)>& func)
-    {
-        if (keyMap.contains(name.data()))
-        {
-            func(event.action);
-            return true;
-        }
-        return false;
     }
 }

@@ -5,6 +5,7 @@
 #include "TexturesManager.h"
 
 #include "Render/Image.h"
+#include "Render/Texture.h"
 #include "Render/Shader.h"
 
 #include <filesystem>
@@ -12,6 +13,8 @@
 namespace
 {
     std::unordered_map<std::string, std::uint32_t> _textures;
+
+    std::shared_ptr<SunsetEngine::Textures> m_Texture = nullptr;
 
     void GetTextureFiles(const std::string_view& path, std::vector<std::string>& files)
     {
@@ -29,12 +32,8 @@ namespace
         }
     }
 
-    SunsetEngine::Textures LoadTextures(const std::string_view& path)
+    void LoadTextures(const std::string_view& path, std::vector<SunsetEngine::Image>& images, int& atlasWidth, int& atlasHeight)
     {
-        int atlasWidth = 0;
-        int atlasHeight = 0;
-        std::vector<SunsetEngine::Image> images;
-
         std::vector<std::string> files;
         GetTextureFiles(path, files);
         images.reserve(files.size());
@@ -55,23 +54,22 @@ namespace
         }
 
         atlasWidth = images.back().width;
-        return {images, atlasWidth, atlasHeight};
     }
 }
 
-TexturesManager::TexturesManager()
-    : m_Texture(LoadTextures("Textures/"))
+void TexturesManager::Init(const std::string_view& path)
 {
+    LOG("SunsetCraft", info, "TextureManager Init");
+    std::vector<SunsetEngine::Image> images;
+    int atlasWidth = 0, atlasHeight = 0;
+    LoadTextures(path, images, atlasWidth, atlasHeight);
+    m_Texture = std::make_shared<SunsetEngine::Textures>("atlasTexture", images, atlasWidth, atlasHeight);
 }
 
-TexturesManager::~TexturesManager()
+void TexturesManager::Shutdown()
 {
-}
-
-void TexturesManager::Use(const SunsetEngine::Shader* shader) const
-{
-    m_Texture.Use(shader, "atlasTexture");
-    shader->SetInt("NbrTile", m_Texture.Nbr());
+    LOG("SunsetCraft", info, "TextureManager Shutdown");
+    m_Texture.reset();
 }
 
 std::uint32_t TexturesManager::Get(const std::string_view& name)
@@ -79,7 +77,7 @@ std::uint32_t TexturesManager::Get(const std::string_view& name)
     return _textures.at(name.data());
 }
 
-SunsetEngine::Textures& TexturesManager::GetImage()
+std::shared_ptr<SunsetEngine::Textures>& TexturesManager::GetImage()
 {
     return m_Texture;
 }
