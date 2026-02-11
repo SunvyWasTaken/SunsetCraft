@@ -2,7 +2,7 @@
 
 layout(location = 0) in uint vData;
 
-uniform vec3 chunkLocation;
+uniform vec3 location;
 uniform mat4 projection;
 uniform mat4 view;
 uniform uint NbrTile;
@@ -122,7 +122,7 @@ void main()
 
     vec3 localPos = cubeVerts[vertId];
 
-    vec3 worldPos = blockPos + localPos + chunkLocation * 16.0;
+    vec3 worldPos = blockPos + localPos + location * 16.0;
 
     gl_Position = projection * view * vec4(worldPos, 1.0);
 

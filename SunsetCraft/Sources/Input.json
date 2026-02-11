@@ -1,0 +1,18 @@
+[
+  {
+    "name" : "forward",
+    "key" : "W"
+  },
+  {
+    "name" : "backward",
+    "key" : "S"
+  },
+  {
+    "name" : "left",
+    "key" : "A"
+  },
+  {
+    "name" : "right",
+    "key" : "D"
+  }
+]

@@ -5,22 +5,50 @@
 #include "CraftScene.h"
 
 #include "RaycastHit.h"
-#include "Chunk/Chunk.h"
 #include "Chunk/ChunkManager.h"
-#include "Render/Buffers.h"
-#include "Render/Drawable.h"
-#include "Render/Mesh.h"
+#include "Core/Input.h"
 #include "Render/RenderCommande.h"
-#include "Render/VertexArray.h"
 #include "Utility/BlockRegistry.h"
 
 namespace
 {
+    float cameraSpeed = 100.f;
+
+    void MoveCamera(SunsetEngine::Camera& m_Camera, float dt)
+    {
+        glm::vec3 forward = m_Camera.GetForward();
+        glm::vec3 right = glm::cross(forward, m_Camera.GetUp());
+
+        glm::vec3 Dir(0.0f, 0.0f, 0.0f);
+
+        if (SunsetEngine::InputRegister::IsKeyPress("forward"))
+        {
+            Dir += forward;
+        }
+        if (SunsetEngine::InputRegister::IsKeyPress("backward"))
+        {
+            Dir += -forward;
+        }
+        if (SunsetEngine::InputRegister::IsKeyPress("left"))
+        {
+            Dir += -right;
+        }
+        if (SunsetEngine::InputRegister::IsKeyPress("right"))
+        {
+            Dir += right;
+        }
+
+        if (Dir.length() <= 1)
+            Dir = glm::normalize(Dir);
+
+        m_Camera.AddPosition(Dir * cameraSpeed);
+    }
 }
 
 CraftScene::CraftScene()
 {
     BlockRegistry::Init("SunsetCraft/Sources/BlockReg.json");
+    SunsetEngine::InputRegister::Init("SunsetCraft/Sources/Input.json");
     ChunkManager::Init();
 }
 
@@ -31,7 +59,8 @@ CraftScene::~CraftScene()
 
 void CraftScene::Update(float deltaTime)
 {
-    ChunkManager::Update({0, 10, 0});
+    ChunkManager::Update(m_Camera.GetPosition());
+    MoveCamera(m_Camera, deltaTime);
 }
 
 void CraftScene::Render()

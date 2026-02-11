@@ -12,6 +12,7 @@ namespace SunsetEngine
     Drawable::Drawable()
         : m_Mesh(nullptr)
         , m_Shader(nullptr)
+        , m_Position(0.f)
         , m_RenderState({})
     {
     }

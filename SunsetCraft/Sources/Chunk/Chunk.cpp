@@ -64,6 +64,7 @@ Chunk::Chunk(const glm::ivec3& pos)
     , data()
     , m_Drawable(std::make_unique<SunsetEngine::Drawable>())
 {
+    m_Drawable->m_Position = glm::vec3(pos);
     m_Drawable->m_RenderState.DrawInstance = true;
 }
 

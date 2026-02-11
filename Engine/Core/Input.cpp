@@ -23,7 +23,17 @@ namespace
 
         for (const auto& input : inputs)
         {
-            keyMap.emplace(input["name"], input["key"]);
+            if (!input.contains("name") || !input.contains("key"))
+                continue;
+
+            const auto& keyJson = input["key"];
+            if (!keyJson.is_string() || keyJson.get_ref<const std::string&>().size() != 1)
+                continue;
+
+            keyMap.emplace(
+                input["name"].get<std::string>(),
+                static_cast<unsigned int>(keyJson.get_ref<const std::string&>()[0])
+            );
         }
     }
 }
