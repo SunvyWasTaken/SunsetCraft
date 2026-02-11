@@ -18,6 +18,7 @@
 #include <GLFW/glfw3.h>
 
 #include "Camera.h"
+#include "Material.h"
 
 namespace
 {
@@ -31,7 +32,7 @@ namespace
     {
         uint32_t vao;
         uint32_t indexCount;
-        std::shared_ptr<SunsetEngine::Shader> shader;
+        std::shared_ptr<SunsetEngine::Material> material;
         glm::vec3 position;
         SunsetEngine::RenderState state;
     };
@@ -67,10 +68,10 @@ namespace
         for (DrawCommand& cmd : m_DrawCommands)
         {
             // ApplyState
-            cmd.shader->Use();
-            cmd.shader->SetMat4("view", m_FrameData.view);
-            cmd.shader->SetMat4("projection", m_FrameData.projection);
-            cmd.shader->SetVec3("location", cmd.position);
+            cmd.material->Bind();
+            cmd.material->m_Shader->SetMat4("view", m_FrameData.view);
+            cmd.material->m_Shader->SetMat4("projection", m_FrameData.projection);
+            cmd.material->m_Shader->SetVec3("location", cmd.position);
 
             glBindVertexArray(cmd.vao);
             // Todo : change the draw command cuz actually it's not compatible with my instance block.
@@ -125,7 +126,7 @@ namespace SunsetEngine
         DrawCommand cmd;
         cmd.vao = drawable.m_Mesh->GetVAO();
         cmd.indexCount = drawable.m_Mesh->GetVertexCount();
-        cmd.shader = drawable.m_Shader;
+        cmd.material = drawable.m_Material;
         cmd.position = drawable.m_Position;
         cmd.state = drawable.m_RenderState;
         m_DrawCommands.emplace_back(cmd);

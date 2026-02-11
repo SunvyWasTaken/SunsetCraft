@@ -4,14 +4,13 @@
 
 #include "Drawable.h"
 
-#include "Mesh.h"
-#include "Shader.h"
+#include "Material.h"
 
 namespace SunsetEngine
 {
     Drawable::Drawable()
         : m_Mesh(nullptr)
-        , m_Shader(nullptr)
+        , m_Material(std::make_shared<Material>())
         , m_Position(0.f)
         , m_RenderState({})
     {

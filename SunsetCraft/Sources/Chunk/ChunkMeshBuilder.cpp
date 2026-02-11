@@ -86,7 +86,10 @@ void ChunkMeshBuilder::Build(Chunk &chunk)
 
     std::shared_ptr<SunsetEngine::VertexBuffer> vbo = std::make_shared<SunsetEngine::VertexBuffer>(vertices.data(), vertices.size(), sizeof(uint32_t));
 
-    vbo->SetLayout({SunsetEngine::BufferElement{SunsetEngine::ShaderDataType::UInt, "data"}});
+    SunsetEngine::BufferElement buffer{SunsetEngine::ShaderDataType::UInt, "data"};
+    buffer.divisor = 1;
+
+    vbo->SetLayout({buffer});
 
     std::unique_ptr<SunsetEngine::VertexArray> vao = std::make_unique<SunsetEngine::VertexArray>();
 

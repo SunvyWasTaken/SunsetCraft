@@ -47,6 +47,9 @@ namespace SunsetEngine
                 glVertexAttribIPointer(index, element.Count(), element.Type(), layout.GetStride(), (const void*)element.offset);
             else
                 glVertexAttribPointer(index, element.Count(), element.Type(), element.normalized, layout.GetStride(), (const void*)element.offset);
+            if (element.divisor > 0)
+                glVertexAttribDivisor(index, element.divisor);
+
             index++;
         }
         count = vertexBuffer.GetSize();

@@ -13,11 +13,13 @@
 namespace
 {
     float cameraSpeed = 100.f;
+    float MouseSpeed = 0.4f;
 
     void MoveCamera(SunsetEngine::Camera& m_Camera, float dt)
     {
-        glm::vec3 forward = m_Camera.GetForward();
-        glm::vec3 right = glm::cross(forward, m_Camera.GetUp());
+        const glm::vec3 forward = m_Camera.GetForward();
+        const glm::vec3 up = m_Camera.GetUp();
+        const glm::vec3 right = glm::cross(forward, up);
 
         glm::vec3 Dir(0.0f, 0.0f, 0.0f);
 
@@ -37,11 +39,27 @@ namespace
         {
             Dir += right;
         }
+        if (SunsetEngine::InputRegister::IsKeyPress("up"))
+        {
+            Dir += up;
+        }
+        if (SunsetEngine::InputRegister::IsKeyPress("down"))
+        {
+            Dir += -up;
+        }
 
-        if (Dir.length() <= 1)
+        if (glm::length(Dir) > 0)
+        {
             Dir = glm::normalize(Dir);
+            m_Camera.AddPosition(Dir * cameraSpeed * dt);
+        }
 
-        m_Camera.AddPosition(Dir * cameraSpeed);
+        glm::vec2 delta = SunsetEngine::InputRegister::GetMouseDelta();
+        if (glm::length(delta) > 0)
+        {
+            m_Camera.AddYaw(delta.x * MouseSpeed);
+            m_Camera.AddPitch(-delta.y * MouseSpeed);
+        }
     }
 }
 
@@ -49,12 +67,14 @@ CraftScene::CraftScene()
 {
     BlockRegistry::Init("SunsetCraft/Sources/BlockReg.json");
     SunsetEngine::InputRegister::Init("SunsetCraft/Sources/Input.json");
+    TexturesManager::Init("Textures/");
     ChunkManager::Init();
 }
 
 CraftScene::~CraftScene()
 {
     ChunkManager::Shutdown();
+    TexturesManager::Shutdown();
 }
 
 void CraftScene::Update(float deltaTime)

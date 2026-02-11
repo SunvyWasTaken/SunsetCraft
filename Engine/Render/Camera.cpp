@@ -9,12 +9,26 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
+namespace
+{
+    void UpdateForward(glm::vec3& forward, const float yaw, const float pitch)
+    {
+        forward.x = glm::cos(glm::radians(yaw)) * glm::cos(glm::radians(pitch));
+        forward.y = glm::sin(glm::radians(pitch));
+        forward.z = glm::sin(glm::radians(yaw)) * glm::cos(glm::radians(pitch));
+
+        forward = glm::normalize(forward);
+    }
+}
+
 namespace SunsetEngine
 {
     Camera::Camera()
         : m_Position(0.f, 0.f, 0.f)
         , m_Forward(0.0f, 0.0f, -1.0f)
         , m_Up(0.0f, 1.0f, 0.0f)
+        , m_Yaw(-90.f)
+        , m_Pitch(0.f)
         , fov(45.f)
     {
     }
@@ -57,5 +71,20 @@ namespace SunsetEngine
     void Camera::AddPosition(glm::vec3 position)
     {
         m_Position += position;
+    }
+
+    void Camera::AddPitch(float pitch)
+    {
+        m_Pitch += pitch;
+        m_Pitch = glm::clamp(m_Pitch, -89.0f, 89.0f);
+
+        UpdateForward(m_Forward, m_Yaw, m_Pitch);
+    }
+
+    void Camera::AddYaw(float yaw)
+    {
+        m_Yaw += yaw;
+
+        UpdateForward(m_Forward, m_Yaw, m_Pitch);
     }
 }

@@ -14,5 +14,13 @@
   {
     "name" : "right",
     "key" : "D"
+  },
+  {
+    "name" : "up",
+    "key" : "E"
+  },
+  {
+    "name" : "down",
+    "key" : "Q"
   }
 ]

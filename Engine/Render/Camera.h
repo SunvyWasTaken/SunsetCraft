@@ -24,10 +24,16 @@ namespace SunsetEngine
 
         void AddPosition(glm::vec3 position);
 
+        void AddPitch(float pitch);
+
+        void AddYaw(float yaw);
+
     private:
         glm::vec3 m_Position;
         glm::vec3 m_Forward;
         glm::vec3 m_Up;
+
+        float m_Yaw, m_Pitch;
 
         float fov;
     };

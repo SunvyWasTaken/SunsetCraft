@@ -7,6 +7,8 @@
 
 namespace SunsetEngine
 {
+    class Material;
+    class Textures;
     class Shader;
     class Mesh;
 
@@ -52,7 +54,7 @@ namespace SunsetEngine
         ~Drawable();
 
         std::shared_ptr<Mesh> m_Mesh;
-        std::shared_ptr<Shader> m_Shader;
+        std::shared_ptr<Material> m_Material;
         glm::vec3 m_Position;
         RenderState m_RenderState;
     };

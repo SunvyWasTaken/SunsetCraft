@@ -96,6 +96,7 @@ namespace SunsetEngine
         , size(GetInfo(type).size)
         , offset(0)
         , normalized(normalized)
+        , divisor(0)
     {
     }
 

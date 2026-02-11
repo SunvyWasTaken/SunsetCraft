@@ -5,11 +5,9 @@ layout(location = 0) in uint vData;
 uniform vec3 location;
 uniform mat4 projection;
 uniform mat4 view;
-uniform uint NbrTile;
 
 out vec3 Normal;
 out vec2 TexCoord;
-flat out uint fNbrTile;
 flat out uint UvId;
 
 // Decoder la position du bloc
@@ -129,5 +127,4 @@ void main()
     Normal = cubeNormals[vertId];
     TexCoord = cubeUV[vertId];
     UvId = DecodeUV(vData);
-    fNbrTile = NbrTile;
 }

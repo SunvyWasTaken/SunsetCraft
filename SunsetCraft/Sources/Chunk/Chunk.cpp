@@ -4,7 +4,9 @@
 
 #include "Chunk.h"
 
+#include "TexturesManager.h"
 #include "Render/Drawable.h"
+#include "Render/Material.h"
 #include "Render/Shader.h"
 
 namespace
@@ -66,6 +68,7 @@ Chunk::Chunk(const glm::ivec3& pos)
 {
     m_Drawable->m_Position = glm::vec3(pos);
     m_Drawable->m_RenderState.DrawInstance = true;
+    m_Drawable->m_Material->m_Textures = {TexturesManager::GetImage()};
 }
 
 Chunk::~Chunk()
@@ -107,7 +110,7 @@ void Chunk::SetBiomeType(const BiomeType::Type &biomeType)
 
 void Chunk::SetShader(const std::shared_ptr<SunsetEngine::Shader>& shader)
 {
-    m_Drawable->m_Shader = shader;
+    m_Drawable->m_Material->m_Shader = shader;
 }
 
 Chunk::operator const SunsetEngine::Drawable&() const

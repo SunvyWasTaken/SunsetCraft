@@ -5,6 +5,7 @@
 #include "TexturesManager.h"
 
 #include "Render/Image.h"
+#include "Render/Texture.h"
 #include "Render/Shader.h"
 
 #include <filesystem>
@@ -12,6 +13,8 @@
 namespace
 {
     std::unordered_map<std::string, std::uint32_t> _textures;
+
+    std::shared_ptr<SunsetEngine::Textures> m_Texture = nullptr;
 
     void GetTextureFiles(const std::string_view& path, std::vector<std::string>& files)
     {
@@ -55,23 +58,20 @@ namespace
         }
 
         atlasWidth = images.back().width;
-        return {images, atlasWidth, atlasHeight};
+        return {"atlasTexture", images, atlasWidth, atlasHeight};
     }
 }
 
-TexturesManager::TexturesManager()
-    : m_Texture(LoadTextures("Textures/"))
+void TexturesManager::Init(const std::string_view& path)
 {
+    LOG("SunsetCraft", info, "TextureManager Init");
+    m_Texture = std::make_shared<SunsetEngine::Textures>(LoadTextures(path));
 }
 
-TexturesManager::~TexturesManager()
+void TexturesManager::Shutdown()
 {
-}
-
-void TexturesManager::Use(const SunsetEngine::Shader* shader) const
-{
-    m_Texture.Use(shader, "atlasTexture");
-    shader->SetInt("NbrTile", m_Texture.Nbr());
+    LOG("SunsetCraft", info, "TextureManager Shutdown");
+    m_Texture.reset();
 }
 
 std::uint32_t TexturesManager::Get(const std::string_view& name)
@@ -79,7 +79,7 @@ std::uint32_t TexturesManager::Get(const std::string_view& name)
     return _textures.at(name.data());
 }
 
-SunsetEngine::Textures& TexturesManager::GetImage()
+std::shared_ptr<SunsetEngine::Textures>& TexturesManager::GetImage()
 {
     return m_Texture;
 }

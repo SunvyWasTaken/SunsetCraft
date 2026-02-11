@@ -15,7 +15,7 @@
 namespace
 {
     int m_RenderDistance = 6;
-    int verticalRadius = 2;
+    int verticalRadius = 4;
 
     std::unordered_map<glm::ivec3, std::unique_ptr<Chunk>, triplet_hash> m_Chunks;
     std::shared_ptr<SunsetEngine::Shader> m_ChunkShader = nullptr;

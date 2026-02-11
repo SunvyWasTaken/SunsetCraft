@@ -57,6 +57,8 @@ namespace SunsetEngine
             std::chrono::duration<float> dt = now - prev;
             prev = now;
 
+            PRINTSCREEN("fps : {}", 1.0 / dt.count())
+
             for (const auto& layer : m_LayerStack)
             {
                 layer->OnUpdate(dt.count());

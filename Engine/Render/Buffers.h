@@ -27,6 +27,7 @@ namespace SunsetEngine
         size_t size;
         size_t offset;
         bool normalized;
+        uint32_t divisor;
     };
 
     class BufferLayout final
