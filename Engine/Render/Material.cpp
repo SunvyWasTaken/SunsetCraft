@@ -32,5 +32,27 @@ namespace SunsetEngine
             glUniform1i(loc, index);
             ++index;
         }
+        for (const auto& [name, value] : m_Uniforms)
+        {
+            std::visit(overloads
+            {
+                [&](const float val)
+                {
+                    m_Shader->SetFloat(name, val);
+                },[&](const int val)
+                {
+                    m_Shader->SetInt(name, val);
+                },[&](const glm::vec2 val)
+                {
+                    m_Shader->SetVec2(name, val);
+                },[&](const glm::vec3 val)
+                {
+                    m_Shader->SetVec3(name, val);
+                },[&](const glm::mat4 val)
+                {
+                    m_Shader->SetMat4(name, val);
+                },
+            }, value);
+        }
     }
 }
