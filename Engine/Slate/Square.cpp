@@ -28,8 +28,8 @@ namespace SunsetEngine
         , m_VBO(0)
         , m_Shader(nullptr)
     {
-        SetPosition(pos);
-        SetSize(size);
+        Slate::SetPosition(pos);
+        Slate::SetSize(size);
 
         if (_shader.expired())
         {

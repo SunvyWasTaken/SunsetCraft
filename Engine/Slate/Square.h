@@ -17,7 +17,7 @@ namespace SunsetEngine
 
         Square(const glm::ivec2& pos, const glm::ivec2& size, const glm::vec4& color = glm::vec4{1.f}, int radius = 0);
 
-        virtual ~Square();
+        ~Square() override;
 
         void Draw() const override;
 

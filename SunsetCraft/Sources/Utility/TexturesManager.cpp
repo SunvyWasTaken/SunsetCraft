@@ -6,7 +6,6 @@
 
 #include "Render/Image.h"
 #include "Render/Texture.h"
-#include "Render/Shader.h"
 
 #include <filesystem>
 
