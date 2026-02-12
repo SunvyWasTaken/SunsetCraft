@@ -37,7 +37,7 @@ L’objectif n’est pas seulement de “faire un jeu”, mais de démontrer ma 
 
 ---
 
-## Focus optimisation (point fort technique)
+## Focus optimisation
 
 Le projet est volontairement orienté vers des enjeux de performance concrets :
 
@@ -52,11 +52,9 @@ Le projet est volontairement orienté vers des enjeux de performance concrets :
   - cache locality (layout de données),
   - profiling CPU/GPU systématique.
 
-> En entretien, je peux détailler les arbitrages (lisibilité vs perf, complexité algorithmique, footprint mémoire, coût des updates chunk).
-
 ---
 
-## Apprentissage autonome (mindset)
+## Apprentissage autonome
 
 Ce projet illustre ma manière d’apprendre :
 
@@ -69,7 +67,7 @@ Ce projet illustre ma manière d’apprendre :
 
 ---
 
-## Roadmap (prochaines contributions)
+## Roadmap
 
 ### Court terme
 - Interaction bloc complète (placer/casser).
