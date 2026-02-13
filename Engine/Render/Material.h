@@ -27,6 +27,8 @@ namespace SunsetEngine
 
         void Bind() const;
 
+        void UniformBind() const;
+
         template <typename T>
         void Set(const std::string_view& name, const T& value)
         {

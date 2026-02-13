@@ -22,7 +22,6 @@ namespace SunsetEngine
 
     void Material::Bind() const
     {
-        m_Shader->Use();
         int index = 0;
         for (const auto& it : m_Textures)
         {
@@ -32,6 +31,10 @@ namespace SunsetEngine
             glUniform1i(loc, index);
             ++index;
         }
+    }
+
+    void Material::UniformBind() const
+    {
         for (const auto& [name, value] : m_Uniforms)
         {
             std::visit(overloads
@@ -42,13 +45,13 @@ namespace SunsetEngine
                 },[&](const int val)
                 {
                     m_Shader->SetInt(name, val);
-                },[&](const glm::vec2 val)
+                },[&](const glm::vec2& val)
                 {
                     m_Shader->SetVec2(name, val);
-                },[&](const glm::vec3 val)
+                },[&](const glm::vec3& val)
                 {
                     m_Shader->SetVec3(name, val);
-                },[&](const glm::mat4 val)
+                },[&](const glm::mat4& val)
                 {
                     m_Shader->SetMat4(name, val);
                 },

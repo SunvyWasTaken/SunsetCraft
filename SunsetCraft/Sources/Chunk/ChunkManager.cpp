@@ -29,16 +29,22 @@ namespace
     void LoadChunk(const glm::ivec3& position)
     {
 
-        for (int x = position.x - m_RenderDistance; x <= position.x + m_RenderDistance; ++x) {
-            for (int z = position.z - m_RenderDistance; z <= position.z + m_RenderDistance; ++z) {
-                for (int y = position.y - verticalRadius; y <= position.y + verticalRadius; ++y) {
+        for (int x = position.x - m_RenderDistance; x <= position.x + m_RenderDistance; ++x)
+        {
+            for (int z = position.z - m_RenderDistance; z <= position.z + m_RenderDistance; ++z)
+            {
+                for (int y = position.y - verticalRadius; y <= position.y + verticalRadius; ++y)
+                {
                     const glm::ivec3 key{x, y, z};
-                    if (m_Chunks.find(key) == m_Chunks.end()) {
+                    if (m_Chunks.find(key) == m_Chunks.end())
+                    {
                         // Créer et générer le chunk
                         m_Chunks[key] = std::make_unique<Chunk>(glm::vec3{x, y, z});
                         m_Chunks[key]->SetShader(m_ChunkShader);
                         WorldGenerator::Request(*(m_Chunks[key].get()));
                     }
+                    // Todo : get le chunk et lui send ça distance au player.
+                    // m_Drawable->m_Material->Set<float>("Distance", distance);
                 }
             }
         }
@@ -63,11 +69,6 @@ namespace
             }
         }
     }
-
-    /********************************************************/
-    /* Frustrum Culling                                     */
-    /********************************************************/
-
 }
 
 void ChunkManager::Init()

@@ -100,6 +100,8 @@ namespace
                 glBindVertexArray(currentVAO);
             }
 
+            cmd.material->UniformBind();
+
             cmd.material->m_Shader->SetVec3("location", cmd.position);
 
             // Todo : change the draw command cuz actually it's not compatible with my instance block.
