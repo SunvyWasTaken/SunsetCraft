@@ -3,6 +3,7 @@
 in vec3 Normal;
 in vec2 TexCoord;
 flat in uint UvId;
+in float dist;
 
 uniform sampler2D atlasTexture;
 
@@ -15,8 +16,15 @@ vec3 GetTint()
     return vec3(0.55, 0.85, 0.35);
 }
 
+float fogStart = 10.0;
+float fogEnd = 12.0;
+
+vec4 fogColor = vec4(1.0, 1.0, 1.0, 1.0);
+
 void main()
 {
+    float fogFactor = clamp((dist - fogStart) / (fogEnd - fogStart), 0.0, 1.0);
+
     float diff = max(dot(normalize(Normal), -lightDir), 0.0);
 
     // taille UV d'une tile
@@ -32,5 +40,7 @@ void main()
 
     vec3 color = texColor.rgb * (0.2 + 0.8 * diff);
 
-    FragColor = vec4(color, 1.0);
+    FragColor = mix(vec4(color, 1.0), fogColor, fogFactor);
+
+    // FragColor = vec4(color, 1.0);
 }

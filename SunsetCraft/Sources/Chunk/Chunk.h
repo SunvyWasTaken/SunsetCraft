@@ -48,6 +48,8 @@ public:
 
     operator const SunsetEngine::Drawable&() const;
 
+    const SunsetEngine::Drawable& GetDrawable() const;
+
     SunsetEngine::AABB GetAABB() const;
 
     bool IsEmpty() const;

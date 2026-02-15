@@ -6,9 +6,12 @@ uniform vec3 location;
 uniform mat4 projection;
 uniform mat4 view;
 
+uniform float Distance;
+
 out vec3 Normal;
 out vec2 TexCoord;
 flat out uint UvId;
+out float dist;
 
 // Decoder la position du bloc
 vec3 DecodePos(uint v)
@@ -127,4 +130,5 @@ void main()
     Normal = cubeNormals[vertId];
     TexCoord = cubeUV[vertId];
     UvId = DecodeUV(vData);
+    dist = Distance;
 }

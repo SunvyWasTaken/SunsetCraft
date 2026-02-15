@@ -8,13 +8,15 @@
 #include "ChunkMeshBuilder.h"
 #include "ChunkUtility.h"
 #include "WorldGenerator.h"
+#include "Render/Drawable.h"
+#include "Render/Material.h"
 #include "Render/RenderCommande.h"
 #include "Render/Shader.h"
 #include "World/CraftScene.h"
 
 namespace
 {
-    int m_RenderDistance = 6;
+    int m_RenderDistance = 12;
     int verticalRadius = 4;
 
     std::unordered_map<glm::ivec3, std::unique_ptr<Chunk>, triplet_hash> m_Chunks;
@@ -26,7 +28,7 @@ namespace
         return static_cast<int>(std::floor(value / m_chunkSize));
     }
 
-    void LoadChunk(const glm::ivec3& position)
+    void LoadChunk(const glm::vec3& position)
     {
 
         for (int x = position.x - m_RenderDistance; x <= position.x + m_RenderDistance; ++x)
@@ -35,7 +37,7 @@ namespace
             {
                 for (int y = position.y - verticalRadius; y <= position.y + verticalRadius; ++y)
                 {
-                    const glm::ivec3 key{x, y, z};
+                    const glm::vec3 key{x, y, z};
                     if (m_Chunks.find(key) == m_Chunks.end())
                     {
                         // Créer et générer le chunk
@@ -45,6 +47,8 @@ namespace
                     }
                     // Todo : get le chunk et lui send ça distance au player.
                     // m_Drawable->m_Material->Set<float>("Distance", distance);
+                    float dist = glm::distance(key, position);
+                    m_Chunks[key]->GetDrawable().m_Material->Set<float>("Distance", dist);
                 }
             }
         }
@@ -94,6 +98,9 @@ void ChunkManager::Update(const glm::vec3& position)
         WorldToChunk(position.x),
         WorldToChunk(position.y),
         WorldToChunk(position.z)};
+
+    PRINTSCREEN("Position {}", position);
+    PRINTSCREEN("Position in chunk {}", positionInChunk);
 
     UnloadChunk(positionInChunk);
     LoadChunk(positionInChunk);
