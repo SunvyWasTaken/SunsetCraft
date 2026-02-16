@@ -19,7 +19,7 @@ vec3 GetTint()
 float fogStart = 10.0;
 float fogEnd = 12.0;
 
-vec4 fogColor = vec4(1.0, 1.0, 1.0, 1.0);
+vec4 fogColor = vec4(0.1, 0.1, 0.1, 0.0);
 
 void main()
 {

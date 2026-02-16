@@ -13,6 +13,7 @@ class InventoryLayer : public SunsetEngine::Layer
 {
 public:
     InventoryLayer(CraftScene* scene);
+    ~InventoryLayer();
 
     void OnUpdate(float dt) override;
     void OnDraw() override;

@@ -33,7 +33,7 @@ namespace SunsetEngine
         void Set(const std::string_view& name, const T& value)
         {
             static_assert(is_in_variant<T, UniformType>::value, "Type not allowed in Material::Set");
-            m_Uniforms.emplace(name, value);
+            m_Uniforms.insert_or_assign(name.data(), value);
         }
 
         std::shared_ptr<Shader> m_Shader;
