@@ -10,6 +10,8 @@
 class DebugLayer : public SunsetEngine::Layer
 {
 public:
+    DebugLayer();
+    ~DebugLayer() override;
     void OnUpdate(float dt) override;
     void OnDraw() override;
     bool OnEvent(SunsetEngine::Event::Type& event) override;
