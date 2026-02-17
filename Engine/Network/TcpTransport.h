@@ -26,6 +26,8 @@ namespace SunsetEngine
 
     private:
 
+        void ReceiveLoop();
+
         int m_Socket;
         std::atomic<bool> m_Connected;
         std::thread m_Thread;

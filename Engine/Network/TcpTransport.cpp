@@ -40,7 +40,7 @@ namespace SunsetEngine
             NetworkEvent ev{NetworkEvent::Type::Connected, {}};
             m_Queue.Push(ev);
 
-            Poll();
+            ReceiveLoop();
         });
     }
 
@@ -51,23 +51,38 @@ namespace SunsetEngine
 
     void TcpTransport::Poll()
     {
-        while (m_Connected)
-        {
-            uint8_t buffer[1024];
-            if (const int bytes = recv(m_Socket, buffer, sizeof(buffer), 0); bytes > 0)
-            {
-                const NetworkEvent ev{NetworkEvent::Type::Message, std::vector<uint8_t>(buffer, buffer + bytes)};
-                m_Queue.Push(ev);
-            }
-        }
-    }
+
+                                            }
 
     void TcpTransport::Disconnect()
     {
         m_Connected = false;
+        if (m_Socket >= 0)
+        {
+            ::shutdown(m_Socket, SHUT_RDWR);
+            ::close(m_Socket);
+            m_Socket = -1;
+        }
         if (m_Thread.joinable())
             m_Thread.join();
-        if (m_Socket >= 0)
-            ::close(m_Socket);
+    }
+
+    void TcpTransport::ReceiveLoop()
+    {
+        while (m_Connected)
+        {
+            uint8_t buffer[1024];
+            const int bytes = recv(m_Socket, buffer, sizeof(buffer), 0);
+            if (bytes > 0)
+            {
+                const NetworkEvent ev{NetworkEvent::Type::Message, std::vector<uint8_t>(buffer, buffer + bytes)};
+                m_Queue.Push(ev);
+            }
+            else
+            {
+                m_Connected = false;
+                m_Queue.Push(NetworkEvent{NetworkEvent::Type::Disconnected, {}});
+            }
+        }
     }
 }
