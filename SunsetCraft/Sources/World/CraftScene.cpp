@@ -5,6 +5,7 @@
 #include "CraftScene.h"
 
 #include "RaycastHit.h"
+#include "SkyCube.h"
 #include "Chunk/ChunkManager.h"
 #include "Core/Input.h"
 #include "Render/RenderCommande.h"
@@ -20,6 +21,8 @@ namespace
     using ItemId = uint8_t;
 
     std::array<ItemId, 8> Toolbar;
+
+    std::unique_ptr<SkyCube> skyCube = nullptr;
 
     void MoveCamera(SunsetEngine::Camera& m_Camera, float dt)
     {
@@ -171,10 +174,12 @@ CraftScene::CraftScene()
     SunsetEngine::InputRegister::Init("SunsetCraft/Sources/Input.json");
     TexturesManager::Init("Textures/");
     ChunkManager::Init();
+    skyCube = std::make_unique<SkyCube>();
 }
 
 CraftScene::~CraftScene()
 {
+    skyCube.reset();
     ChunkManager::Shutdown();
     TexturesManager::Shutdown();
 }
@@ -187,6 +192,7 @@ void CraftScene::Update(float deltaTime)
 
 void CraftScene::Render() const
 {
+    skyCube->Draw();
     SunsetEngine::RenderCommande::UseCamera(m_Camera);
     ChunkManager::Render(m_Camera);
 }
