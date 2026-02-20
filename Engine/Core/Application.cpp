@@ -10,6 +10,7 @@
 #include "Render/Renderer.h"
 
 #include <chrono>
+#include <deque>
 
 namespace
 {
@@ -35,6 +36,33 @@ namespace
             PRINTSCREEN("{} : {}ms", name, duration.count());
         }
     };
+
+    struct EMA
+    {
+        std::deque<float> dts;
+
+        void Display() const
+        {
+            float sommeDt = 0;
+            for (const auto dt : dts)
+            {
+                sommeDt += dt;
+            }
+            sommeDt /= dts.size();
+            PRINTSCREEN("dts : {}", 1.f/sommeDt);
+        }
+
+        void Add(const float dt)
+        {
+            if (dts.size() >= 180)
+            {
+                dts.pop_front();
+            }
+            dts.push_back(dt);
+        }
+    };
+
+    EMA fpsema;
 }
 
 namespace SunsetEngine
@@ -75,7 +103,9 @@ namespace SunsetEngine
             std::chrono::duration<float> dt = now - prev;
             prev = now;
 
-            PRINTSCREEN("fps : {}", 1.0 / dt.count())
+            fpsema.Add(dt.count());
+            fpsema.Display();
+
             {
                 HeapTest logic("Logic part");
                 for (const auto& layer : m_LayerStack)
