@@ -127,9 +127,9 @@ namespace SunsetEngine
         }
 #endif
 
-        glEnable(GL_DEPTH_TEST);
-        glEnable(GL_CULL_FACE);
-        glCullFace(GL_FRONT);
+        // glEnable(GL_DEPTH_TEST);
+        // glEnable(GL_CULL_FACE);
+        // glCullFace(GL_FRONT);
         // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
         IMGUI_CHECKVERSION();

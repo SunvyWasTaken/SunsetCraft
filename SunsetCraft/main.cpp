@@ -15,7 +15,7 @@ int main()
 
     auto gameLayer = new GameLayer();
     app.AddLayer(gameLayer);
-    app.PushLayer<InventoryLayer>(gameLayer->GetScene());
+    //app.PushLayer<InventoryLayer>(gameLayer->GetScene());
     app.PushLayer<DebugLayer>();
 
     app.Run();

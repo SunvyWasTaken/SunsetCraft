@@ -68,6 +68,73 @@ namespace
 
     FrameData m_FrameData;
 
+    GLenum ToGLBlendFactor(SunsetEngine::BlendFactor factor)
+    {
+        switch (factor)
+        {
+        case SunsetEngine::BlendFactor::Zero:                return GL_ZERO;
+        case SunsetEngine::BlendFactor::One:                 return GL_ONE;
+        case SunsetEngine::BlendFactor::SrcAlpha:            return GL_SRC_ALPHA;
+        case SunsetEngine::BlendFactor::OneMinusSrcAlpha:    return GL_ONE_MINUS_SRC_ALPHA;
+        case SunsetEngine::BlendFactor::DstAlpha:            return GL_DST_ALPHA;
+        case SunsetEngine::BlendFactor::OneMinusDstAlpha:    return GL_ONE_MINUS_DST_ALPHA;
+        case SunsetEngine::BlendFactor::SrcColor:            return GL_SRC_COLOR;
+        case SunsetEngine::BlendFactor::OneMinusSrcColor:    return GL_ONE_MINUS_SRC_COLOR;
+        default:                               return GL_ONE;
+        }
+    }
+
+    GLenum ToGLCullMode(SunsetEngine::CullMode mode)
+    {
+        switch (mode)
+        {
+        case SunsetEngine::CullMode::Back:  return GL_BACK;
+        case SunsetEngine::CullMode::Front: return GL_FRONT;
+        default:              return GL_BACK;
+        }
+    }
+
+    void ApplyState(const SunsetEngine::RenderState& state)
+    {
+        // Depth Test
+        if (state.depthTest)
+            glEnable(GL_DEPTH_TEST);
+        else
+            glDisable(GL_DEPTH_TEST);
+
+        // Depth Write
+        glDepthMask(state.depthWrite ? GL_TRUE : GL_FALSE);
+
+        // Blending
+        if (state.blending)
+        {
+            glEnable(GL_BLEND);
+            glBlendFunc(
+                ToGLBlendFactor(state.src),
+                ToGLBlendFactor(state.dest)
+            );
+        }
+        else
+        {
+            glDisable(GL_BLEND);
+        }
+
+        // Face Culling
+        if (state.cullMode == SunsetEngine::CullMode::None)
+        {
+            glDisable(GL_CULL_FACE);
+        }
+        else
+        {
+            glEnable(GL_CULL_FACE);
+            glCullFace(ToGLCullMode(state.cullMode));
+        }
+
+        // Wireframe
+        glPolygonMode(GL_FRONT_AND_BACK,
+            state.wireframe ? GL_LINE : GL_FILL);
+    }
+
     void FlushDrawCommand()
     {
         HeapTest t(std::format("FlushDrawCommand {}", m_DrawCommands.size()));
@@ -79,7 +146,8 @@ namespace
 
         for (DrawCommand& cmd : m_DrawCommands)
         {
-            // ApplyState
+            ApplyState(cmd.state);
+
             if (currentShader != cmd.material->m_Shader)
             {
                 currentShader = cmd.material->m_Shader;

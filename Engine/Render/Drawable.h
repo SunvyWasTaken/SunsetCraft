@@ -38,11 +38,11 @@ namespace SunsetEngine
         bool depthTest = true;
         bool depthWrite = true;
 
-        bool blending = true;
+        bool blending = false;
         BlendFactor src = BlendFactor::One;
         BlendFactor dest = BlendFactor::Zero;
 
-        CullMode cullMode = CullMode::Back;
+        CullMode cullMode = CullMode::Front;
         bool wireframe = false;
         bool DrawInstance = false;
     };

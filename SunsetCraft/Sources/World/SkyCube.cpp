@@ -68,7 +68,7 @@ namespace
     }
 
     constexpr float size = 4000.f;
-    constexpr float height = 150.f;
+    constexpr float height = 50.f;
 
     std::array<glm::vec3, 4> CloudVertices = {
         glm::vec3{-size, height, -size},
@@ -83,6 +83,8 @@ namespace
     };
 
     std::unique_ptr<SunsetEngine::Drawable> CloudDrawable = nullptr;
+
+    float ttTime = 0.0f;
 }
 
 SkyCube::SkyCube()
@@ -92,6 +94,8 @@ SkyCube::SkyCube()
     {
         auto shader = std::make_shared<SunsetEngine::Shader>("SunsetCraft/Shaders/SkyCube.vert", "SunsetCraft/Shaders/SkyCube.frag");
         m_Drawable->m_Material->m_Shader = shader;
+        //m_Drawable->m_RenderState.depthWrite = false;
+        //m_Drawable->m_RenderState.blending = true;
 
         std::vector<Vertex> vertices = GenerateSkyDome(500.f, 64, 32);
         std::vector<uint32_t> indices = GenerateSkyDomeIndices(64, 32);
@@ -116,6 +120,8 @@ SkyCube::SkyCube()
 
     {
         CloudDrawable = std::make_unique<SunsetEngine::Drawable>();
+        CloudDrawable->m_RenderState.depthWrite = false;
+        CloudDrawable->m_RenderState.blending = true;
 
         auto shader = std::make_shared<SunsetEngine::Shader>("SunsetCraft/Shaders/Cloud.vert", "SunsetCraft/Shaders/Cloud.frag");
         CloudDrawable->m_Material->m_Shader = shader;
@@ -143,8 +149,14 @@ SkyCube::~SkyCube()
     LOG("SunsetCraft", info, "SkyDome destroyed")
 }
 
+void SkyCube::Update(const float deltaTime)
+{
+    ttTime += deltaTime;
+    CloudDrawable->m_Material->Set<float>("uTime", fmod(ttTime, 1000.f));
+}
+
 void SkyCube::Draw() const
 {
-    SunsetEngine::RenderCommande::Submit(*m_Drawable);
+    //SunsetEngine::RenderCommande::Submit(*m_Drawable);
     SunsetEngine::RenderCommande::Submit(*CloudDrawable);
 }

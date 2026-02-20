@@ -15,6 +15,7 @@ class SkyCube
 public:
     SkyCube();
     ~SkyCube();
+    void Update(const float deltaTime);
     void Draw() const;
 private:
     std::unique_ptr<SunsetEngine::Drawable> m_Drawable;
