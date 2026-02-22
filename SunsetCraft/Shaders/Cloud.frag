@@ -46,6 +46,9 @@ void main()
     // Densité
     cloud = smoothstep(0.6, 0.8, cloud);
 
+    // if(cloud <= 0.01)
+    // discard;
+
     // Faux éclairage
     float light = clamp(dot(normalize(vec3(0.0,1.0,0.0)), -uSunDir), 0.0, 1.0);
     vec3 bright = vec3(1.0);
@@ -55,5 +58,5 @@ void main()
 
     FragColor = vec4(color, cloud);
 
-    FragColor = vec4(1.0);
+    // FragColor = vec4(1.0);
 }

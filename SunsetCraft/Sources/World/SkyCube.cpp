@@ -67,8 +67,8 @@ namespace
         return indices;
     }
 
-    constexpr float size = 4000.f;
-    constexpr float height = 50.f;
+    constexpr float size = 500.f;
+    constexpr float height = 120.f;
 
     std::array<glm::vec3, 4> CloudVertices = {
         glm::vec3{-size, height, -size},
@@ -122,6 +122,7 @@ SkyCube::SkyCube()
         CloudDrawable = std::make_unique<SunsetEngine::Drawable>();
         CloudDrawable->m_RenderState.depthWrite = false;
         CloudDrawable->m_RenderState.blending = true;
+        CloudDrawable->m_RenderState.cullMode = SunsetEngine::CullMode::None;
 
         auto shader = std::make_shared<SunsetEngine::Shader>("SunsetCraft/Shaders/Cloud.vert", "SunsetCraft/Shaders/Cloud.frag");
         CloudDrawable->m_Material->m_Shader = shader;

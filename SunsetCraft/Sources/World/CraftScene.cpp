@@ -187,12 +187,13 @@ CraftScene::~CraftScene()
 void CraftScene::Update(float deltaTime)
 {
     MoveCamera(m_Camera, deltaTime);
+    skyCube->Update(deltaTime);
     ChunkManager::Update(m_Camera.GetPosition());
 }
 
 void CraftScene::Render() const
 {
-    skyCube->Draw();
     SunsetEngine::RenderCommande::UseCamera(m_Camera);
+    skyCube->Draw();
     ChunkManager::Render(m_Camera);
 }
