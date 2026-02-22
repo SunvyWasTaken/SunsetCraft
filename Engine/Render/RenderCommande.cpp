@@ -32,6 +32,7 @@ namespace
 
     struct FrameData
     {
+        glm::vec3 position;
         glm::mat4 view;
         glm::mat4 projection;
     };
@@ -152,6 +153,7 @@ namespace
             {
                 currentShader = cmd.material->m_Shader;
                 currentShader->Use();
+                currentShader->SetVec3("camPosition", m_FrameData.position);
                 currentShader->SetMat4("view", m_FrameData.view);
                 currentShader->SetMat4("projection", m_FrameData.projection);
             }
@@ -237,6 +239,7 @@ namespace SunsetEngine
 
     void RenderCommande::UseCamera(const SunsetEngine::Camera& camera)
     {
+        m_FrameData.position = camera.GetPosition();
         m_FrameData.view = camera.GetViewMatrix();
         m_FrameData.projection = camera.GetProjection();
     }

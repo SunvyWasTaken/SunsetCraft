@@ -1,62 +1,81 @@
 #version 330
 
 in vec3 worldPos;
+
 out vec4 FragColor;
 
 uniform float uTime;
 vec3 uSunDir = vec3(0.6, 0.8, 0.0);
 
-float hash(vec2 p)
-{
-    p = fract(p * vec2(123.34, 345.45));
-    p += dot(p, p + 34.345);
-    return fract(p.x * p.y);
+const float CLOUD_SCALE  = 0.003;   // adapte à ton monde (important)
+const float SPEED        = 0.01;
+const float COVERAGE     = 0.45;    // quantité globale de nuages
+const float SOFTNESS     = 0.15;    // douceur des bords
+
+const mat2 m = mat2( 1.6,  1.2, -1.2,  1.6 );
+
+vec2 hash( vec2 p ) {
+    p = vec2(dot(p,vec2(127.1,311.7)), dot(p,vec2(269.5,183.3)));
+    return -1.0 + 2.0*fract(sin(p)*43758.5453123);
 }
 
-float noise(vec2 p)
-{
-    vec2 i = floor(p);
-    vec2 f = fract(p);
-
-    float a = hash(i);
-    float b = hash(i + vec2(1.0, 0.0));
-    float c = hash(i + vec2(0.0, 1.0));
-    float d = hash(i + vec2(1.0, 1.0));
-
-    vec2 u = f * f * (3.0 - 2.0 * f);
-
-    return mix(a, b, u.x) +
-    (c - a)* u.y * (1.0 - u.x) +
-    (d - b) * u.x * u.y;
+float noise( in vec2 p ) {
+    const float K1 = 0.366025404; // (sqrt(3)-1)/2;
+    const float K2 = 0.211324865; // (3-sqrt(3))/6;
+    vec2 i = floor(p + (p.x+p.y)*K1);
+    vec2 a = p - i + (i.x+i.y)*K2;
+    vec2 o = (a.x>a.y) ? vec2(1.0,0.0) : vec2(0.0,1.0); //vec2 of = 0.5 + 0.5*vec2(sign(a.x-a.y), sign(a.y-a.x));
+    vec2 b = a - o + K2;
+    vec2 c = a - 1.0 + 2.0*K2;
+    vec3 h = max(0.5-vec3(dot(a,a), dot(b,b), dot(c,c) ), 0.0 );
+    vec3 n = h*h*h*h*vec3( dot(a,hash(i+0.0)), dot(b,hash(i+o)), dot(c,hash(i+1.0)));
+    return dot(n, vec3(70.0));
 }
+
+float fbm(vec2 n) {
+    float total = 0.0, amplitude = 0.1;
+    for (int i = 0; i < 7; i++) {
+        total += noise(n) * amplitude;
+        n = m * n;
+        amplitude *= 0.4;
+    }
+    return total;
+}
+
+// -----------------------------------------------
 
 void main()
 {
-    vec2 uv = worldPos.xz * 0.0005;
+    // Coordonnées monde → bruit
+    vec2 uv = worldPos.xz * CLOUD_SCALE;
 
-    // Scroll
-    vec2 wind1 = uv + vec2(uTime * 0.01, 0.0);
-    vec2 wind2 = uv * 2.0 + vec2(uTime * 0.02, 0.0);
+    // Vent
+    uv += vec2(uTime * SPEED, 0.0);
 
-    float base = noise(wind1);
-    float detail = noise(wind2) * 0.5;
+    float density = fbm(uv);
 
-    float cloud = base + detail;
+    // Normalisation
+    density = density * 0.5 + 0.5;
 
-    // Densité
-    cloud = smoothstep(0.6, 0.8, cloud);
+    // Contrôle couverture
+    float cloud = smoothstep(COVERAGE,
+    COVERAGE + SOFTNESS,
+    density);
 
-    // if(cloud <= 0.01)
-    // discard;
+    // Si très faible → pas de pixel
+    if(cloud < 0.01)
+    discard;
 
-    // Faux éclairage
-    float light = clamp(dot(normalize(vec3(0.0,1.0,0.0)), -uSunDir), 0.0, 1.0);
-    vec3 bright = vec3(1.0);
-    vec3 shadow = vec3(0.75);
+    // ================= Lighting =================
 
-    vec3 color = mix(shadow, bright, light);
+    vec3 sunDir = normalize(uSunDir);
 
-    FragColor = vec4(color, cloud);
+    float light = clamp(dot(vec3(0.0,1.0,0.0), sunDir), 0.0, 1.0);
 
-    // FragColor = vec4(1.0);
+    vec3 shadowColor = vec3(0.65);
+    vec3 lightColor  = vec3(1.0);
+
+    vec3 finalColor = mix(shadowColor, lightColor, light);
+
+    FragColor = vec4(finalColor, cloud);
 }
