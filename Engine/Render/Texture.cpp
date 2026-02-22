@@ -44,7 +44,15 @@ namespace SunsetEngine
 
         for (const auto& image : images)
         {
-            glTexSubImage2D(GL_TEXTURE_2D, 0, 0, currentY, image.width, image.height, GL_RGB, GL_UNSIGNED_BYTE, image.m_Data);
+            GLenum format = GL_RGB;
+            if (image.nbrChannels == 1)
+                format = GL_RED;
+            else if (image.nbrChannels == 3)
+                format = GL_RGB;
+            else if (image.nbrChannels == 4)
+                format = GL_RGBA;
+
+            glTexSubImage2D(GL_TEXTURE_2D, 0, 0, currentY, image.width, image.height, format, GL_UNSIGNED_BYTE, image.m_Data);
             currentY += image.width;
         }
     }
