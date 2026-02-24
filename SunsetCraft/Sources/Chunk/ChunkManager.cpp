@@ -12,6 +12,7 @@
 #include "Render/Material.h"
 #include "Render/RenderCommande.h"
 #include "Render/Shader.h"
+#include "Utility/BlockRegistry.h"
 #include "World/CraftScene.h"
 
 namespace
@@ -43,7 +44,11 @@ namespace
                         // Créer et générer le chunk
                         m_Chunks[key] = std::make_unique<Chunk>(glm::vec3{x, y, z});
                         m_Chunks[key]->SetShader(m_ChunkShader);
-                        WorldGenerator::Request(*(m_Chunks[key].get()));
+                        WorldGenerator::Request(*(m_Chunks[key]));
+                    }
+                    if (m_Chunks[key]->bIsDirty)
+                    {
+                        ChunkMeshBuilder::Build(*(m_Chunks[key]));
                     }
                     // Todo : get le chunk et lui send ça distance au player.
                     // m_Drawable->m_Material->Set<float>("Distance", distance);
@@ -106,13 +111,29 @@ void ChunkManager::Update(const glm::vec3& position)
     LoadChunk(positionInChunk);
 }
 
-void ChunkManager::SetBlock(const glm::vec3 &position, BlockType blockType)
+void ChunkManager::SetBlock(const glm::vec3 &position, BlockId blockType)
 {
+    const glm::ivec3 positionInChunk{
+        WorldToChunk(position.x),
+        WorldToChunk(position.y),
+        WorldToChunk(position.z)};
+
+    if (Chunk* chunk = m_Chunks[positionInChunk].get())
+        chunk->SetBlockId(position, blockType);
 }
 
-BlockType ChunkManager::GetBlock(const glm::vec3 &position)
+BlockId ChunkManager::GetBlock(const glm::vec3 &position)
 {
-    return BlockType{};
+    const glm::ivec3 positionInChunk{
+        WorldToChunk(position.x),
+        WorldToChunk(position.y),
+        WorldToChunk(position.z)};
+    const Chunk* chunk = m_Chunks[positionInChunk].get();
+
+    if (!chunk)
+        return BlockRegistry::AIR;
+
+    return chunk->GetBlockId(position);
 }
 
 void ChunkManager::Render(const SunsetEngine::Camera& camera)

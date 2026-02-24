@@ -18,6 +18,8 @@ public:
     void OnUpdate(float dt) override;
     void OnDraw() override;
 
+    bool OnEvent(SunsetEngine::Event::Type& event) override;
+
 private:
     std::unique_ptr<CraftScene> m_craftScene;
 };

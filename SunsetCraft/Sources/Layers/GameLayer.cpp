@@ -26,3 +26,8 @@ void GameLayer::OnDraw()
 {
     m_craftScene->Render();
 }
+
+bool GameLayer::OnEvent(SunsetEngine::Event::Type& event)
+{
+    return Layer::OnEvent(event);
+}

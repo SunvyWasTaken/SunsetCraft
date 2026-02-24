@@ -24,7 +24,8 @@ namespace SunsetEngine
 
         struct MouseEvent
         {
-            double x, y;
+            int button;
+            Action action;
         };
 
         using Type = std::variant<KeyEvent, MouseEvent>;
@@ -34,7 +35,7 @@ namespace SunsetEngine
     {
         // Take a path to a .json with the key in it.
         static void Init(const std::string_view& Path);
-        static void OnEvent(const Event::Type& event);
+        static bool OnEvent(const Event::Type& event);
         static glm::vec2 GetMouseDelta();
         static bool IsKeyPress(const std::string_view& name);
         static void RegisterAction(const std::string_view& name, const std::function<void(const Event::Action&)>& func);

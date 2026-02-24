@@ -86,6 +86,7 @@ void Chunk::SetBlockId(const glm::ivec3& pos, BlockId blockId)
 {
     const glm::ivec3 i = WorldToChunk(position, pos);
     data[Index(i.x, i.y, i.z)] = blockId;
+    bIsDirty = true;
 }
 
 glm::ivec3 Chunk::GetPosition() const

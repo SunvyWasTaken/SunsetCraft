@@ -5,8 +5,10 @@
 #ifndef SUNSETCRAFT_CRAFTSCENE_H
 #define SUNSETCRAFT_CRAFTSCENE_H
 
-#include "../Utility/TexturesManager.h"
+#include "Core/Input.h"
 #include "Render/Camera.h"
+
+struct RaycastHit;
 
 struct CraftScene
 {
@@ -18,7 +20,11 @@ struct CraftScene
 
     void Render() const;
 
+    void LineTrace(RaycastHit& hit, const glm::vec3& start, const glm::vec3& forward, float distance);
+
 private:
+
+    void PlaceBlock(const SunsetEngine::Event::Action& action);
 
     SunsetEngine::Camera m_Camera;
 

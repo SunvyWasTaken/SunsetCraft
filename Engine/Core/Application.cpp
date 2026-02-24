@@ -77,6 +77,8 @@ namespace SunsetEngine
         AppSetting = setting;
         m_Render = new Renderer();
         m_Render->BindEvent([this](Event::Type& event){ OnEvent(event); });
+
+        InputRegister::Init("SunsetCraft/Sources/Input.json");
     }
 
     Application::~Application()
@@ -128,6 +130,7 @@ namespace SunsetEngine
 
     void Application::OnEvent(Event::Type& event)
     {
+        InputRegister::OnEvent(event);
         for (const auto& layer : m_LayerStack)
         {
             if (layer->OnEvent(event))

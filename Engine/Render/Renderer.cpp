@@ -58,15 +58,35 @@ namespace
         return glfwCreateWindow(setting.WindowSize.x, setting.WindowSize.y, setting.WindowTitle.data(), NULL, NULL);
     }
 
+    SunsetEngine::Event::Action ItoA(const int action)
+    {
+        if (action == 0)
+            return SunsetEngine::Event::Action::Release;
+
+        if (action == 1)
+            return SunsetEngine::Event::Action::Press;
+
+        if (action == 2)
+            return SunsetEngine::Event::Action::Hold;
+
+        return SunsetEngine::Event::Action::Release;
+    }
+
     void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
     {
-        SunsetEngine::Event::Type event = SunsetEngine::Event::KeyEvent{static_cast<unsigned int>(key)};
+        SunsetEngine::Event::Type event = SunsetEngine::Event::KeyEvent{static_cast<unsigned int>(key), ItoA(action)};
         EventCallback(event);
     }
 
     void CursorPositionCallback(GLFWwindow* window, double x, double y)
     {
-        SunsetEngine::Event::Type event = SunsetEngine::Event::MouseEvent{x, y};
+        // SunsetEngine::Event::Type event = SunsetEngine::Event::MouseEvent{x, y};
+        // EventCallback(event);
+    }
+
+    void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
+    {
+        SunsetEngine::Event::Type event = SunsetEngine::Event::MouseEvent{button, ItoA(action)};
         EventCallback(event);
     }
 
@@ -95,6 +115,8 @@ namespace SunsetEngine
         glfwSetFramebufferSizeCallback(m_Window, framebuffer_size_callback);
 
         glfwSetKeyCallback(m_Window, KeyCallback);
+
+        glfwSetMouseButtonCallback(m_Window, MouseButtonCallback);
 
         glfwSetCursorPosCallback(m_Window, CursorPositionCallback);
 

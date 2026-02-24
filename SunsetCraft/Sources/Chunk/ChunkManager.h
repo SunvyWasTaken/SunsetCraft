@@ -5,6 +5,8 @@
 #ifndef SUNSETCRAFT_CHUNKMANAGER_H
 #define SUNSETCRAFT_CHUNKMANAGER_H
 
+#include "World/Block.h"
+
 namespace SunsetEngine
 {
     class Camera;
@@ -23,9 +25,9 @@ public:
 
     static void Update(const glm::vec3& position);
 
-    static void SetBlock(const glm::vec3& position, BlockType blockType);
+    static void SetBlock(const glm::vec3& position, BlockId blockType);
 
-    static BlockType GetBlock(const glm::vec3& position);
+    static BlockId GetBlock(const glm::vec3& position);
 
     static void Render(const SunsetEngine::Camera& camera);
 };

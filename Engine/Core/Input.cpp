@@ -16,6 +16,8 @@ namespace
 
     std::unordered_map<std::string, unsigned int> keyMap;
 
+    std::unordered_map<unsigned int, std::function<void(const SunsetEngine::Event::Action&)>> ActionRegister;
+
     void ProcessInputs(const nlohmann::json& inputs)
     {
         if (inputs.empty())
@@ -47,16 +49,23 @@ namespace SunsetEngine
         ProcessInputs(j);
     }
 
-    void InputRegister::OnEvent(const Event::Type& event)
+    bool InputRegister::OnEvent(const Event::Type& event)
     {
         std::visit(overloads{
         [](const Event::KeyEvent& event)
         {
-
+            if (ActionRegister.contains(event.key))
+            {
+                ActionRegister[event.key](event.action);
+            }
         }, [](const Event::MouseEvent& event)
         {
-
+            if (ActionRegister.contains(event.button))
+            {
+                ActionRegister[event.button](event.action);
+            }
         }}, event);
+        return false;
     }
 
     glm::vec2 InputRegister::GetMouseDelta()
@@ -78,5 +87,12 @@ namespace SunsetEngine
     void InputRegister::RegisterAction(const std::string_view& name,
         const std::function<void(const Event::Action&)>& func)
     {
+        if (!keyMap.contains(name.data()))
+        {
+            LOG("Engine", error, "The register Input isn't valid {}", name);
+            return;
+        }
+
+        ActionRegister.emplace(keyMap[name.data()], func);
     }
 }

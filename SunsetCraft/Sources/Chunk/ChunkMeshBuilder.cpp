@@ -5,13 +5,12 @@
 #include "ChunkMeshBuilder.h"
 
 #include "Chunk.h"
-#include "ChunkUtility.h"
 #include "Render/Buffers.h"
 #include "Render/Drawable.h"
 #include "Render/Mesh.h"
 #include "Render/VertexArray.h"
 #include "Utility/BlockRegistry.h"
-#include "World/CraftScene.h"
+#include "Utility/TexturesManager.h"
 
 namespace
 {
@@ -81,6 +80,9 @@ namespace
 
 void ChunkMeshBuilder::Build(Chunk &chunk)
 {
+    if (chunk.m_Drawable->m_Mesh)
+        chunk.m_Drawable->m_Mesh.reset();
+
     std::vector<std::uint32_t> vertices;
     CreateMesh(chunk.GetBlocks(), vertices);
 
@@ -102,5 +104,7 @@ void ChunkMeshBuilder::Build(Chunk &chunk)
     m_Mesh->m_VertexBuffer = vbo;
 
     chunk.m_Drawable->m_Mesh = m_Mesh;
+
+    chunk.bIsDirty = false;
 }
 
