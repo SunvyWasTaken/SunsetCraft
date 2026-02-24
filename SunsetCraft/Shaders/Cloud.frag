@@ -8,7 +8,7 @@ uniform float uTime;
 vec3 uSunDir = vec3(0.6, 0.8, 0.0);
 
 const float CLOUD_SCALE  = 0.003;   // adapte à ton monde (important)
-const float SPEED        = 0.01;
+const float SPEED        = 0.02;
 const float COVERAGE     = 0.45;    // quantité globale de nuages
 const float SOFTNESS     = 0.15;    // douceur des bords
 
