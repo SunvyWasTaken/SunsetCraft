@@ -5,6 +5,7 @@
 #ifndef SUNSETCRAFT_CRAFTSCENE_H
 #define SUNSETCRAFT_CRAFTSCENE_H
 
+#include "Block.h"
 #include "Core/Input.h"
 #include "Render/Camera.h"
 
@@ -26,10 +27,16 @@ private:
 
     bool PlaceBlock(const SunsetEngine::Event::Action& action);
 
-    SunsetEngine::Camera m_Camera;
+public:
 
     // Toolbar
     std::int8_t currentSelectTool = 1;
+
+    std::array<BlockId, 9> m_ToolBar;
+
+private:
+    SunsetEngine::Camera m_Camera;
+
 };
 
 

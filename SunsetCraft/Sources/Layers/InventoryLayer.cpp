@@ -9,7 +9,10 @@
 #include "Core/Application.h"
 #include "Core/ApplicationSetting.h"
 #include "Slate/HorizontalBox.h"
+#include "Slate/SlateImage.h"
 #include "Slate/Square.h"
+#include "Utility/BlockRegistry.h"
+#include "World/CraftScene.h"
 
 namespace
 {
@@ -29,8 +32,16 @@ InventoryLayer::InventoryLayer(CraftScene* scene)
     ToolbarBox->SetAnchor({0, -1});
     for (std::uint8_t i = 0; i < ToolbarSize; ++i)
     {
+        BlockType block = BlockRegistry::Get(_scene->m_ToolBar[i]);
         std::shared_ptr<SunsetEngine::Slate> Square = std::make_shared<SunsetEngine::Square>(glm::ivec2{0,0}, glm::ivec2{74, 74}, glm::vec4{1.0, 0.3, 0.3, 1.0}, 15.f);
         ToolbarBox->AddChild(Square);
+
+        if (block.id != BlockRegistry::AIR)
+        {
+            std::shared_ptr<SunsetEngine::Slate> img = std::make_shared<SunsetEngine::SlateImage>();
+            std::static_pointer_cast<SunsetEngine::SlateImage>(img)->LoadImage("Textures/" + block.textures[4]);
+            std::static_pointer_cast<SunsetEngine::Square>(Square)->AddChild(img);
+        }
     }
 
     SunsetEngine::InputRegister::RegisterAction("OpenInventory", std::bind(&InventoryLayer::OpenInventory, this, std::placeholders::_1));
@@ -43,6 +54,17 @@ InventoryLayer::~InventoryLayer()
 
 void InventoryLayer::OnUpdate(float dt)
 {
+    if (!_scene)
+        return;
+
+    for (auto& box : *ToolbarBox)
+    {
+        box->SetSize({74, 74});
+        //std::static_pointer_cast<SunsetEngine::Square>(box)->SetRadius(15.f);
+    }
+
+    (*ToolbarBox)[_scene->currentSelectTool]->SetSize({84, 84});
+    //std::static_pointer_cast<SunsetEngine::Square>((*ToolbarBox)[_scene->currentSelectTool])->SetRadius(30.f);
 }
 
 void InventoryLayer::OnDraw()

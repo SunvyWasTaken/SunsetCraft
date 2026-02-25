@@ -15,6 +15,7 @@ namespace SunsetEngine
         void LoadImage(const std::string_view& path);
         void Clear();
         void SetData(unsigned char* data);
+        unsigned int Format() const;
         explicit operator bool() const;
 
         std::string m_ImageName;

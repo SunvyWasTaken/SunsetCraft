@@ -86,7 +86,13 @@ namespace
 
     void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
     {
-        SunsetEngine::Event::Type event = SunsetEngine::Event::MouseEvent{button, ItoA(action)};
+        SunsetEngine::Event::Type event = SunsetEngine::Event::MouseEvent{button, 0, ItoA(action)};
+        EventCallback(event);
+    }
+
+    void CursorScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
+    {
+        SunsetEngine::Event::Type event = SunsetEngine::Event::MouseEvent{0, static_cast<int>(yoffset), ItoA(1)};
         EventCallback(event);
     }
 
@@ -119,6 +125,8 @@ namespace SunsetEngine
         glfwSetMouseButtonCallback(m_Window, MouseButtonCallback);
 
         glfwSetCursorPosCallback(m_Window, CursorPositionCallback);
+
+        glfwSetScrollCallback(m_Window, CursorScrollCallback);
 
     #ifdef NDEBUG
         glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);

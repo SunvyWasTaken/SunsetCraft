@@ -25,6 +25,7 @@ namespace SunsetEngine
         struct MouseEvent
         {
             int button;
+            int Scroll;
             Action action;
         };
 

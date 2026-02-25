@@ -7,6 +7,8 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
+#include <glad/glad.h>
+
 namespace SunsetEngine
 {
     Image::Image(const std::string_view& path)
@@ -49,6 +51,19 @@ namespace SunsetEngine
     void Image::SetData(unsigned char* data)
     {
         m_Data = data;
+    }
+
+    unsigned int Image::Format() const
+    {
+        GLenum format = GL_RGB;
+        if (nbrChannels == 1)
+            format = GL_RED;
+        else if (nbrChannels == 3)
+            format = GL_RGB;
+        else if (nbrChannels == 4)
+            format = GL_RGBA;
+
+        return format;
     }
 
     Image::operator bool() const

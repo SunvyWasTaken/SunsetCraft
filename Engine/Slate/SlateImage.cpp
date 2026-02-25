@@ -35,7 +35,7 @@ namespace
     };
 
 
-    void SendTextureToGpu(std::uint32_t& id, const int width, const int height, void* data = nullptr)
+    void SendTextureToGpu(std::uint32_t& id, const SunsetEngine::Image& img)
     {
         glGenTextures(1, &id);
         glBindTexture(GL_TEXTURE_2D, id);
@@ -45,7 +45,7 @@ namespace
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glTexImage2D(GL_TEXTURE_2D, 0, img.Format(), img.width, img.height, 0, img.Format(), GL_UNSIGNED_BYTE, img.m_Data);
     }
 }
 
@@ -74,8 +74,9 @@ namespace SunsetEngine
 
     void SlateImage::LoadImage(const std::string_view &path)
     {
+        LOG("Engine", trace, "Slate image try to load {}", path);
         Image img{path};
-        SendTextureToGpu(m_Id, img.width, img.height, img.m_Data);
+        SendTextureToGpu(m_Id, img);
     }
 
     void SlateImage::Draw() const
@@ -89,8 +90,8 @@ namespace SunsetEngine
         const GLint loc = glGetUniformLocation(m_Shader->GetId(), "U_Image");
         glUniform1i(loc, 0);
 
-        glDisable(GL_CULL_FACE);
-        glDisable(GL_DEPTH_TEST);
+        // glDisable(GL_CULL_FACE);
+        // glDisable(GL_DEPTH_TEST);
 
         glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLES, 0, 6);

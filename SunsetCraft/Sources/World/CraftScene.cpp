@@ -17,11 +17,6 @@ namespace
     float cameraSpeed = 10.f;
     float MouseSpeed = 0.4f;
 
-    // void cmt utilisé item Id pour ensuite crée de block.
-    using ItemId = uint8_t;
-
-    std::array<ItemId, 8> Toolbar;
-
     std::unique_ptr<SkyCube> skyCube = nullptr;
 
     void MoveCamera(SunsetEngine::Camera& m_Camera, float dt)
@@ -80,6 +75,7 @@ CraftScene::CraftScene()
     skyCube = std::make_unique<SkyCube>();
 
     SunsetEngine::InputRegister::RegisterAction("MainAction", std::bind(&CraftScene::PlaceBlock, this, std::placeholders::_1));
+    m_ToolBar = {BlockRegistry::DIRT, BlockRegistry::GRASS, BlockRegistry::STONE, BlockRegistry::AIR, BlockRegistry::AIR, BlockRegistry::AIR, BlockRegistry::AIR, BlockRegistry::AIR};
 }
 
 CraftScene::~CraftScene()
@@ -208,8 +204,7 @@ bool CraftScene::PlaceBlock(const SunsetEngine::Event::Action& action)
         return false;
 
     const glm::vec3 target = hit.blockPose + hit.hitNormal;
-    LOG("SunsetCraft", info, "Target pos : {}", hit.blockPose)
-    ChunkManager::SetBlock(hit.blockPose, BlockRegistry::AIR);
+    ChunkManager::SetBlock(target, m_ToolBar[currentSelectTool]);
 
     return true;
 }

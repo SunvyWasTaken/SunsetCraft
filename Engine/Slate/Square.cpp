@@ -49,6 +49,10 @@ namespace SunsetEngine
     {
         const_cast<Square*>(this)->Rebuild();
 
+        glDisable(GL_CULL_FACE);
+        glDisable(GL_DEPTH_TEST);
+        glDisable(GL_BLEND);
+
         m_Shader->Use();
         m_Shader->SetVec2("u_ScreenSize", Application::GetSetting().WindowSize);
         m_Shader->SetVec4("u_Color", m_Color);
@@ -59,6 +63,10 @@ namespace SunsetEngine
 
         if (m_Child)
             m_Child->Draw();
+
+        // glEnable(GL_BLEND);
+        // glEnable(GL_CULL_FACE);
+        // glEnable(GL_DEPTH_TEST);
     }
 
     void Square::SetAnchor(const glm::vec2 &val)
@@ -86,6 +94,12 @@ namespace SunsetEngine
         Slate::SetSize(size);
         if (m_Child)
             m_Child->SetSize(size - glm::ivec2{m_Radius + 5, m_Radius + 5});
+    }
+
+    void Square::SetRadius(int radius)
+    {
+        m_Radius = radius;
+        bIsDirty = true;
     }
 
     void Square::Clear()

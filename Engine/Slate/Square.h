@@ -25,9 +25,11 @@ namespace SunsetEngine
 
         void AddChild(const std::shared_ptr<Slate>& child);
 
-        virtual void SetPosition(const glm::ivec2& pos) override;
+        void SetPosition(const glm::ivec2& pos) override;
 
-        virtual void SetSize(const glm::ivec2& size) override;
+        void SetSize(const glm::ivec2& size) override;
+
+        void SetRadius(int radius);
 
     private:
 
