@@ -24,7 +24,7 @@ struct CraftScene
 
 private:
 
-    void PlaceBlock(const SunsetEngine::Event::Action& action);
+    bool PlaceBlock(const SunsetEngine::Event::Action& action);
 
     SunsetEngine::Camera m_Camera;
 

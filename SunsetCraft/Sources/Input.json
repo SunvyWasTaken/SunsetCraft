@@ -26,5 +26,9 @@
   {
     "name" : "MainAction",
     "key" : "F"
+  },
+  {
+    "name" : "OpenInventory",
+    "key" : "C"
   }
 ]

@@ -194,10 +194,10 @@ void CraftScene::LineTrace(RaycastHit& hit, const glm::vec3& start, const glm::v
     }
 }
 
-void CraftScene::PlaceBlock(const SunsetEngine::Event::Action& action)
+bool CraftScene::PlaceBlock(const SunsetEngine::Event::Action& action)
 {
     if (action != SunsetEngine::Event::Action::Press)
-        return;
+        return false;
 
     RaycastHit hit;
     glm::vec3 start = m_Camera.GetPosition();
@@ -205,9 +205,11 @@ void CraftScene::PlaceBlock(const SunsetEngine::Event::Action& action)
 
     LineTrace(hit, start, forward, 50);
     if (!hit)
-        return;
+        return false;
 
     const glm::vec3 target = hit.blockPose + hit.hitNormal;
     LOG("SunsetCraft", info, "Target pos : {}", hit.blockPose)
     ChunkManager::SetBlock(hit.blockPose, BlockRegistry::AIR);
+
+    return true;
 }

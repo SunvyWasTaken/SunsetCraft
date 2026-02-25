@@ -4,6 +4,8 @@
 
 #include "InventoryLayer.h"
 
+#include <imgui.h>
+
 #include "Core/Application.h"
 #include "Core/ApplicationSetting.h"
 #include "Slate/HorizontalBox.h"
@@ -13,6 +15,8 @@ namespace
 {
     constexpr size_t ToolbarSize = 9;
     std::unique_ptr<SunsetEngine::HorizontalBox> ToolbarBox = nullptr;
+
+    bool DrawInventory = false;
 }
 
 InventoryLayer::InventoryLayer(CraftScene* scene)
@@ -28,6 +32,8 @@ InventoryLayer::InventoryLayer(CraftScene* scene)
         std::shared_ptr<SunsetEngine::Slate> Square = std::make_shared<SunsetEngine::Square>(glm::ivec2{0,0}, glm::ivec2{74, 74}, glm::vec4{1.0, 0.3, 0.3, 1.0}, 15.f);
         ToolbarBox->AddChild(Square);
     }
+
+    SunsetEngine::InputRegister::RegisterAction("OpenInventory", std::bind(&InventoryLayer::OpenInventory, this, std::placeholders::_1));
 }
 
 InventoryLayer::~InventoryLayer()
@@ -64,4 +70,20 @@ void InventoryLayer::OnDraw()
     crossDown.Draw();
     crossLeft.Draw();
     crossRight.Draw();
+
+    if (!DrawInventory)
+        return;
+
+    SunsetEngine::Square Inventory{{WinSize.x / 2, WinSize.y / 2}, {500, 500}, color, radius};
+    Inventory.Draw();
+}
+
+bool InventoryLayer::OpenInventory(const SunsetEngine::Event::Action& type)
+{
+    if (type == SunsetEngine::Event::Action::Press)
+    {
+        DrawInventory = !DrawInventory;
+        return true;
+    }
+    return false;
 }

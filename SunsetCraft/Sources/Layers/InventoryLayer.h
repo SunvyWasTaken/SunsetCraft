@@ -19,6 +19,8 @@ public:
     void OnDraw() override;
 
 private:
+
+    bool OpenInventory(const SunsetEngine::Event::Action& type);
     CraftScene* _scene;
 };
 

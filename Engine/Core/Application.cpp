@@ -130,7 +130,9 @@ namespace SunsetEngine
 
     void Application::OnEvent(Event::Type& event)
     {
-        InputRegister::OnEvent(event);
+        if (InputRegister::OnEvent(event))
+            return;
+
         for (const auto& layer : m_LayerStack)
         {
             if (layer->OnEvent(event))
