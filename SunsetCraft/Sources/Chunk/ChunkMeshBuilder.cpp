@@ -98,7 +98,7 @@ void ChunkMeshBuilder::Build(Chunk &chunk)
 
     std::unique_ptr<SunsetEngine::VertexArray> vao = std::make_unique<SunsetEngine::VertexArray>();
 
-    vao->AddVertexBuffer(*vbo);
+    vao->AddVertexBuffer(vbo);
 
     std::shared_ptr<SunsetEngine::Mesh> m_Mesh = std::make_shared<SunsetEngine::Mesh>(vao);
     m_Mesh->m_VertexBuffer = vbo;

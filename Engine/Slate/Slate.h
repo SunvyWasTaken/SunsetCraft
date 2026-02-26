@@ -7,13 +7,15 @@
 
 namespace SunsetEngine
 {
+    class Drawable;
+
     class Slate
     {
     public:
         Slate();
         virtual ~Slate();
 
-        virtual void Draw() const {};
+        virtual void Draw() const;
 
         [[nodiscard]]
         glm::ivec2 GetPosition() const;
@@ -28,6 +30,8 @@ namespace SunsetEngine
         glm::ivec2 m_Position;
         glm::ivec2 m_Size;
         glm::vec2 m_Anchor;
+
+        std::unique_ptr<Drawable> m_Drawable;
     };
 }
 

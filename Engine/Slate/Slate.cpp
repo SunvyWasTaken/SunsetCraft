@@ -4,6 +4,9 @@
 
 #include "Slate.h"
 
+#include "Render/Drawable.h"
+#include "Render/RenderCommande.h"
+
 namespace SunsetEngine
 {
     Slate::Slate()
@@ -11,11 +14,15 @@ namespace SunsetEngine
         , m_Position(0, 0)
         , m_Size(0, 0)
         , m_Anchor(0.f, 0.f)
+        , m_Drawable(nullptr)
     {
     }
 
-    Slate::~Slate()
+    Slate::~Slate() = default;
+
+    void Slate::Draw() const
     {
+        RenderCommande::Submit(*m_Drawable);
     }
 
     glm::ivec2 Slate::GetPosition() const
@@ -39,4 +46,5 @@ namespace SunsetEngine
         m_Size = size;
         bIsDirty = true;
     }
+
 }

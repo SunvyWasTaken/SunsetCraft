@@ -12,7 +12,7 @@ namespace SunsetEngine
 
     class Material
     {
-        using UniformType = std::variant<float, int, glm::vec2, glm::vec3, glm::mat4>;
+        using UniformType = std::variant<float, int, glm::vec2, glm::vec3, glm::vec4, glm::mat4>;
 
         template<typename T, typename Variant>
         struct is_in_variant;

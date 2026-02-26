@@ -14,6 +14,7 @@ namespace
 
 namespace SunsetEngine
 {
+    class Textures;
     class Camera;
     class Shader;
 
@@ -29,10 +30,7 @@ namespace SunsetEngine
         void ComputeVertex(std::vector<vertice>& vertices);
         void Clear();
     private:
-        std::shared_ptr<Shader> m_Shader;
-        uint32_t VAO;
-        uint32_t VBO;
-        uint32_t m_Id;
+        std::shared_ptr<Textures> m_Texture;
     };
 }
 

@@ -51,7 +51,10 @@ namespace SunsetEngine
                 },[&](const glm::vec3& val)
                 {
                     m_Shader->SetVec3(name, val);
-                },[&](const glm::mat4& val)
+                }, [&](const glm::vec4& val)
+                {
+                    m_Shader->SetVec4(name, val);
+                }, [&](const glm::mat4& val)
                 {
                     m_Shader->SetMat4(name, val);
                 },

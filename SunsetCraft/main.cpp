@@ -14,9 +14,9 @@ int main()
     INITLOG("SunsetCraft");
 
     auto gameLayer = new GameLayer();
-    app.AddLayer(gameLayer);
     app.PushLayer<InventoryLayer>(gameLayer->GetScene());
-    app.PushLayer<DebugLayer>();
+    app.AddLayer(gameLayer);
+    //app.PushLayer<DebugLayer>();
 
     app.Run();
     return 0;

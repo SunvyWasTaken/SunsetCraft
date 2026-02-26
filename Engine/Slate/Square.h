@@ -43,10 +43,6 @@ namespace SunsetEngine
         glm::vec4 m_Color;
         int m_Radius;
         std::shared_ptr<Slate> m_Child;
-    private:
-        std::uint32_t m_VAO;
-        std::uint32_t m_VBO;
-        std::shared_ptr<Shader> m_Shader;
     };
 }
 

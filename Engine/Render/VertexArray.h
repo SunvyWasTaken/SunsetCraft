@@ -20,7 +20,7 @@ namespace SunsetEngine
         void Bind() const;
         void Unbind() const;
 
-        void AddVertexBuffer(const VertexBuffer& vertexBuffer);
+        void AddVertexBuffer(const std::shared_ptr<VertexBuffer>& vertexBuffer);
         void AddIndexBuffer(const IndiceBuffer& indexBuffer);
 
         [[nodiscard]] uint32_t GetVAO() const;

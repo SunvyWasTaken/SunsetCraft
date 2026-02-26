@@ -95,6 +95,20 @@ namespace
         }
     }
 
+    GLenum ToGLPrimitiveType(const SunsetEngine::PrimitiveType& type)
+    {
+        switch (type)
+        {
+        case SunsetEngine::PrimitiveType::Points:           return GL_POINT;
+        case SunsetEngine::PrimitiveType::Lines:            return GL_LINES;
+        case SunsetEngine::PrimitiveType::LineStrip:        return GL_LINE_STRIP;
+        case SunsetEngine::PrimitiveType::Triangles:        return GL_TRIANGLES;
+        case SunsetEngine::PrimitiveType::TriangleStrip:    return GL_TRIANGLE_STRIP;
+        case SunsetEngine::PrimitiveType::TriangleFan:      return GL_TRIANGLE_FAN;
+        }
+        return GL_POINT;
+    }
+
     void ApplyState(const SunsetEngine::RenderState& state)
     {
         // Depth Test
@@ -174,11 +188,12 @@ namespace
 
             cmd.material->m_Shader->SetVec3("location", cmd.position);
 
-            // Todo : change the draw command cuz actually it's not compatible with my instance block.
             if (cmd.state.DrawInstance)
-                glDrawArraysInstanced(GL_TRIANGLES, 0, 6, cmd.indexCount);
+                glDrawArraysInstanced(ToGLPrimitiveType(cmd.state.primitiveType), 0, 6, cmd.indexCount);
+            else if (cmd.state.HasIndice)
+                glDrawElements(ToGLPrimitiveType(cmd.state.primitiveType), cmd.indexCount, GL_UNSIGNED_INT, nullptr);
             else
-                glDrawElements(GL_TRIANGLES, cmd.indexCount, GL_UNSIGNED_INT, nullptr);
+                glDrawArrays(ToGLPrimitiveType(cmd.state.primitiveType), 0, cmd.indexCount);
         }
 
         m_DrawCommands.clear();

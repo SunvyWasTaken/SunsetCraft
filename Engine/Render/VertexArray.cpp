@@ -19,6 +19,7 @@ namespace SunsetEngine
 
     VertexArray::~VertexArray()
     {
+        LOG("Engine", trace, "VAO {} delete", m_Id)
         glDeleteVertexArrays(1, &m_Id);
     }
 
@@ -32,12 +33,12 @@ namespace SunsetEngine
         glBindVertexArray(0);
     }
 
-    void VertexArray::AddVertexBuffer(const VertexBuffer& vertexBuffer)
+    void VertexArray::AddVertexBuffer(const std::shared_ptr<VertexBuffer>& vertexBuffer)
     {
         Bind();
-        vertexBuffer.Bind();
+        vertexBuffer->Bind();
 
-        const auto& layout = vertexBuffer.GetLayout();
+        const auto& layout = vertexBuffer->GetLayout();
         uint32_t index = 0;
 
         for (auto& element : layout)
@@ -52,7 +53,7 @@ namespace SunsetEngine
 
             index++;
         }
-        count = vertexBuffer.GetSize();
+        count = vertexBuffer->GetSize();
         Unbind();
     }
 

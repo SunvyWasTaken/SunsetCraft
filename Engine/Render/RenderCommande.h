@@ -15,8 +15,8 @@ namespace SunsetEngine
         static void BeginFrame();
         static void EndFrame();
 
-        static void Submit(const SunsetEngine::Drawable& drawable);
-        static void UseCamera(const SunsetEngine::Camera& camera);
+        static void Submit(const Drawable& drawable);
+        static void UseCamera(const Camera& camera);
     };
 }
 

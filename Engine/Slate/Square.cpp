@@ -8,8 +8,13 @@
 #include "Core/ApplicationSetting.h"
 #include "Render/Shader.h"
 
-#include <glad/glad.h>
 #include <glm/gtc/constants.hpp>
+
+#include "Render/Buffers.h"
+#include "Render/Drawable.h"
+#include "Render/Material.h"
+#include "Render/Mesh.h"
+#include "Render/VertexArray.h"
 
 namespace
 {
@@ -24,20 +29,31 @@ namespace SunsetEngine
         : m_Color(color)
         , m_Radius(radius)
         , m_Child(nullptr)
-        , m_VAO(0)
-        , m_VBO(0)
-        , m_Shader(nullptr)
     {
         Slate::SetPosition(pos);
         Slate::SetSize(size);
 
+        m_Drawable = std::make_unique<Drawable>();
+
         if (_shader.expired())
         {
-            m_Shader =std::make_shared<Shader>("Engine/Shaders/Square.vert", "Engine/Shaders/Square.frag");
-            _shader = m_Shader;
+            m_Drawable->m_Material->m_Shader =std::make_shared<Shader>("Engine/Shaders/Square.vert", "Engine/Shaders/Square.frag");
+            _shader = m_Drawable->m_Material->m_Shader;
         }
         else
-            m_Shader = _shader.lock();
+            m_Drawable->m_Material->m_Shader = _shader.lock();
+
+        m_Drawable->m_Material->Set<glm::vec2>("u_ScreenSize", Application::GetSetting().WindowSize);
+        m_Drawable->m_Material->Set<glm::vec4>("u_Color", m_Color);
+
+        m_Drawable->m_RenderState.depthTest = false;
+        m_Drawable->m_RenderState.depthWrite = false;
+        m_Drawable->m_RenderState.blending = true;
+        m_Drawable->m_RenderState.src = BlendFactor::SrcAlpha;
+        m_Drawable->m_RenderState.dest = BlendFactor::OneMinusSrcAlpha;
+        m_Drawable->m_RenderState.cullMode = CullMode::None;
+        m_Drawable->m_RenderState.primitiveType = PrimitiveType::TriangleFan;
+        m_Drawable->m_RenderState.HasIndice = false;
     }
 
     Square::~Square()
@@ -49,24 +65,10 @@ namespace SunsetEngine
     {
         const_cast<Square*>(this)->Rebuild();
 
-        glDisable(GL_CULL_FACE);
-        glDisable(GL_DEPTH_TEST);
-        glDisable(GL_BLEND);
-
-        m_Shader->Use();
-        m_Shader->SetVec2("u_ScreenSize", Application::GetSetting().WindowSize);
-        m_Shader->SetVec4("u_Color", m_Color);
-
-        glBindVertexArray(m_VAO);
-        glDrawArrays(GL_TRIANGLE_FAN, 0, NbrPoints);
-        glBindVertexArray(0);
+        Slate::Draw();
 
         if (m_Child)
             m_Child->Draw();
-
-        // glEnable(GL_BLEND);
-        // glEnable(GL_CULL_FACE);
-        // glEnable(GL_DEPTH_TEST);
     }
 
     void Square::SetAnchor(const glm::vec2 &val)
@@ -104,11 +106,7 @@ namespace SunsetEngine
 
     void Square::Clear()
     {
-        glDeleteVertexArrays(1, &m_VAO);
-        glDeleteBuffers(1, &m_VBO);
-
-        m_VAO = 0;
-        m_VBO = 0;
+        m_Drawable->m_Mesh.reset();
     }
 
     void Square::Rebuild()
@@ -121,20 +119,18 @@ namespace SunsetEngine
         std::vector<glm::vec2> points;
         ComputePoints(points);
 
-        glGenVertexArrays(1, &m_VAO);
-        glGenBuffers(1, &m_VBO);
+        auto VBO = std::make_shared<VertexBuffer>(points.data(), points.size(), sizeof(glm::vec2));
 
-        glBindVertexArray(m_VAO);
-        glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
+        VBO->SetLayout({BufferElement{ShaderDataType::Float2, "position"}});
 
-        glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * points.size(), points.data(), GL_STATIC_DRAW);
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), (void*)0);
+        auto VAO = std::make_unique<VertexArray>();
 
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glEnableVertexAttribArray(0);
+        VAO->AddVertexBuffer(VBO);
 
-        bIsDirty = true;
+        m_Drawable->m_Mesh = std::make_unique<Mesh>(VAO);
+        m_Drawable->m_Mesh->m_VertexBuffer = VBO;
+
+        bIsDirty = false;
     }
 
     void Square::ComputePoints(std::vector<glm::vec2> &points)

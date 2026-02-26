@@ -106,7 +106,7 @@ SkyCube::SkyCube()
         auto ebo = std::make_shared<SunsetEngine::IndiceBuffer>(indices);
 
         auto vao = std::make_unique<SunsetEngine::VertexArray>();
-        vao->AddVertexBuffer(*vbo);
+        vao->AddVertexBuffer(vbo);
         vao->AddIndexBuffer(*ebo);
 
         m_Drawable->m_Mesh = std::make_unique<SunsetEngine::Mesh>(vao);
@@ -136,7 +136,7 @@ SkyCube::SkyCube()
         auto ebo = std::make_shared<SunsetEngine::IndiceBuffer>(CloudIndices);
 
         auto vao = std::make_unique<SunsetEngine::VertexArray>();
-        vao->AddVertexBuffer(*vbo);
+        vao->AddVertexBuffer(vbo);
         vao->AddIndexBuffer(*ebo);
 
         CloudDrawable->m_Mesh = std::make_unique<SunsetEngine::Mesh>(vao);

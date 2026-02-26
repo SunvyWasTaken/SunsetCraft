@@ -33,6 +33,16 @@ namespace SunsetEngine
         Front
     };
 
+    enum class PrimitiveType
+    {
+        Points,
+        Lines,
+        LineStrip,
+        Triangles,
+        TriangleStrip,
+        TriangleFan
+    };
+
     struct RenderState
     {
         bool depthTest = true;
@@ -45,6 +55,8 @@ namespace SunsetEngine
         CullMode cullMode = CullMode::Front;
         bool wireframe = false;
         bool DrawInstance = false;
+        bool HasIndice = true;
+        PrimitiveType primitiveType = PrimitiveType::Triangles;
     };
 
     class Drawable final
