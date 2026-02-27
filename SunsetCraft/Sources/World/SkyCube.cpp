@@ -162,5 +162,5 @@ void SkyCube::Update(const float deltaTime)
 void SkyCube::Draw() const
 {
     //SunsetEngine::RenderCommande::Submit(*m_Drawable);
-    SunsetEngine::RenderCommande::Submit(*CloudDrawable);
+    //SunsetEngine::RenderCommande::Submit(*CloudDrawable);
 }

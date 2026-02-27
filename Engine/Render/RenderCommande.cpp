@@ -22,14 +22,6 @@
 
 namespace
 {
-    struct FrameState
-    {
-        uint32_t drawCalls = 0;
-        uint64_t triangleCount = 0;
-    };
-
-    FrameState m_FrameState;
-
     struct FrameData
     {
         glm::vec3 position;
@@ -204,8 +196,6 @@ namespace SunsetEngine
 {
     void RenderCommande::BeginFrame()
     {
-        m_FrameState = {};
-
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glfwPollEvents();
@@ -231,8 +221,6 @@ namespace SunsetEngine
 
         FlushDrawCommand();
 
-        PRINTSCREEN("Nbr vertice count {}", m_FrameState.triangleCount);
-
         ImGui::Render();
 
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -245,7 +233,6 @@ namespace SunsetEngine
         DrawCommand cmd;
         cmd.vao = drawable.m_Mesh->GetVAO();
         cmd.indexCount = drawable.m_Mesh->GetVertexCount();
-        m_FrameState.triangleCount += cmd.indexCount * 6;
         cmd.material = drawable.m_Material;
         cmd.position = drawable.m_Position;
         cmd.state = drawable.m_RenderState;
