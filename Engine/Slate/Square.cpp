@@ -47,10 +47,10 @@ namespace SunsetEngine
         m_Drawable->m_Material->Set<glm::vec4>("u_Color", m_Color);
 
         m_Drawable->m_RenderState.depthTest = false;
-        m_Drawable->m_RenderState.depthWrite = false;
-        m_Drawable->m_RenderState.blending = true;
-        m_Drawable->m_RenderState.src = BlendFactor::SrcAlpha;
-        m_Drawable->m_RenderState.dest = BlendFactor::OneMinusSrcAlpha;
+        m_Drawable->m_RenderState.depthWrite = true;
+        // m_Drawable->m_RenderState.blending = true;
+        // m_Drawable->m_RenderState.src = BlendFactor::SrcAlpha;
+        // m_Drawable->m_RenderState.dest = BlendFactor::OneMinusSrcAlpha;
         m_Drawable->m_RenderState.cullMode = CullMode::None;
         m_Drawable->m_RenderState.primitiveType = PrimitiveType::TriangleFan;
         m_Drawable->m_RenderState.HasIndice = false;

@@ -74,7 +74,6 @@ CraftScene::CraftScene()
     ChunkManager::Init();
     skyCube = std::make_unique<SkyCube>();
 
-    SunsetEngine::InputRegister::RegisterAction("MainAction", std::bind(&CraftScene::PlaceBlock, this, std::placeholders::_1));
     m_ToolBar = {BlockRegistry::DIRT, BlockRegistry::GRASS, BlockRegistry::STONE, BlockRegistry::AIR, BlockRegistry::AIR, BlockRegistry::AIR, BlockRegistry::AIR, BlockRegistry::AIR};
 }
 
@@ -190,11 +189,8 @@ void CraftScene::LineTrace(RaycastHit& hit, const glm::vec3& start, const glm::v
     }
 }
 
-bool CraftScene::PlaceBlock(const SunsetEngine::Event::Action& action)
+bool CraftScene::PlaceBlock(bool destroy)
 {
-    if (action != SunsetEngine::Event::Action::Press)
-        return false;
-
     RaycastHit hit;
     glm::vec3 start = m_Camera.GetPosition();
     glm::vec3 forward = m_Camera.GetForward();
@@ -203,8 +199,15 @@ bool CraftScene::PlaceBlock(const SunsetEngine::Event::Action& action)
     if (!hit)
         return false;
 
-    const glm::vec3 target = hit.blockPose + hit.hitNormal;
-    ChunkManager::SetBlock(target, m_ToolBar[currentSelectTool]);
+    if (destroy)
+    {
+        ChunkManager::SetBlock(hit.blockPose, BlockRegistry::AIR);
+    }
+    else
+    {
+        const glm::vec3 target = hit.blockPose + hit.hitNormal;
+        ChunkManager::SetBlock(target, m_ToolBar[currentSelectTool]);
+    }
 
     return true;
 }

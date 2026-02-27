@@ -12,8 +12,8 @@ struct CraftScene;
 class InventoryLayer : public SunsetEngine::Layer
 {
 public:
-    InventoryLayer(CraftScene* scene);
-    ~InventoryLayer();
+    explicit InventoryLayer(CraftScene* scene);
+    ~InventoryLayer() override;
 
     void OnUpdate(float dt) override;
     void OnDraw() override;

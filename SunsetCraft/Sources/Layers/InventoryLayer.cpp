@@ -19,7 +19,15 @@ namespace
     constexpr size_t ToolbarSize = 9;
     std::unique_ptr<SunsetEngine::HorizontalBox> ToolbarBox = nullptr;
 
+    std::unique_ptr<SunsetEngine::Square> crossTop = nullptr;
+    std::unique_ptr<SunsetEngine::Square> crossDown = nullptr;
+    std::unique_ptr<SunsetEngine::Square> crossLeft = nullptr;
+    std::unique_ptr<SunsetEngine::Square> crossRight = nullptr;
+
+
     bool DrawInventory = false;
+
+    uint8_t PrevToolSelected = 0;
 }
 
 InventoryLayer::InventoryLayer(CraftScene* scene)
@@ -45,11 +53,32 @@ InventoryLayer::InventoryLayer(CraftScene* scene)
     }
 
     SunsetEngine::InputRegister::RegisterAction("OpenInventory", std::bind(&InventoryLayer::OpenInventory, this, std::placeholders::_1));
+
+    int length = 15;
+    int width = 5;
+    int radius = 2;
+    glm::vec4 color{1.0, 0.2, 0.2, 0.5};
+    int spacecing = 2;
+
+    glm::ivec2 WinSize = SunsetEngine::Application::GetSetting().WindowSize;
+
+    crossTop = std::make_unique<SunsetEngine::Square>(glm::ivec2{WinSize.x / 2, WinSize.y / 2 - spacecing}, glm::ivec2{width, length}, color, radius);
+    crossTop->SetAnchor({0, -1});
+    crossDown = std::make_unique<SunsetEngine::Square>(glm::ivec2{WinSize.x / 2, WinSize.y / 2 + spacecing}, glm::ivec2{width, length}, color, radius);
+    crossDown->SetAnchor({0, 1});
+    crossLeft = std::make_unique<SunsetEngine::Square>(glm::ivec2{WinSize.x / 2 - spacecing, WinSize.y / 2}, glm::ivec2{length, width}, color, radius);
+    crossLeft->SetAnchor({-1, 0});
+    crossRight = std::make_unique<SunsetEngine::Square>(glm::ivec2{WinSize.x / 2 + spacecing, WinSize.y / 2}, glm::ivec2{length, width}, color, radius);
+    crossRight->SetAnchor({1, 0});
 }
 
 InventoryLayer::~InventoryLayer()
 {
     ToolbarBox.reset();
+    crossTop.reset();
+    crossDown.reset();
+    crossLeft.reset();
+    crossRight.reset();
 }
 
 void InventoryLayer::OnUpdate(float dt)
@@ -57,13 +86,18 @@ void InventoryLayer::OnUpdate(float dt)
     if (!_scene)
         return;
 
-    for (auto& box : *ToolbarBox)
+    if (PrevToolSelected == _scene->currentSelectTool)
+        return;
+
+    PrevToolSelected = _scene->currentSelectTool;
+
+    for (const auto& box : *ToolbarBox)
     {
         box->SetSize({74, 74});
         //std::static_pointer_cast<SunsetEngine::Square>(box)->SetRadius(15.f);
     }
 
-    (*ToolbarBox)[_scene->currentSelectTool]->SetSize({84, 84});
+    (*ToolbarBox)[PrevToolSelected]->SetSize({84, 84});
     //std::static_pointer_cast<SunsetEngine::Square>((*ToolbarBox)[_scene->currentSelectTool])->SetRadius(30.f);
 }
 
@@ -71,27 +105,10 @@ void InventoryLayer::OnDraw()
 {
     ToolbarBox->Draw();
 
-    // int length = 15;
-    // int width = 5;
-    // int radius = 2;
-    // glm::vec4 color{1.0, 0.2, 0.2, 0.5};
-    // int spacecing = 2;
-    //
-    // glm::ivec2 WinSize = SunsetEngine::Application::GetSetting().WindowSize;
-    //
-    // SunsetEngine::Square crossTop{{WinSize.x / 2, WinSize.y / 2 - spacecing}, {width, length}, color, radius};
-    // crossTop.SetAnchor({0, -1});
-    // SunsetEngine::Square crossDown{{WinSize.x / 2, WinSize.y / 2 + spacecing}, {width, length}, color, radius};
-    // crossDown.SetAnchor({0, 1});
-    // SunsetEngine::Square crossLeft{{WinSize.x / 2 - spacecing, WinSize.y / 2}, {length, width}, color, radius};
-    // crossLeft.SetAnchor({-1, 0});
-    // SunsetEngine::Square crossRight{{WinSize.x / 2 + spacecing, WinSize.y / 2}, {length, width}, color, radius};
-    // crossRight.SetAnchor({1, 0});
-    //
-    // crossTop.Draw();
-    // crossDown.Draw();
-    // crossLeft.Draw();
-    // crossRight.Draw();
+    crossTop->Draw();
+    crossDown->Draw();
+    crossLeft->Draw();
+    crossRight->Draw();
     //
     // if (!DrawInventory)
     //     return;

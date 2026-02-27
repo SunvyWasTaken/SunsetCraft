@@ -23,9 +23,7 @@ struct CraftScene
 
     void LineTrace(RaycastHit& hit, const glm::vec3& start, const glm::vec3& forward, float distance);
 
-private:
-
-    bool PlaceBlock(const SunsetEngine::Event::Action& action);
+    bool PlaceBlock(bool destroy);
 
 public:
 

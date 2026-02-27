@@ -46,7 +46,16 @@ bool GameLayer::OnEvent(SunsetEngine::Event::Type& event)
 
                 return true;
             }
-            return false;
+
+            if (e.action != SunsetEngine::Event::Action::Press)
+                return false;
+
+            if (e.button == 0)
+                m_craftScene->PlaceBlock(true);
+            else if (e.button == 1)
+                m_craftScene->PlaceBlock(false);
+
+            return true;
         }
     }, event);
 }

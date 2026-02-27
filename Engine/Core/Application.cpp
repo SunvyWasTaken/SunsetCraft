@@ -49,7 +49,7 @@ namespace
                 sommeDt += dt;
             }
             sommeDt /= dts.size();
-            PRINTSCREEN("dts : {}", 1.f/sommeDt);
+            PRINTSCREEN("FPS : {}", 1.f/sommeDt);
         }
 
         void Add(const float dt)

@@ -151,7 +151,12 @@ namespace
         std::shared_ptr<SunsetEngine::Material> currentMaterial = nullptr;
         GLuint currentVAO = 0;
 
-        for (DrawCommand& cmd : m_DrawCommands)
+        // glEnable(GL_DEPTH_TEST);
+        // glDepthMask(GL_TRUE);
+        // glDepthFunc(GL_LESS);
+        // glDepthRange(0.0, 1.0);
+
+        for (const  DrawCommand& cmd : m_DrawCommands)
         {
             ApplyState(cmd.state);
 
@@ -207,6 +212,8 @@ namespace SunsetEngine
 
     void RenderCommande::EndFrame()
     {
+        FlushDrawCommand();
+
         if (!PrintScreen::Get().empty())
         {
             ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
@@ -218,8 +225,6 @@ namespace SunsetEngine
             ImGui::End();
             PrintScreen::Clear();
         }
-
-        FlushDrawCommand();
 
         ImGui::Render();
 

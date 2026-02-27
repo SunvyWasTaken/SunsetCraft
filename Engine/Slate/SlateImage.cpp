@@ -58,12 +58,12 @@ namespace SunsetEngine
         m_Drawable->m_Material->Set("u_Proj", glm::ortho(0.0f, (float)WindowSize.x, (float)WindowSize.y, 0.0f, -1.0f, 1.0f));
 
         m_Drawable->m_RenderState.depthTest = false;
-        m_Drawable->m_RenderState.depthWrite = false;
-        m_Drawable->m_RenderState.blending = true;
-        m_Drawable->m_RenderState.src = BlendFactor::SrcAlpha;
-        m_Drawable->m_RenderState.dest = BlendFactor::OneMinusSrcAlpha;
+        m_Drawable->m_RenderState.depthWrite = true;
+        // m_Drawable->m_RenderState.blending = true;
+        // m_Drawable->m_RenderState.src = BlendFactor::SrcAlpha;
+        // m_Drawable->m_RenderState.dest = BlendFactor::OneMinusSrcAlpha;
         m_Drawable->m_RenderState.cullMode = CullMode::None;
-        m_Drawable->m_RenderState.primitiveType = PrimitiveType::Triangles;
+        // m_Drawable->m_RenderState.primitiveType = PrimitiveType::Triangles;
         m_Drawable->m_RenderState.HasIndice = false;
     }
 
