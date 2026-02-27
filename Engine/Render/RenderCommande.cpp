@@ -38,24 +38,6 @@ namespace
         SunsetEngine::RenderState state;
     };
 
-    struct HeapTest
-    {
-        std::chrono::steady_clock::time_point start;
-        const std::string name;
-        explicit HeapTest(const std::string_view& _name)
-            : name(_name)
-        {
-            start = std::chrono::steady_clock::now();
-        }
-
-        ~HeapTest()
-        {
-            const auto end = std::chrono::steady_clock::now();
-            const auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-            PRINTSCREEN("{} : {}ms", name, duration.count());
-        }
-    };
-
     // to change from just a vector to a 2 vector.
     std::vector<DrawCommand> m_DrawCommands;
 

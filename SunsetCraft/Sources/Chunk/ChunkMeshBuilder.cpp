@@ -87,7 +87,10 @@ void ChunkMeshBuilder::Build(Chunk &chunk)
     CreateMesh(chunk.GetBlocks(), vertices);
 
     if (vertices.empty())
+    {
+        chunk.bIsDirty = false;
         return;
+    }
 
     std::shared_ptr<SunsetEngine::VertexBuffer> vbo = std::make_shared<SunsetEngine::VertexBuffer>(vertices.data(), vertices.size(), sizeof(uint32_t));
 
